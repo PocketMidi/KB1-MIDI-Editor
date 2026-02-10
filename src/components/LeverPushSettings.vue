@@ -25,12 +25,12 @@
 
       <div class="group">
         <label :for="`push-maxCCValue-${lever}`">CC Max</label>
-        <input type="number" :id="`push-maxCCValue-${lever}`" v-model.number="model.maxCCValue" />
+        <input type="number" :id="`push-maxCCValue-${lever}`" v-model.number="model.maxCCValue" min="0" max="127" />
       </div>
 
       <div class="group">
         <label :for="`push-minCCValue-${lever}`">CC Min</label>
-        <input type="number" :id="`push-minCCValue-${lever}`" v-model.number="model.minCCValue" />
+        <input type="number" :id="`push-minCCValue-${lever}`" v-model.number="model.minCCValue" min="0" max="127" />
       </div>
 
       <div class="group">
@@ -43,7 +43,7 @@
       <div class="group">
         <label :for="`push-onsetTime-${lever}`">Attack Time</label>
         <div class="number-with-unit">
-          <input type="number" :id="`push-onsetTime-${lever}`" v-model.number="model.onsetTime" />
+          <input type="number" :id="`push-onsetTime-${lever}`" v-model.number="model.onsetTime" min="0" max="10000" step="10" />
           <span>ms</span>
         </div>
       </div>
@@ -58,7 +58,7 @@
       <div class="group">
         <label :for="`push-offsetTime-${lever}`">Decay Time</label>
         <div class="number-with-unit">
-          <input type="number" :id="`push-offsetTime-${lever}`" v-model.number="model.offsetTime" />
+          <input type="number" :id="`push-offsetTime-${lever}`" v-model.number="model.offsetTime" min="0" max="10000" step="10" />
           <span>ms</span>
         </div>
       </div>

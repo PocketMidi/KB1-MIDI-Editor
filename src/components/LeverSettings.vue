@@ -32,17 +32,17 @@
 
       <div class="group">
         <label :for="`lever-stepSize-${lever}`">Steps</label>
-        <input type="number" :id="`lever-stepSize-${lever}`" v-model.number="model.stepSize" />
+        <input type="number" :id="`lever-stepSize-${lever}`" v-model.number="model.stepSize" min="1" max="127" />
       </div>
 
       <div class="group">
         <label :for="`lever-maxCCValue-${lever}`">CC Max</label>
-        <input type="number" :id="`lever-maxCCValue-${lever}`" v-model.number="model.maxCCValue" />
+        <input type="number" :id="`lever-maxCCValue-${lever}`" v-model.number="model.maxCCValue" min="0" max="127" />
       </div>
 
       <div class="group">
         <label :for="`lever-minCCValue-${lever}`">CC Min</label>
-        <input type="number" :id="`lever-minCCValue-${lever}`" v-model.number="model.minCCValue" />
+        <input type="number" :id="`lever-minCCValue-${lever}`" v-model.number="model.minCCValue" min="0" max="127" />
       </div>
 
       <div class="group">
@@ -55,7 +55,7 @@
       <div class="group">
         <label :for="`lever-onsetTime-${lever}`">Attack Time</label>
         <div class="number-with-unit">
-          <input type="number" :id="`lever-onsetTime-${lever}`" v-model.number="model.onsetTime" />
+          <input type="number" :id="`lever-onsetTime-${lever}`" v-model.number="model.onsetTime" min="0" max="10000" step="10" />
           <span>ms</span>
         </div>
       </div>
@@ -70,7 +70,7 @@
       <div class="group">
         <label :for="`lever-offsetTime-${lever}`">Decay Time</label>
         <div class="number-with-unit">
-          <input type="number" :id="`lever-offsetTime-${lever}`" v-model.number="model.offsetTime" />
+          <input type="number" :id="`lever-offsetTime-${lever}`" v-model.number="model.offsetTime" min="0" max="10000" step="10" />
           <span>ms</span>
         </div>
       </div>

@@ -25,12 +25,12 @@
 
       <div class="group">
         <label for="touch-maxCCValue">CC Max</label>
-        <input type="number" id="touch-maxCCValue" v-model.number="model.maxCCValue" />
+        <input type="number" id="touch-maxCCValue" v-model.number="model.maxCCValue" min="0" max="127" />
       </div>
 
       <div class="group">
         <label for="touch-minCCValue">CC Min</label>
-        <input type="number" id="touch-minCCValue" v-model.number="model.minCCValue" />
+        <input type="number" id="touch-minCCValue" v-model.number="model.minCCValue" min="0" max="127" />
       </div>
     </div>
   </div>

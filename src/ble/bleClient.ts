@@ -6,11 +6,12 @@
  * connecting, disconnecting, and sending/receiving data.
  */
 
-// Standard MIDI over BLE UUIDs (MIDI BLE specification)
-// Service UUID: MIDI Service
-const KB1_SERVICE_UUID = '03b80e5a-ede8-4b33-a751-6ce34ec4c700';
-// Characteristic UUID: MIDI I/O Characteristic
-const KB1_CHARACTERISTIC_UUID = '7772e5db-3868-4112-a1a9-f2669d106bf3';
+// KB1-specific BLE UUIDs (custom, not standard MIDI BLE)
+// These UUIDs are defined in the KB1 firmware (firmware/src/objects/Constants.h)
+// Service UUID: KB1 custom service
+const KB1_SERVICE_UUID = 'f22b99e8-81ab-4e46-abff-79a74a1f2ff3';
+// Characteristic UUID: KB1 MIDI I/O Characteristic
+const KB1_CHARACTERISTIC_UUID = 'eb58b31b-d963-4c7d-9a11-e8aabec2fe32';
 
 export interface BLEConnectionStatus {
   connected: boolean;
@@ -59,7 +60,7 @@ export class BLEClient {
 
     try {
       // Request device with KB1 service filter
-      // Using MIDI BLE service UUID to find compatible devices
+      // Using KB1-specific custom service UUID
       this.device = await navigator.bluetooth.requestDevice({
         filters: [
           { namePrefix: 'KB1' },
@@ -78,7 +79,7 @@ export class BLEClient {
       // Connect to GATT server
       this.server = await this.device.gatt!.connect();
 
-      // Get MIDI service using standard BLE-MIDI service UUID
+      // Get KB1 custom service using KB1-specific service UUID
       const service = await this.server.getPrimaryService(KB1_SERVICE_UUID);
 
       // Get MIDI I/O characteristic for read/write

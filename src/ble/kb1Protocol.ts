@@ -147,6 +147,7 @@ export class KB1Protocol {
     // TODO: Implement actual KB1 protocol encoding for setting device settings
     // This method should encode all settings (lever1, leverPush1, lever2, leverPush2, touch, scale)
     // into the binary format expected by the KB1 device
+    console.log('TODO: Encode settings:', settings); // Placeholder to avoid unused param error
     const buffer = new ArrayBuffer(128); // Placeholder size, adjust based on actual protocol
     const view = new DataView(buffer);
     view.setUint8(0, KB1MessageType.SET_SETTINGS);

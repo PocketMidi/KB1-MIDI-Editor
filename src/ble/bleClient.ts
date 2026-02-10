@@ -6,9 +6,11 @@
  * connecting, disconnecting, and sending/receiving data.
  */
 
-// TODO: Replace these placeholder UUIDs with actual KB1 service and characteristic UUIDs
-const KB1_SERVICE_UUID = '00000000-0000-0000-0000-000000000000'; // TODO: Update with actual UUID
-const KB1_CHARACTERISTIC_UUID = '00000000-0000-0000-0000-000000000000'; // TODO: Update with actual UUID
+// Standard MIDI over BLE UUIDs (MIDI BLE specification)
+// Service UUID: MIDI Service
+const KB1_SERVICE_UUID = '03b80e5a-ede8-4b33-a751-6ce34ec4c700';
+// Characteristic UUID: MIDI I/O Characteristic
+const KB1_CHARACTERISTIC_UUID = '7772e5db-3868-4112-a1a9-f2669d106bf3';
 
 export interface BLEConnectionStatus {
   connected: boolean;
@@ -57,14 +59,13 @@ export class BLEClient {
 
     try {
       // Request device with KB1 service filter
-      // TODO: Update filters when KB1 service UUID is known
+      // Using MIDI BLE service UUID to find compatible devices
       this.device = await navigator.bluetooth.requestDevice({
-        // acceptAllDevices: true, // For testing - remove in production
         filters: [
-          { namePrefix: 'KB1' }, // TODO: Update with actual device name prefix
-          // { services: [KB1_SERVICE_UUID] } // Uncomment when UUID is known
+          { namePrefix: 'KB1' },
+          { services: [KB1_SERVICE_UUID] }
         ],
-        optionalServices: [KB1_SERVICE_UUID] // TODO: Update with actual service UUID
+        optionalServices: [KB1_SERVICE_UUID]
       });
 
       if (!this.device) {
@@ -77,12 +78,10 @@ export class BLEClient {
       // Connect to GATT server
       this.server = await this.device.gatt!.connect();
 
-      // Get KB1 service
-      // TODO: Update service UUID when known
+      // Get MIDI service using standard BLE-MIDI service UUID
       const service = await this.server.getPrimaryService(KB1_SERVICE_UUID);
 
-      // Get characteristic for read/write
-      // TODO: Update characteristic UUID when known
+      // Get MIDI I/O characteristic for read/write
       this.characteristic = await service.getCharacteristic(KB1_CHARACTERISTIC_UUID);
 
       // Start notifications if supported

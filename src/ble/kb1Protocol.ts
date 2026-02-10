@@ -331,7 +331,7 @@ export class KB1Protocol {
       settings.leverPush2 !== undefined &&
       settings.touch !== undefined &&
       settings.scale !== undefined &&
-      // Validate CC numbers are in valid range
+      // Validate CC numbers are in valid range (-1 for "Off" or 0-127 for valid CC)
       this.isValidCC(settings.lever1.ccNumber) &&
       this.isValidCC(settings.lever2.ccNumber) &&
       this.isValidCC(settings.leverPush1.ccNumber) &&
@@ -341,10 +341,10 @@ export class KB1Protocol {
   }
 
   /**
-   * Check if CC number is valid
+   * Check if CC number is valid (-1 for "Off" or 0-127)
    */
   private isValidCC(ccNumber: number): boolean {
-    return ccNumber >= 0 && ccNumber <= 127;
+    return ccNumber === -1 || (ccNumber >= 0 && ccNumber <= 127);
   }
 }
 

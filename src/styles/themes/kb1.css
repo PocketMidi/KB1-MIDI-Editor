@@ -1,0 +1,150 @@
+/**
+ * KB1 Theme - Designer-friendly CSS variables
+ * 
+ * To update visuals:
+ * 1. Export assets from Figma to src/assets/ui/
+ * 2. Update the URLs in this file to reference new assets
+ * 3. No code changes needed - components automatically pick up new visuals
+ */
+
+.theme-kb1 {
+  /* ===== Panel Backgrounds ===== */
+  /* These would reference Figma-exported images for each settings section */
+  --lever-panel-bg: url('/src/assets/ui/lever-panel.svg');
+  --lever-push-panel-bg: url('/src/assets/ui/lever-push-panel.svg');
+  --touch-panel-bg: url('/src/assets/ui/touch-panel.svg');
+  --scale-panel-bg: url('/src/assets/ui/scale-panel.svg');
+  
+  /* ===== Fader Elements ===== */
+  /* Designers can export specific fader track and thumb images */
+  --fader-track-bg: url('/src/assets/ui/fader-track.svg');
+  --fader-thumb-bg: url('/src/assets/ui/fader-thumb.svg');
+  --fader-track-height: 200px;
+  --fader-thumb-size: 24px;
+  
+  /* ===== Button States ===== */
+  /* Primary buttons (Apply, Save, etc.) */
+  --btn-primary-bg: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  --btn-primary-bg-hover: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  --btn-primary-bg-disabled: #1e3a5f;
+  --btn-primary-color: #ffffff;
+  --btn-primary-color-disabled: #94a3b8;
+  
+  /* Secondary buttons (Load, Reset, etc.) */
+  --btn-secondary-bg: var(--color-background-mute);
+  --btn-secondary-bg-hover: var(--color-background-soft);
+  --btn-secondary-bg-disabled: var(--color-background-mute);
+  --btn-secondary-color: var(--color-text);
+  --btn-secondary-color-disabled: var(--color-text-muted);
+  --btn-secondary-border: 1px solid var(--color-border);
+  
+  /* ===== Color Tokens (from design system) ===== */
+  --kb1-color-primary: #3b82f6;
+  --kb1-color-primary-hover: #2563eb;
+  --kb1-color-primary-active: #1d4ed8;
+  
+  --kb1-color-accent: #8b5cf6;
+  --kb1-color-accent-hover: #7c3aed;
+  
+  --kb1-color-success: #10b981;
+  --kb1-color-warning: #f59e0b;
+  --kb1-color-error: #ef4444;
+  
+  /* ===== Typography ===== */
+  --kb1-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --kb1-font-size-xs: 0.75rem;
+  --kb1-font-size-sm: 0.875rem;
+  --kb1-font-size-base: 1rem;
+  --kb1-font-size-lg: 1.125rem;
+  --kb1-font-size-xl: 1.25rem;
+  --kb1-font-size-2xl: 1.5rem;
+  
+  /* ===== Spacing ===== */
+  --kb1-spacing-xs: 0.25rem;
+  --kb1-spacing-sm: 0.5rem;
+  --kb1-spacing-md: 1rem;
+  --kb1-spacing-lg: 1.5rem;
+  --kb1-spacing-xl: 2rem;
+  --kb1-spacing-2xl: 3rem;
+  
+  /* ===== Border Radius ===== */
+  --kb1-radius-sm: 4px;
+  --kb1-radius-md: 6px;
+  --kb1-radius-lg: 8px;
+  --kb1-radius-xl: 12px;
+  --kb1-radius-full: 9999px;
+  
+  /* ===== Settings Panel Styling ===== */
+  --settings-panel-padding: 1.5rem;
+  --settings-panel-gap: 1rem;
+  --settings-panel-bg: var(--color-background-soft);
+  --settings-panel-border: 1px solid var(--color-border);
+  --settings-panel-radius: var(--kb1-radius-lg);
+  
+  /* ===== Input Styling ===== */
+  --input-bg: var(--color-background);
+  --input-border: 1px solid var(--color-border);
+  --input-border-focus: 1px solid var(--kb1-color-primary);
+  --input-radius: var(--kb1-radius-md);
+  --input-padding: 0.75rem;
+  --input-color: var(--color-text);
+  
+  /* ===== Select/Dropdown Styling ===== */
+  --select-bg: var(--color-background);
+  --select-border: 1px solid var(--color-border);
+  --select-border-focus: 1px solid var(--kb1-color-primary);
+  --select-radius: var(--kb1-radius-md);
+  --select-padding: 0.75rem;
+  --select-color: var(--color-text);
+  
+  /* ===== Label Styling ===== */
+  --label-color: var(--color-text);
+  --label-font-size: var(--kb1-font-size-sm);
+  --label-font-weight: 500;
+  
+  /* ===== Title Block Styling ===== */
+  --title-color: var(--color-text);
+  --title-font-size: var(--kb1-font-size-xl);
+  --title-font-weight: 600;
+  --title-cc-color: var(--kb1-color-primary);
+  --title-cc-bg: rgba(59, 130, 246, 0.1);
+  --title-cc-padding: 0.5rem 1rem;
+  --title-cc-radius: var(--kb1-radius-md);
+}
+
+/* ===== Helper: Fallback for missing images ===== */
+/* If designer hasn't exported an image yet, show a gradient placeholder */
+.theme-kb1 .settings-lever,
+.theme-kb1 .settings-leverpush,
+.theme-kb1 .settings-touch,
+.theme-kb1 .settings-scale {
+  background: var(--settings-panel-bg);
+  border: var(--settings-panel-border);
+  border-radius: var(--settings-panel-radius);
+  padding: var(--settings-panel-padding);
+}
+
+/* Individual panel background images (when provided) */
+.theme-kb1 .settings-lever {
+  /* background-image: var(--lever-panel-bg); */
+  background-size: cover;
+  background-position: center;
+}
+
+.theme-kb1 .settings-leverpush {
+  /* background-image: var(--lever-push-panel-bg); */
+  background-size: cover;
+  background-position: center;
+}
+
+.theme-kb1 .settings-touch {
+  /* background-image: var(--touch-panel-bg); */
+  background-size: cover;
+  background-position: center;
+}
+
+.theme-kb1 .settings-scale {
+  /* background-image: var(--scale-panel-bg); */
+  background-size: cover;
+  background-position: center;
+}

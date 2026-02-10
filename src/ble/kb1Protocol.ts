@@ -131,7 +131,8 @@ export class KB1Protocol {
    * Encode a request to get device settings
    */
   encodeGetSettings(): ArrayBuffer {
-    // TODO: Implement actual KB1 protocol encoding
+    // TODO: Implement actual KB1 protocol encoding for getting settings
+    // This method should encode a request to retrieve all device settings from the KB1
     const buffer = new ArrayBuffer(2);
     const view = new DataView(buffer);
     view.setUint8(0, KB1MessageType.GET_SETTINGS);
@@ -156,7 +157,8 @@ export class KB1Protocol {
    * Encode a save command to persist settings to flash
    */
   encodeSaveToFlash(): ArrayBuffer {
-    // TODO: Implement actual KB1 protocol encoding
+    // TODO: Implement actual KB1 protocol encoding for save to flash command
+    // This method should encode a command to save current RAM settings to flash memory
     const buffer = new ArrayBuffer(2);
     const view = new DataView(buffer);
     view.setUint8(0, KB1MessageType.SAVE_TO_FLASH);
@@ -223,6 +225,62 @@ export class KB1Protocol {
       channel: 1,
       minValue: 0,
       maxValue: 127,
+    };
+  }
+
+  /**
+   * Create default lever settings
+   */
+  createDefaultLeverSettings(): LeverModel {
+    return {
+      ccNumber: 1,
+      minCCValue: 0,
+      maxCCValue: 127,
+      stepSize: 1,
+      functionMode: 0,
+      valueMode: 0,
+      onsetTime: 0,
+      offsetTime: 0,
+      onsetType: 0,
+      offsetType: 0,
+    };
+  }
+
+  /**
+   * Create default lever push settings
+   */
+  createDefaultLeverPushSettings(): LeverPushModel {
+    return {
+      ccNumber: 2,
+      minCCValue: 0,
+      maxCCValue: 127,
+      functionMode: 0,
+      onsetTime: 0,
+      offsetTime: 0,
+      onsetType: 0,
+      offsetType: 0,
+    };
+  }
+
+  /**
+   * Create default touch sensor settings
+   */
+  createDefaultTouchSettings(): TouchModel {
+    return {
+      ccNumber: 3,
+      minCCValue: 0,
+      maxCCValue: 127,
+      functionMode: 0,
+    };
+  }
+
+  /**
+   * Create default scale settings
+   */
+  createDefaultScaleSettings(): ScaleModel {
+    return {
+      scaleType: 0, // Chromatic
+      rootNote: 0, // C
     };
   }
 
@@ -357,6 +415,13 @@ export class KB1Protocol {
       settings.touch !== undefined && validateTouch(settings.touch) &&
       settings.scale !== undefined && validateScale(settings.scale)
     );
+  }
+
+  /**
+   * Check if CC number is valid (-1 for "Off" or 0-127)
+   */
+  private isValidCC(ccNumber: number): boolean {
+    return ccNumber === -1 || (ccNumber >= 0 && ccNumber <= 127);
   }
 }
 

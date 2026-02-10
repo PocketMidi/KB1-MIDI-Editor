@@ -4,6 +4,7 @@ import ConnectionStatus from './components/ConnectionStatus.vue';
 import MidiEditor from './pages/MidiEditor.vue';
 import DeviceSettings from './pages/DeviceSettings.vue';
 import { useDeviceState } from './composables/useDeviceState';
+import './styles/themes/kb1.css';
 
 const { 
   isBluetoothAvailable, 
@@ -36,7 +37,7 @@ async function handleDisconnect() {
 </script>
 
 <template>
-  <div class="app">
+  <div class="app theme-kb1">
     <header class="app-header">
       <div class="header-content">
         <div class="logo-section">

@@ -2,11 +2,11 @@
   <div class="device-settings-page">
     <div class="page-header">
       <h2>Device Settings</h2>
-      <p>Configure KB1 device settings</p>
+      <p>Configure KB1 lever, touch, and scale settings</p>
     </div>
     
     <div v-if="!isConnected" class="not-connected-message">
-      <p>Please connect to your KB1 device to view settings.</p>
+      <p>Please connect to your KB1 device to view and configure settings.</p>
     </div>
     
     <div v-else class="settings-content">
@@ -283,15 +283,17 @@ async function handleSave() {
   justify-content: flex-end;
   padding-top: 1rem;
   border-top: 1px solid var(--color-border);
+  flex-wrap: wrap;
 }
 
 .btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--kb1-radius-md, 6px);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .btn:disabled {
@@ -300,21 +302,35 @@ async function handleSave() {
 }
 
 .btn-primary {
-  background: #3b82f6;
-  color: white;
+  background: var(--btn-primary-bg, #3b82f6);
+  color: var(--btn-primary-color, white);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2563eb;
+  background: var(--btn-primary-bg-hover, #2563eb);
 }
 
 .btn-secondary {
-  background: var(--color-background-mute);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
+  background: var(--btn-secondary-bg, var(--color-background-mute));
+  color: var(--btn-secondary-color, var(--color-text));
+  border: var(--btn-secondary-border, 1px solid var(--color-border));
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--color-background-soft);
+  background: var(--btn-secondary-bg-hover, var(--color-background-soft));
+}
+
+@media (max-width: 768px) {
+  .device-settings-page {
+    padding: 1rem;
+  }
+
+  .action-bar {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
 }
 </style>

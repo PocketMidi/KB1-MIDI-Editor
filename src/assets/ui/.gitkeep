@@ -1,0 +1,13 @@
+# UI Assets Directory
+
+This directory contains visual assets exported from Figma for the KB1 theme.
+
+## Expected Files (to be added by designer):
+- lever-panel.svg
+- lever-push-panel.svg
+- touch-panel.svg
+- scale-panel.svg
+- fader-track.svg
+- fader-thumb.svg
+
+See DESIGNER_WORKFLOW.md for instructions on adding and updating assets.

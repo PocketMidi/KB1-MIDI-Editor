@@ -87,10 +87,22 @@ function normalizeParameterName(name: string): string {
 }
 
 /**
- * Normalize category name (remove embedded newlines)
+ * Normalize category name (remove embedded newlines and convert to Title Case)
+ * Converts CSV category names to consistent Title Case format:
+ * - "GLOBAL" -> "Global"
+ * - "VOLUME" -> "Volume"
+ * - "WAVETABLE\nPosition" -> "Wavetable Position"
  */
 function normalizeCategoryName(name: string): string {
-  return name.replace(/\s*\n\s*/g, ' ').trim();
+  // Remove embedded newlines and trim
+  const cleaned = name.replace(/\s*\n\s*/g, ' ').trim();
+  
+  // Convert to Title Case
+  return cleaned
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 /**

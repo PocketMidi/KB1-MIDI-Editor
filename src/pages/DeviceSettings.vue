@@ -46,7 +46,7 @@
         </button>
       </div>
       
-      <div class="settings-sections">
+      <div v-if="isCCMapLoaded()" class="settings-sections">
         <LeverSettings
           title="Lever"
           :lever="1"

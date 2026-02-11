@@ -224,11 +224,11 @@ export function getCCGroups(): CCGroup[] {
 
 /**
  * Category overrides for factory default CCs
- * These CCs should appear under "Global" category for UI purposes
- * Note: CC 24 (Release) is in the Volume category in the CSV but should appear in Global for factory defaults
+ * These CCs should appear under different categories for UI purposes if needed
+ * Currently empty - all CCs use their CSV-defined categories
  */
 const FACTORY_DEFAULT_CATEGORY_OVERRIDES: Record<number, string> = {
-  24: 'Global',  // Release (Volume category) - override to Global for factory defaults
+  // No overrides - use CSV categories
 };
 
 /**

@@ -289,13 +289,19 @@ async function handleSaveToDevice() {
   try {
     // First apply the settings to the device RAM
     await sendSettings(localSettings.value);
+    
     // Then persist to flash memory
-    await saveToFlash();
-    hasChanges.value = false;
-    alert('Settings saved to device successfully');
+    try {
+      await saveToFlash();
+      hasChanges.value = false;
+      alert('Settings saved to device successfully');
+    } catch (flashError) {
+      console.error('Failed to save to flash after applying to RAM:', flashError);
+      alert('Settings applied to device RAM but failed to save to flash memory. Settings will be lost on power cycle.');
+    }
   } catch (error) {
-    console.error('Failed to save settings:', error);
-    alert('Failed to save settings to device');
+    console.error('Failed to apply settings to device:', error);
+    alert('Failed to apply settings to device');
   }
 }
 </script>

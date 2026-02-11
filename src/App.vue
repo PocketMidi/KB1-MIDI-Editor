@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import ConnectionStatus from './components/ConnectionStatus.vue';
 import MidiEditor from './pages/MidiEditor.vue';
 import DeviceSettings from './pages/DeviceSettings.vue';
+import LandingPage from './pages/LandingPage.vue';
 import { useDeviceState } from './composables/useDeviceState';
 import './styles/themes/kb1.css';
 
@@ -16,7 +17,7 @@ const {
   isLoading 
 } = useDeviceState();
 
-type Tab = 'midi-editor' | 'device-settings';
+type Tab = 'midi-editor' | 'device-settings' | 'live-sliders';
 const activeTab = ref<Tab>('midi-editor');
 
 async function handleConnect() {
@@ -84,7 +85,14 @@ async function handleDisconnect() {
         :class="{ active: activeTab === 'midi-editor' }"
         @click="activeTab = 'midi-editor'"
       >
-        SLIDERS
+        FADERS
+      </button>
+      <button 
+        class="nav-tab"
+        :class="{ active: activeTab === 'live-sliders' }"
+        @click="activeTab = 'live-sliders'"
+      >
+        LIVE SLIDERS
       </button>
       <button 
         class="nav-tab"
@@ -97,6 +105,7 @@ async function handleDisconnect() {
     
     <main class="app-main">
       <MidiEditor v-if="activeTab === 'midi-editor'" />
+      <LandingPage v-if="activeTab === 'live-sliders'" />
       <DeviceSettings v-if="activeTab === 'device-settings'" />
     </main>
     

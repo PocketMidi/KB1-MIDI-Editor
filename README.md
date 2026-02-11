@@ -5,6 +5,15 @@ KB1 MIDI Editor is a browser-based configuration tool for the PocketMidi KB1 dev
 ## Features
 
 - 🎹 **MIDI Editor** - Configure CC mappings for each fader
+- 🎚️ **Live Sliders** - Real-time BLE MIDI control with vertical sliders
+  - Select parameters from 10 preset controls (Volume, Panning, Tune, Filters, Effects)
+  - Lock/unlock individual sliders
+  - Center bipolar values with double-click
+  - Fine control mode with Shift key
+  - A/B/C/D snapshot slots for instant recall
+  - Group Morph between two captured states with per-parameter weights
+  - Live Performance fullscreen mode (toggle with F key, exit with Esc)
+  - Advanced per-parameter settings (curve, invert, mode)
 - ⚙️ **Device Settings** - Customize device name, MIDI channel, brightness
 - 📡 **Web Bluetooth** - Wireless connection using Web Bluetooth API
 - 🔒 **HTTPS Ready** - Compatible with GitHub Pages deployment
@@ -27,12 +36,24 @@ src/
 │   └── kb1Protocol.ts     # KB1 device protocol encoding/decoding
 ├── components/
 │   ├── ConnectionStatus.vue  # Connection status indicator
-│   └── CCMappingCard.vue    # CC mapping configuration card
+│   ├── CCMappingCard.vue    # CC mapping configuration card
+│   ├── SettingsPanel.vue    # Parameter selection and configuration
+│   ├── SlidersPanel.vue     # Real-time slider grid
+│   ├── SliderControl.vue    # Individual vertical slider
+│   ├── SnapshotBar.vue      # A/B/C/D snapshot management
+│   └── GroupMorph.vue       # Group morphing between states
 ├── pages/
 │   ├── MidiEditor.vue       # MIDI editor page
-│   └── DeviceSettings.vue   # Device settings page
+│   ├── DeviceSettings.vue   # Device settings page
+│   └── LandingPage.vue      # Live Sliders page
+├── services/
+│   └── midiBle.ts           # BLE MIDI real-time control
+├── state/
+│   └── presets.ts           # Snapshot persistence
 ├── composables/
 │   └── useDeviceState.ts    # Central device state management
+├── styles/
+│   └── slider.css           # Slider visual styles
 ├── App.vue                   # Main application component
 └── main.ts                   # Application entry point
 ```
@@ -92,13 +113,57 @@ npm run preview
 2. Select your KB1 device from the browser's Bluetooth pairing dialog
 3. Once connected, the status indicator will turn green
 
-### MIDI Editor
+### MIDI Editor (Faders Tab)
 
 - Configure CC numbers, MIDI channels, and value ranges for each fader
 - Click "Load from Device" to fetch current settings
 - Make your changes in the UI
 - Click "Apply to Device" to send changes to the KB1
 - Click "Save to Flash" to persist settings on the device
+
+### Live Sliders
+
+The Live Sliders interface provides real-time MIDI CC control with an intuitive visual interface:
+
+**Getting Started:**
+1. Navigate to the "LIVE SLIDERS" tab
+2. In the Settings panel (left), check the parameters you want to control
+3. Sliders appear instantly in the main panel (right)
+4. Click "Connect KB1" to establish real-time BLE MIDI connection
+
+**Slider Features:**
+- **Real-time Control**: Move sliders to send MIDI CC messages instantly
+- **Lock/Unlock**: Click 🔓/🔒 button to prevent accidental changes
+- **Center**: Double-click slider or click ⊙ button to center bipolar values
+- **Fine Control**: Hold Shift while adjusting for fine-grained control
+- **Color-coded**: Each parameter has a unique color for easy identification
+
+**Snapshots:**
+- **A/B/C/D Slots**: Save up to 4 snapshot presets
+- **Save**: Click "Save A/B/C/D" to store current slider positions
+- **Recall**: Click "Recall A/B/C/D" to restore saved positions
+- **Last**: Use "Save Snapshot" / "Reset to Previous" for quick undo
+
+**Group Morph:**
+- **Capture A**: Save current state as morph point A
+- **Capture B**: Save current state as morph point B
+- **Morph Slider**: Smoothly interpolate between A and B
+- **Per-Parameter Weights**: Advanced settings allow different morph amounts per parameter
+
+**Live Performance Mode:**
+- **Enter**: Click "Enter Live Mode" button or press **F** key
+- **Fullscreen**: Hides settings panel, maximizes sliders for performance
+- **Exit**: Click "Exit" pill button or press **Esc** key
+- **Toggle**: Press **F** to quickly toggle Live Mode on/off
+
+**Advanced Settings:**
+- Expand parameter details to configure:
+  - **Curve**: Linear, Log, or Exp response
+  - **Invert**: Reverse slider direction
+  - **Mode**: Unipolar (0-max) or Bipolar (-max to +max)
+  - **Morph Amount**: Control per-parameter morphing weight (0-1)
+
+**Note**: Live Sliders are real-time controls only. There is no "load from device" - all changes are sent immediately.
 
 ### Device Settings
 

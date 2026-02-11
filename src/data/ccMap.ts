@@ -112,9 +112,11 @@ function normalizeCategoryName(name: string): string {
 function getRowKeys(firstRow: any): { ccKey: string; paramKey: string; rangeKey: string } {
   const keys = Object.keys(firstRow);
   
-  // Find the CC Number column - could be "Category & CC Number", "Category \n& CC Number", "CC Number", etc.
+  // Find the CC Number column - prioritize "cc number" matches first
+  // to avoid matching a standalone "Category" column
   const ccKey = keys.find(key => 
-    key.toLowerCase().includes('cc number') || 
+    key.toLowerCase().includes('cc number')
+  ) || keys.find(key =>
     key.toLowerCase().includes('category')
   ) || keys[0] || 'CC Number';
   
@@ -206,8 +208,8 @@ async function parsePolyendCSV(csvText: string): Promise<void> {
           // Log each category with its CCs for verification
           console.log('Categories and CCs:');
           for (const group of newGroups) {
-            const ccNumbers = group.entries.map(e => e.ccNumber).join(', ');
-            console.log(`  ${group.category}: [${ccNumbers}]`);
+            const ccList = group.entries.map(e => e.ccNumber).join(', ');
+            console.log(`  ${group.category}: [${ccList}]`);
           }
           
           resolve();

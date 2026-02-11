@@ -121,8 +121,8 @@ const model = computed({
 
 const isValidCC = computed(() => model.value.ccNumber >= 0 && model.value.ccNumber <= 128)
 
-// Initialize selectedCategory from current ccNumber's category (fallback to "Global")
-const initialCategory = props.ccMapByNumber.get(model.value.ccNumber)?.category ?? 'Global'
+// Initialize selectedCategory from current ccNumber's category (fallback to "GLOBAL")
+const initialCategory = props.ccMapByNumber.get(model.value.ccNumber)?.category ?? 'GLOBAL'
 const selectedCategory = ref<string>(initialCategory)
 
 // Filter options by selected category

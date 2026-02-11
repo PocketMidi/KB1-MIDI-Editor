@@ -46,7 +46,10 @@
         </button>
       </div>
       
-      <div class="settings-sections">
+      <!-- Guard to ensure CC map is loaded before rendering settings sections.
+           This prevents race conditions where category data might not be available
+           during component initialization, which would cause blank category dropdowns. -->
+      <div v-if="isCCMapLoaded()" class="settings-sections">
         <LeverSettings
           title="Lever"
           :lever="1"

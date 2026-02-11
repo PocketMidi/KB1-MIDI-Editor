@@ -343,11 +343,11 @@ export class KB1Protocol {
         offsetType: InterpolationType.LINEAR,
       },
       lever2: {
-        ccNumber: 4,
-        minCCValue: 0,
+        ccNumber: 128,
+        minCCValue: 15,
         maxCCValue: 127,
-        stepSize: 1,
-        functionMode: 0, // Interpolated
+        stepSize: 8,
+        functionMode: 2, // Incremental
         valueMode: ValueMode.BIPOLAR,
         onsetTime: 100,
         offsetTime: 100,

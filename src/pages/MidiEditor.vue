@@ -23,11 +23,27 @@
       <div class="action-bar">
         <button
           class="btn btn-secondary"
-          @click="handleLoad"
+          @click="handleLoadClick"
           :disabled="isLoading"
         >
           <span v-if="isLoading">Loading...</span>
           <span v-else>Load from Device</span>
+        </button>
+        
+        <button
+          class="btn btn-secondary"
+          @click="handleRestoreSnapshot"
+          :disabled="isLoading"
+        >
+          Restore from Snapshot
+        </button>
+        
+        <button
+          class="btn btn-secondary"
+          @click="handleResetDefaults"
+          :disabled="isLoading"
+        >
+          Reset to Defaults
         </button>
         
         <button
@@ -62,20 +78,44 @@ const {
   isConnected,
   ccMappings,
   isLoading,
-  loadCCMappings,
   sendCCMapping,
   saveToFlash,
+  handleLoad,
+  recallBaseline,
+  resetToDefaults,
 } = useDeviceState();
 
 const hasChanges = ref(false);
 
-async function handleLoad() {
+async function handleLoadClick() {
   try {
-    await loadCCMappings();
+    await handleLoad();
     hasChanges.value = false;
   } catch (error) {
-    console.error('Failed to load CC mappings:', error);
-    alert('Failed to load CC mappings from device');
+    console.error('Failed to load from device:', error);
+    alert('Failed to load from device');
+  }
+}
+
+async function handleRestoreSnapshot() {
+  try {
+    recallBaseline();
+    hasChanges.value = false;
+  } catch (error) {
+    console.error('Failed to restore from snapshot:', error);
+    alert('No snapshot available to restore');
+  }
+}
+
+async function handleResetDefaults() {
+  if (confirm('Reset all settings to firmware defaults? This will discard current changes.')) {
+    try {
+      resetToDefaults();
+      hasChanges.value = true;
+    } catch (error) {
+      console.error('Failed to reset to defaults:', error);
+      alert('Failed to reset to defaults');
+    }
   }
 }
 
@@ -168,6 +208,7 @@ async function handleSave() {
   justify-content: flex-end;
   padding-top: 1rem;
   border-top: 1px solid var(--color-border);
+  flex-wrap: wrap;
 }
 
 .btn {

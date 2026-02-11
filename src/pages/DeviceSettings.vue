@@ -78,7 +78,7 @@
       <div class="action-bar">
         <button
           class="btn btn-secondary"
-          @click="handleLoad"
+          @click="handleLoadClick"
           :disabled="isLoading"
         >
           <span v-if="isLoading">Loading...</span>
@@ -87,10 +87,26 @@
         
         <button
           class="btn btn-secondary"
+          @click="handleRestoreSnapshot"
+          :disabled="isLoading"
+        >
+          Restore from Snapshot
+        </button>
+        
+        <button
+          class="btn btn-secondary"
+          @click="handleResetDefaults"
+          :disabled="isLoading"
+        >
+          Reset to Defaults
+        </button>
+        
+        <button
+          class="btn btn-secondary"
           @click="handleReset"
           :disabled="isLoading || !hasChanges"
         >
-          Reset
+          Reset Changes
         </button>
         
         <button
@@ -134,9 +150,11 @@ const {
   isConnected,
   deviceSettings,
   isLoading,
-  loadSettings,
   sendSettings,
   saveToFlash,
+  handleLoad,
+  recallBaseline,
+  resetToDefaults,
 } = useDeviceState();
 
 const localSettings = ref<DeviceSettings>({ ...deviceSettings.value });
@@ -245,14 +263,38 @@ function markChanged() {
   hasChanges.value = true;
 }
 
-async function handleLoad() {
+async function handleLoadClick() {
   try {
-    await loadSettings();
+    await handleLoad();
     localSettings.value = { ...deviceSettings.value };
     hasChanges.value = false;
   } catch (error) {
     console.error('Failed to load settings:', error);
     alert('Failed to load settings from device');
+  }
+}
+
+async function handleRestoreSnapshot() {
+  try {
+    recallBaseline();
+    localSettings.value = { ...deviceSettings.value };
+    hasChanges.value = false;
+  } catch (error) {
+    console.error('Failed to restore from snapshot:', error);
+    alert('No snapshot available to restore');
+  }
+}
+
+async function handleResetDefaults() {
+  if (confirm('Reset all settings to firmware defaults? This will discard current changes.')) {
+    try {
+      resetToDefaults();
+      localSettings.value = { ...deviceSettings.value };
+      hasChanges.value = true;
+    } catch (error) {
+      console.error('Failed to reset to defaults:', error);
+      alert('Failed to reset to defaults');
+    }
   }
 }
 

@@ -106,6 +106,34 @@ function normalizeCategoryName(name: string): string {
 }
 
 /**
+ * Detect the CSV column keys from the header row
+ * Supports both "Category & CC Number" and legacy "CC Number" headers
+ */
+function getRowKeys(firstRow: any): { ccKey: string; paramKey: string; rangeKey: string } {
+  const keys = Object.keys(firstRow);
+  
+  // Find the CC Number column - prioritize "cc number" matches first
+  // to avoid matching a standalone "Category" column
+  const ccKey = keys.find(key => 
+    key.toLowerCase().includes('cc number')
+  ) || keys.find(key =>
+    key.toLowerCase().includes('category')
+  ) || keys[0] || 'CC Number';
+  
+  // Find the Parameter column
+  const paramKey = keys.find(key => 
+    key.toLowerCase().includes('parameter')
+  ) || keys[1] || 'Parameter';
+  
+  // Find the Range column
+  const rangeKey = keys.find(key => 
+    key.toLowerCase().includes('range')
+  ) || keys[2] || 'Polyend Range';
+  
+  return { ccKey, paramKey, rangeKey };
+}
+
+/**
  * Parse the Polyend CSV and populate the CC map
  */
 async function parsePolyendCSV(csvText: string): Promise<void> {
@@ -171,10 +199,18 @@ async function parsePolyendCSV(csvText: string): Promise<void> {
           state.loaded = true;
           state.error = null;
           
+          // Debug logging: Show all categories and their CCs
           console.log('Polyend CC map loaded:', {
             entries: newCCMap.size,
             groups: newGroups.length,
           });
+          
+          // Log each category with its CCs for verification
+          console.log('Categories and CCs:');
+          for (const group of newGroups) {
+            const ccList = group.entries.map(e => e.ccNumber).join(', ');
+            console.log(`  ${group.category}: [${ccList}]`);
+          }
           
           resolve();
         } catch (error) {
@@ -203,18 +239,40 @@ export async function loadPolyendCCMap(): Promise<void> {
   try {
     // Use import.meta.env.BASE_URL for GitHub Pages compatibility
     const baseUrl = import.meta.env.BASE_URL || '/';
-    const url = `${baseUrl}Polyend`;
     
-    console.log('Loading Polyend CC map from:', url);
+    // Try canonical path first, then fall back to legacy path
+    const urls = [
+      `${baseUrl}polyend-cc.csv`,  // Canonical path
+      `${baseUrl}Polyend`,          // Legacy path
+    ];
     
-    // Fetch with cache: 'no-store' to ensure fresh data
-    const response = await fetch(url, { cache: 'no-store' });
+    let csvText: string | null = null;
+    let lastError: Error | null = null;
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`);
+    for (const url of urls) {
+      try {
+        console.log('Attempting to load Polyend CC map from:', url);
+        
+        // Fetch with cache: 'no-store' to ensure fresh data
+        const response = await fetch(url, { cache: 'no-store' });
+        
+        if (response.ok) {
+          csvText = await response.text();
+          console.log('Successfully loaded CSV from:', url);
+          break;
+        } else {
+          console.warn(`Failed to fetch from ${url}: ${response.status} ${response.statusText}`);
+        }
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        console.warn(`Error fetching from ${url}:`, lastError.message);
+      }
     }
     
-    const csvText = await response.text();
+    if (!csvText) {
+      throw lastError || new Error('Failed to fetch CSV from all paths');
+    }
+    
     await parsePolyendCSV(csvText);
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);

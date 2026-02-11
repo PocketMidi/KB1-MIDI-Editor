@@ -151,13 +151,13 @@ const ccGroups = computed<CCGroup[]>(() => {
     return [];
   }
   
-  // Get groups but reorder to ensure GLOBAL with Velocity is first
+  // Get groups but reorder to ensure Global with Velocity is first
   const groups = getCCGroups();
-  const globalGroup = groups.find(g => g.category === 'GLOBAL');
-  const otherGroups = groups.filter(g => g.category !== 'GLOBAL');
+  const globalGroup = groups.find(g => g.category === 'Global');
+  const otherGroups = groups.filter(g => g.category !== 'Global');
   
   if (globalGroup) {
-    // Ensure Velocity is first in GLOBAL
+    // Ensure Velocity is first in Global
     const velocityEntry = globalGroup.entries.find(e => e.ccNumber === 128);
     const otherEntries = globalGroup.entries.filter(e => e.ccNumber !== 128);
     

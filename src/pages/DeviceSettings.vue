@@ -17,6 +17,7 @@
           v-model="localSettings.lever1"
           :ccOptions="ccOptions"
           :ccMapByNumber="ccMapByNumber"
+          :categories="categories"
           :functionModes="leverFunctionModes"
           :valueModes="valueModes"
           :interpolations="interpolations"
@@ -29,6 +30,7 @@
           v-model="localSettings.leverPush1"
           :ccOptions="ccOptions"
           :ccMapByNumber="ccMapByNumber"
+          :categories="categories"
           :functionModes="leverPushFunctionModes"
           :interpolations="interpolations"
           @update:modelValue="markChanged"
@@ -40,6 +42,7 @@
           v-model="localSettings.lever2"
           :ccOptions="ccOptions"
           :ccMapByNumber="ccMapByNumber"
+          :categories="categories"
           :functionModes="leverFunctionModes"
           :valueModes="valueModes"
           :interpolations="interpolations"
@@ -52,6 +55,7 @@
           v-model="localSettings.leverPush2"
           :ccOptions="ccOptions"
           :ccMapByNumber="ccMapByNumber"
+          :categories="categories"
           :functionModes="leverPushFunctionModes"
           :interpolations="interpolations"
           @update:modelValue="markChanged"
@@ -62,6 +66,7 @@
           v-model="localSettings.touch"
           :ccOptions="ccOptions"
           :ccMapByNumber="ccMapByNumber"
+          :categories="categories"
           :functionModes="touchFunctionModes"
           @update:modelValue="markChanged"
         />
@@ -144,6 +149,7 @@ import {
   getCCMap,
   isCCMapLoaded,
   getSortedCCOptions,
+  getCCGroups,
 } from '../data/ccMap';
 
 const {
@@ -187,6 +193,9 @@ const ccOptions = computed(() => {
 
 // Expose ccMapByNumber for child components
 const ccMapByNumber = computed(() => getCCMap());
+
+// Expose categories for child components
+const categories = computed(() => getCCGroups().map(g => g.category));
 
 // Lever Function Modes (firmware values)
 const leverFunctionModes = [

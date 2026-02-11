@@ -11,12 +11,16 @@
 
     <div class="inputs">
       <div class="group">
+        <label for="touch-category">Category</label>
+        <select id="touch-category" v-model="selectedCategory">
+          <option v-for="cat in props.categories" :key="cat" :value="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <div class="group">
         <label for="touch-ccNumber">Parameter</label>
         <select id="touch-ccNumber" v-model.number="model.ccNumber">
-          <optgroup v-for="group in groupedOptions" :key="group.category" :label="group.category">
-            <option v-for="opt in group.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-          </optgroup>
-          <option v-if="ungroupedOptions.length > 0" v-for="opt in ungroupedOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+          <option v-for="opt in filteredOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
         </select>
       </div>
 
@@ -51,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { midiToRelative, type CCEntry } from '../data/ccMap'
 
 type TouchModel = {
@@ -66,6 +70,7 @@ const props = defineProps<{
   modelValue: TouchModel
   ccOptions: Array<{ value: number; label: string; group?: string }>
   ccMapByNumber: Map<number, CCEntry>
+  categories: string[]
   functionModes: { value: number, label: string }[]
 }>()
 
@@ -80,27 +85,33 @@ const model = computed({
 
 const isValidCC = computed(() => model.value.ccNumber >= 0 && model.value.ccNumber <= 128)
 
-// Group options by category
-const groupedOptions = computed(() => {
-  const groups = new Map<string, Array<{ value: number; label: string }>>()
-  
-  for (const opt of props.ccOptions) {
-    if (opt.group) {
-      if (!groups.has(opt.group)) {
-        groups.set(opt.group, [])
-      }
-      groups.get(opt.group)!.push({ value: opt.value, label: opt.label })
-    }
-  }
-  
-  return Array.from(groups.entries()).map(([category, options]) => ({
-    category,
-    options
-  }))
+// Initialize selectedCategory from current ccNumber's category (fallback to "Global")
+const initialCategory = props.ccMapByNumber.get(model.value.ccNumber)?.category ?? 'Global'
+const selectedCategory = ref<string>(initialCategory)
+
+// Filter options by selected category
+const filteredOptions = computed(() => {
+  const list = props.ccOptions.filter(opt => opt.group === selectedCategory.value)
+  const none = props.ccOptions.find(o => o.value === -1)
+  return none ? [none, ...list] : list
 })
 
-const ungroupedOptions = computed(() => {
-  return props.ccOptions.filter(opt => !opt.group)
+// Watch ccNumber to keep Category in sync
+watch(() => model.value.ccNumber, (cc) => {
+  const cat = props.ccMapByNumber.get(cc)?.category
+  if (cat) selectedCategory.value = cat
+})
+
+// Watch selectedCategory to ensure a valid parameter is selected
+watch(selectedCategory, (cat) => {
+  // If "None" is selected, keep it
+  if (model.value.ccNumber === -1) return
+  
+  const ok = props.ccMapByNumber.get(model.value.ccNumber)?.category === cat
+  if (!ok) {
+    const first = filteredOptions.value.find(o => o.value >= 0)
+    if (first) model.value.ccNumber = first.value
+  }
 })
 
 // Get current parameter entry from ccMapByNumber

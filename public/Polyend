@@ -1,4 +1,5 @@
-CC Number,Parameter,Polyend Range
+"Category 
+& CC Number",Parameter,Polyend Range
 GLOBAL,,
 128,Velocity,0 to 100
 1,Cutoff,0 to 100
@@ -11,13 +12,15 @@ GLOBAL,,
 13,Bit Depth,4 to 16
 14,Reverb Send,-40 to 0
 15,Delay Send,-40 to 0
+16,WT Gran Position,
+17,WT Window Gran Length,
 VOLUME,,
 20,Automation Type,
 21,Attack - Shape LFO,
 22,Decay - Speed LFO,
-23,Sustain,
-24,Release,
-25,Amount,
+23,Sustain,0 to 100
+24,Release,0 to 100
+25,Amount,-24 to +24
 PANNING,,
 26,Automation Type,
 27,Attack - Shape LFO,
@@ -31,15 +34,17 @@ CUTOFF,,
 85,Decay - Speed LFO ,
 86,Sustain ,
 87,Release,
-88,Amount ,
-WAVETABLE Position,,
+88,Amount ,0 to 100
+"WAVETABLE
+Position",,
 102,Automation Type ,
 103,Attack - Shape LFO ,
 104,Decay - Speed LFO ,
 105,Sustain ,
 106,Release ,
 107,Amount,
-GRANULAR Position,,
+"GRANULAR
+Position",,
 108,Automation Type ,
 109,Attack - Shape LFO ,
 110,Decay - Speed LFO ,

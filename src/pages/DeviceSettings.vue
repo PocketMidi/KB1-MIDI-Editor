@@ -142,7 +142,6 @@ const {
   sendSettings,
   saveToFlash,
   handleLoad,
-  recallBaseline,
   resetToDefaults,
 } = useDeviceState();
 

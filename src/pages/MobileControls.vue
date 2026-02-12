@@ -116,7 +116,12 @@
 <script setup lang="ts">
 import { ref, watch, computed, onMounted } from 'vue';
 import { useDeviceState } from '../composables/useDeviceState';
-import type { DeviceSettings } from '../ble/kb1Protocol';
+import type { 
+  DeviceSettings, 
+  LeverSettings as LeverSettingsType, 
+  LeverPushSettings as LeverPushSettingsType, 
+  TouchSettings as TouchSettingsType 
+} from '../ble/kb1Protocol';
 import AccordionSection from '../components/AccordionSection.vue';
 import StickyActionBar from '../components/StickyActionBar.vue';
 import LeverSettings from '../components/LeverSettings.vue';
@@ -199,8 +204,9 @@ const interpolations = [
   { value: 2, label: 'Logarithmic' },
 ];
 
-// Helper functions to generate subtitles
-function getLeverSubtitle(lever: any): string {
+// Helper functions to generate subtitles for accordion headers
+// These use the CC map to show user-friendly parameter names and ranges
+function getLeverSubtitle(lever: LeverSettingsType): string {
   const ccMap = ccMapByNumber.value;
   const ccInfo = ccMap.get(lever.ccNumber);
   const paramName = ccInfo?.parameter || `CC ${lever.ccNumber}`;
@@ -208,7 +214,7 @@ function getLeverSubtitle(lever: any): string {
   return `${paramName} | ${range} | MIDI CC ${lever.ccNumber}`;
 }
 
-function getLeverPushSubtitle(leverPush: any): string {
+function getLeverPushSubtitle(leverPush: LeverPushSettingsType): string {
   const ccMap = ccMapByNumber.value;
   const ccInfo = ccMap.get(leverPush.ccNumber);
   const paramName = ccInfo?.parameter || `CC ${leverPush.ccNumber}`;
@@ -216,7 +222,7 @@ function getLeverPushSubtitle(leverPush: any): string {
   return `${paramName} | ${range} | MIDI CC ${leverPush.ccNumber}`;
 }
 
-function getTouchSubtitle(touch: any): string {
+function getTouchSubtitle(touch: TouchSettingsType): string {
   const ccMap = ccMapByNumber.value;
   const ccInfo = ccMap.get(touch.ccNumber);
   const paramName = ccInfo?.parameter || `CC ${touch.ccNumber}`;

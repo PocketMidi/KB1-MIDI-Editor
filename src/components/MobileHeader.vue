@@ -12,6 +12,9 @@
       </button>
     </div>
     
+    <!-- Connection status bar showing device connection state and optional timeout warnings.
+         The timeout prop displays a warning when BLE connection might time out soon,
+         alerting users to check their device connection. -->
     <div class="connection-bar" :class="connectionClass">
       <div class="connection-status">
         <span class="status-indicator" :class="{ connected: isConnected }"></span>

@@ -55,14 +55,18 @@ async function handleDisconnect() {
   }
 }
 
+// Handler functions for mobile header actions
+// Note: Back and Menu buttons are placeholders for future functionality
+// Back: Could navigate to a home/landing screen or previous view
+// Menu: Could open a settings drawer or additional options menu
 function handleBack() {
-  // Could navigate to a home/landing screen if implemented
-  console.log('Back button clicked');
+  // TODO: Implement navigation to home screen or previous view
+  console.log('Back button clicked - navigation not yet implemented');
 }
 
 function handleMenu() {
-  // Could open a menu or settings drawer
-  console.log('Menu button clicked');
+  // TODO: Implement settings menu or options drawer
+  console.log('Menu button clicked - menu not yet implemented');
 }
 
 async function handleBottomSync() {

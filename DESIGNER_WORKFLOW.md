@@ -1,8 +1,8 @@
-# KB1 Theme - Designer Workflow
+# KB1 Config Lab Theme - Designer Workflow
 
 ## Overview
 
-The KB1 MIDI Editor now uses a **CSS-only theme system** that allows designers to update visuals without touching any code. All visual assets are referenced through CSS variables in a single theme file.
+The KB1 Config Lab now uses a **CSS-only theme system** that allows designers to update visuals without touching any code. All visual assets are referenced through CSS variables in a single theme file.
 
 ## Quick Start for Designers
 
@@ -180,7 +180,7 @@ Then update paths in CSS:
 
 ### Testing Your Changes
 1. Run `npm run dev` 
-2. Open http://localhost:5173/KB1-MIDI-Editor/
+2. Open http://localhost:5173/KB1-Config-Lab/
 3. Navigate to Device Settings tab
 4. Check your visuals at different window sizes
 

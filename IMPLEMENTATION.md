@@ -1,4 +1,4 @@
-# KB1 MIDI Editor - Implementation Notes
+# KB1 Config Lab - Implementation Notes
 
 ## Project Overview
 
@@ -221,7 +221,7 @@ Before integration with real KB1 hardware:
 4. **Deploy to GitHub Pages:**
    - Push to `main` branch
    - GitHub Actions automatically builds and deploys
-   - Access at `https://pocketmidi.github.io/KB1-MIDI-Editor/`
+   - Access at `https://pocketmidi.github.io/KB1-Config-Lab/`
 
 ## Security Considerations
 
@@ -275,7 +275,7 @@ Potential features to add after basic integration:
 ## File Structure Reference
 
 ```
-KB1-MIDI-Editor/
+KB1-Config-Lab/
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml          # GitHub Pages deployment

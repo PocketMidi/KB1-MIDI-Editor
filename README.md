@@ -1,6 +1,6 @@
-# KB1 MIDI Editor
+# KB1 Config Lab
 
-KB1 MIDI Editor is a browser-based configuration tool for the PocketMidi KB1 device. Configure MIDI CC mappings, customize faders and controls, and manage device settings wirelessly over Bluetooth directly from your browser.
+KB1 Config Lab is a browser-based configuration tool for the PocketMidi KB1 device. Configure MIDI CC mappings, customize faders and controls, and manage device settings wirelessly over Bluetooth directly from your browser.
 
 ## Features
 
@@ -70,8 +70,8 @@ src/
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/PocketMidi/KB1-MIDI-Editor.git
-cd KB1-MIDI-Editor
+git clone https://github.com/PocketMidi/KB1-Config-Lab.git
+cd KB1-Config-Lab
 ```
 
 2. Install dependencies:
@@ -113,7 +113,7 @@ npm run preview
 2. Select your KB1 device from the browser's Bluetooth pairing dialog
 3. Once connected, the status indicator will turn green
 
-### MIDI Editor (Faders Tab)
+### Config Lab (Faders Tab)
 
 - Configure CC numbers, MIDI channels, and value ranges for each fader
 - Click "Load from Device" to fetch current settings
@@ -224,7 +224,7 @@ This repository includes a GitHub Actions workflow that automatically deploys to
 1. Go to your repository Settings → Pages
 2. Set Source to "GitHub Actions"
 3. Push to the `main` branch
-4. The site will be available at `https://pocketmidi.github.io/KB1-MIDI-Editor/`
+4. The site will be available at `https://pocketmidi.github.io/KB1-Config-Lab/`
 
 ### Manual Deployment
 

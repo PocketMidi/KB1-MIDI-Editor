@@ -2,7 +2,7 @@
 
 ## Architecture Overview
 
-This implementation provides a CSS-only theme system for the KB1 MIDI Editor with a complete device settings UI. The design prioritizes **designer-friendliness** and **maintainability** by centralizing all visual assets in a single CSS file.
+This implementation provides a CSS-only theme system for the KB1 Config Lab with a complete device settings UI. The design prioritizes **designer-friendliness** and **maintainability** by centralizing all visual assets in a single CSS file.
 
 ## Key Design Decisions
 

@@ -5,11 +5,14 @@
       <p>Configure KB1 lever, touch, and scale settings</p>
     </div>
     
-    <div v-if="!isConnected" class="not-connected-message">
-      <p>Please connect to your KB1 device to view and configure settings.</p>
+    <!-- Subtle connection status indicator -->
+    <div v-if="!isConnected" class="connection-status-bar">
+      <span class="status-dot disconnected"></span>
+      <span class="status-text">Disconnected - Preview mode</span>
     </div>
     
-    <div v-else class="settings-content">
+    <!-- Always show content, but apply disconnected styling -->
+    <div class="settings-content" :class="{ 'disconnected-state': !isConnected }">
       <div class="action-bar">
         <button
           class="btn btn-secondary"

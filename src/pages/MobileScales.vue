@@ -10,11 +10,14 @@
       @save="handleSaveToDevice"
     />
     
-    <div v-if="!isConnected" class="not-connected-message">
-      <p>Please connect to your KB1 device to configure scales.</p>
+    <!-- Subtle connection status indicator -->
+    <div v-if="!isConnected" class="connection-status-bar">
+      <span class="status-dot disconnected"></span>
+      <span class="status-text">Disconnected - Preview mode</span>
     </div>
     
-    <div v-else class="scales-content">
+    <!-- Always show content, but apply disconnected styling -->
+    <div class="scales-content" :class="{ 'disconnected-state': !isConnected }">
       <ScaleSettings
         title="Scales"
         v-model="localSettings.scale"

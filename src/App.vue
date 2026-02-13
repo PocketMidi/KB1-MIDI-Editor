@@ -208,6 +208,59 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+/* Main disconnected state styling */
+.disconnected-state {
+  filter: grayscale(100%);
+  pointer-events: none;
+  position: relative;
+  opacity: 0.8;
+}
+
+.disconnected-state::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(128, 128, 128, 0.05);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Subtle connection status bar */
+.connection-status-bar {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: var(--color-background-mute);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.status-dot.disconnected {
+  background: #ef4444;
+  animation: pulse-subtle 2s infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Cursor feedback for disconnected controls */
+.disconnected-state * {
+  cursor: not-allowed !important;
+}
 </style>
 
 <style scoped>

@@ -10,11 +10,14 @@
       @save="handleSaveToDevice"
     />
     
-    <div v-if="!isConnected" class="not-connected-message">
-      <p>Please connect to your KB1 device to configure settings.</p>
+    <!-- Subtle connection status indicator -->
+    <div v-if="!isConnected" class="connection-status-bar">
+      <span class="status-dot disconnected"></span>
+      <span class="status-text">Disconnected - Preview mode</span>
     </div>
     
-    <div v-else-if="isCCMapLoaded()" class="controls-accordion">
+    <!-- Always show content, but apply disconnected styling -->
+    <div v-if="isCCMapLoaded()" class="controls-accordion" :class="{ 'disconnected-state': !isConnected }">
       <AccordionSection
         :title="`Lever 1`"
         :subtitle="getLeverSubtitle(localSettings.lever1)"

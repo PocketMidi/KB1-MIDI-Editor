@@ -5,11 +5,14 @@
       <p>Perform and control live CC output</p>
     </div>
     
-    <div v-if="!isConnected" class="not-connected-message">
-      <p>Please connect to your KB1 device to edit MIDI mappings.</p>
+    <!-- Subtle connection status indicator -->
+    <div v-if="!isConnected" class="connection-status-bar">
+      <span class="status-dot disconnected"></span>
+      <span class="status-text">Disconnected - Preview mode</span>
     </div>
     
-    <div v-else class="editor-content">
+    <!-- Always show content, but apply disconnected styling -->
+    <div class="editor-content" :class="{ 'disconnected-state': !isConnected }">
       <div class="cc-mappings-grid">
         <CCMappingCard
           v-for="mapping in ccMappings"

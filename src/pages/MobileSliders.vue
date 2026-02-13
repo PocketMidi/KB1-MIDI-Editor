@@ -1,10 +1,13 @@
 <template>
   <div class="mobile-sliders-tab">
-    <div v-if="!isConnected" class="not-connected-message">
-      <p>Please connect to your KB1 device to use live sliders.</p>
+    <!-- Subtle connection status indicator -->
+    <div v-if="!isConnected" class="connection-status-bar">
+      <span class="status-dot disconnected"></span>
+      <span class="status-text">Disconnected - Preview mode</span>
     </div>
     
-    <div v-else class="sliders-wrapper">
+    <!-- Always show content, but apply disconnected styling -->
+    <div class="sliders-wrapper" :class="{ 'disconnected-state': !isConnected }">
       <LandingPage />
     </div>
   </div>

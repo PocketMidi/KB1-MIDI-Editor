@@ -221,7 +221,7 @@ Before integration with real KB1 hardware:
 4. **Deploy to GitHub Pages:**
    - Push to `main` branch
    - GitHub Actions automatically builds and deploys
-   - Access at `https://pocketmidi.github.io/KB1-Config-Lab/`
+   - Access at `https://pocketmidi.github.io/KB1-config/`
 
 ## Security Considerations
 
@@ -275,7 +275,7 @@ Potential features to add after basic integration:
 ## File Structure Reference
 
 ```
-KB1-Config-Lab/
+KB1-config/
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml          # GitHub Pages deployment

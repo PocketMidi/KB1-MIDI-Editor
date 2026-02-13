@@ -1,5 +1,5 @@
 {
-  "name": "kb1-config-lab",
+  "name": "kb1-config",
   "private": false,
   "version": "1.0.0",
   "description": "Web Bluetooth MIDI editor for the PocketMidi KB1 device",

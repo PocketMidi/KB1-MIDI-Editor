@@ -1,6 +1,6 @@
-# KB1 Config
+# KB1 config
 
-KB1 Config is a browser-based configuration tool for the PocketMidi KB1 device. Configure MIDI CC mappings, customize faders and controls, and manage device settings wirelessly over Bluetooth directly from your browser.
+KB1 config is a browser-based configuration tool for the PocketMidi KB1 device. Configure MIDI CC mappings, customize faders and controls, and manage device settings wirelessly over Bluetooth directly from your browser.
 
 ## Features
 

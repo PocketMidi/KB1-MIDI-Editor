@@ -180,7 +180,7 @@ Then update paths in CSS:
 
 ### Testing Your Changes
 1. Run `npm run dev` 
-2. Open http://localhost:5173/KB1-Config-Lab/
+2. Open http://localhost:5173/KB1-config/
 3. Navigate to Device Settings tab
 4. Check your visuals at different window sizes
 

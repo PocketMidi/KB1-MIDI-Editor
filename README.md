@@ -70,8 +70,8 @@ src/
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/PocketMidi/KB1-Config-Lab.git
-cd KB1-Config-Lab
+git clone https://github.com/PocketMidi/KB1-config.git
+cd KB1-config
 ```
 
 2. Install dependencies:
@@ -224,7 +224,7 @@ This repository includes a GitHub Actions workflow that automatically deploys to
 1. Go to your repository Settings → Pages
 2. Set Source to "GitHub Actions"
 3. Push to the `main` branch
-4. The site will be available at `https://pocketmidi.github.io/KB1-Config-Lab/`
+4. The site will be available at `https://pocketmidi.github.io/KB1-config/`
 
 ### Manual Deployment
 

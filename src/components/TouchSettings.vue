@@ -229,6 +229,19 @@ const relativeMax = computed(() => {
   gap: 1rem;
 }
 
+@media (max-width: 768px) {
+  .inputs {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .inputs {
+    grid-template-columns: 1fr;
+  }
+}
+
 .group {
   display: flex;
   flex-direction: column;

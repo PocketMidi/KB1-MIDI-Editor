@@ -212,7 +212,6 @@ body {
 /* Main disconnected state styling */
 .disconnected-state {
   filter: grayscale(100%);
-  pointer-events: none;
   position: relative;
   opacity: 0.8;
 }
@@ -257,8 +256,21 @@ body {
   50% { opacity: 0.5; }
 }
 
-/* Cursor feedback for disconnected controls */
-.disconnected-state * {
+/* Allow accordion header interaction when disconnected */
+.disconnected-state .accordion-header,
+.disconnected-state .accordion-header * {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* But keep form controls disabled when disconnected */
+.disconnected-state .form-control,
+.disconnected-state input,
+.disconnected-state select,
+.disconnected-state button:not(.accordion-header),
+.disconnected-state .group input,
+.disconnected-state .group select {
+  pointer-events: none !important;
   cursor: not-allowed !important;
 }
 </style>

@@ -58,11 +58,11 @@ defineEmits<{
 <style scoped>
 .sticky-action-bar {
   position: sticky;
-  top: 0;
-  z-index: 100;
+  top: 44px; /* Height of mobile tab nav */
+  z-index: 199;
   display: flex;
   gap: 0.5rem;
-  padding: 0.75rem;
+  padding: 0.5rem 0.75rem;
   background: var(--color-background);
   border-bottom: 1px solid var(--color-border);
   flex-wrap: wrap;
@@ -76,7 +76,7 @@ defineEmits<{
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
-  padding: 0.625rem 0.75rem;
+  padding: 0.5rem 0.625rem;
   border: none;
   border-radius: var(--kb1-radius-sm, 6px);
   font-weight: 500;
@@ -84,7 +84,7 @@ defineEmits<{
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
-  min-height: 44px; /* Mobile touch target */
+  min-height: 40px; /* Compressed from 44px */
 }
 
 .action-btn:disabled {
@@ -126,12 +126,14 @@ defineEmits<{
 @media (max-width: 480px) {
   .sticky-action-bar {
     padding: 0.5rem;
+    gap: 0.375rem;
   }
   
   .action-btn {
     font-size: 0.75rem;
-    padding: 0.5rem 0.625rem;
+    padding: 0.5rem 0.5rem;
     min-width: 70px;
+    min-height: 38px;
   }
   
   .action-icon {

@@ -307,6 +307,8 @@ async function handleSaveToDevice() {
 .controls-accordion {
   padding: 1rem;
   overflow-y: auto;
+  /* Ensure content doesn't hide behind sticky bars */
+  padding-top: 1rem;
 }
 
 @media (max-width: 768px) {

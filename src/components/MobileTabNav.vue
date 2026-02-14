@@ -30,6 +30,9 @@ defineEmits<{
 
 <style scoped>
 .mobile-tab-nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
   display: flex;
   background: var(--color-background-mute);
   border-bottom: 1px solid var(--color-border);
@@ -39,7 +42,7 @@ defineEmits<{
 
 .tab-button {
   flex: 1;
-  padding: 1rem 0.75rem;
+  padding: 0.75rem 0.5rem;
   background: transparent;
   border: none;
   color: var(--color-text-muted);
@@ -71,7 +74,7 @@ defineEmits<{
 @media (max-width: 768px) {
   .tab-button {
     font-size: 0.8125rem;
-    padding: 0.875rem 0.5rem;
+    padding: 0.625rem 0.5rem;
   }
 }
 </style>

@@ -155,6 +155,8 @@ async function handleSaveToDevice() {
 .scales-content {
   padding: 1rem;
   overflow-y: auto;
+  /* Ensure content doesn't hide behind sticky bars */
+  padding-top: 1rem;
 }
 
 @media (max-width: 768px) {

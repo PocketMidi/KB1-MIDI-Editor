@@ -38,9 +38,28 @@
         </select>
       </div>
 
-      <div class="group">
-        <label :for="`lever-stepSize-${lever}`">Steps</label>
-        <input type="number" :id="`lever-stepSize-${lever}`" v-model.number="model.stepSize" min="1" max="127" />
+      <!-- Mode-specific Type dropdown for Interpolated mode -->
+      <div v-if="isInterpolatedMode" class="group">
+        <label :for="`lever-type-${lever}`">Type</label>
+        <select :id="`lever-type-${lever}`" v-model.number="interpolatedType">
+          <option v-for="opt in interpolations" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+        </select>
+      </div>
+
+      <!-- Mode-specific Type dropdown for Peak & Decay mode -->
+      <div v-if="isPeakDecayMode" class="group">
+        <label :for="`lever-type-${lever}`">Type</label>
+        <select :id="`lever-type-${lever}`" v-model.number="model.offsetType">
+          <option v-for="opt in interpolations" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+        </select>
+      </div>
+
+      <!-- Mode-specific Steps dropdown for Incremental mode -->
+      <div v-if="isIncrementalMode" class="group">
+        <label :for="`lever-steps-${lever}`">Steps</label>
+        <select :id="`lever-steps-${lever}`" v-model.number="model.stepSize">
+          <option v-for="opt in stepOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+        </select>
       </div>
 
       <div class="group">
@@ -64,25 +83,11 @@
       </div>
 
       <div class="group">
-        <label :for="`lever-onsetType-${lever}`">Attack Type</label>
-        <select :id="`lever-onsetType-${lever}`" v-model.number="model.onsetType">
-          <option v-for="opt in interpolations" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-        </select>
-      </div>
-
-      <div class="group">
         <label :for="`lever-onsetTime-${lever}`">Attack Time</label>
         <div class="number-with-unit">
           <input type="number" :id="`lever-onsetTime-${lever}`" v-model.number="model.onsetTime" min="0" max="10000" step="10" />
           <span>ms</span>
         </div>
-      </div>
-
-      <div class="group">
-        <label :for="`lever-offsetType-${lever}`">Decay Type</label>
-        <select :id="`lever-offsetType-${lever}`" v-model.number="model.offsetType">
-          <option v-for="opt in interpolations" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-        </select>
       </div>
 
       <div class="group">
@@ -225,6 +230,34 @@ const relativeMax = computed(() => {
     entry.range.max
   )
   return String(value)
+})
+
+// Computed properties for mode detection
+const isInterpolatedMode = computed(() => model.value.functionMode === 0)
+const isPeakDecayMode = computed(() => model.value.functionMode === 1)
+const isIncrementalMode = computed(() => model.value.functionMode === 2)
+
+// Step options for Incremental mode
+// MIDI range is 0-127 (128 total values)
+const stepOptions = [
+  { value: 32, label: '4 steps (32 MIDI values per step)' },
+  { value: 16, label: '8 steps (16 MIDI values per step)' },
+  { value: 8, label: '16 steps (8 MIDI values per step)' },
+  { value: 4, label: '32 steps (4 MIDI values per step)' },
+  { value: 2, label: '64 steps (2 MIDI values per step)' },
+]
+
+// Computed property for Interpolated mode to gang attack and decay types together
+const interpolatedType = computed({
+  get: () => model.value.onsetType,
+  set: (value: number) => {
+    // Set both onset and offset types to the same value
+    model.value = {
+      ...model.value,
+      onsetType: value,
+      offsetType: value
+    }
+  }
 })
 </script>
 

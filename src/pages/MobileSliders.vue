@@ -8,14 +8,14 @@
     
     <!-- Always show content, but apply disconnected styling -->
     <div class="sliders-wrapper" :class="{ 'disconnected-state': !isConnected }">
-      <LandingPage />
+      <PerformanceSliders />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useDeviceState } from '../composables/useDeviceState';
-import LandingPage from './LandingPage.vue';
+import PerformanceSliders from '../components/PerformanceSliders.vue';
 
 const { isConnected } = useDeviceState();
 </script>

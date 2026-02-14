@@ -25,6 +25,13 @@
       </div>
 
       <div class="group">
+        <label :for="`lever-valueMode-${lever}`">Polarity</label>
+        <select :id="`lever-valueMode-${lever}`" v-model.number="model.valueMode">
+          <option v-for="opt in valueModes" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+        </select>
+      </div>
+
+      <div class="group">
         <label :for="`lever-functionMode-${lever}`">Function Mode</label>
         <select :id="`lever-functionMode-${lever}`" v-model.number="model.functionMode">
           <option v-for="opt in functionModes" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
@@ -32,10 +39,11 @@
       </div>
 
       <div class="group">
-        <label :for="`lever-valueMode-${lever}`">Mode</label>
-        <select :id="`lever-valueMode-${lever}`" v-model.number="model.valueMode">
-          <option v-for="opt in valueModes" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-        </select>
+        <label :for="`lever-duration-${lever}`">Duration</label>
+        <div class="number-with-unit">
+          <input type="number" :id="`lever-duration-${lever}`" v-model.number="duration" min="0" max="10000" step="10" />
+          <span>ms</span>
+        </div>
       </div>
 
       <!-- Mode-specific Type dropdown for Interpolated mode -->
@@ -80,22 +88,6 @@
       <div class="group">
         <label :for="`lever-relativeMax-${lever}`">Relative Max</label>
         <input type="text" :id="`lever-relativeMax-${lever}`" :value="relativeMax" readonly class="readonly-field" />
-      </div>
-
-      <div class="group">
-        <label :for="`lever-onsetTime-${lever}`">Attack Time</label>
-        <div class="number-with-unit">
-          <input type="number" :id="`lever-onsetTime-${lever}`" v-model.number="model.onsetTime" min="0" max="10000" step="10" />
-          <span>ms</span>
-        </div>
-      </div>
-
-      <div class="group">
-        <label :for="`lever-offsetTime-${lever}`">Decay Time</label>
-        <div class="number-with-unit">
-          <input type="number" :id="`lever-offsetTime-${lever}`" v-model.number="model.offsetTime" min="0" max="10000" step="10" />
-          <span>ms</span>
-        </div>
       </div>
     </div>
   </div>
@@ -255,6 +247,16 @@ const interpolatedType = computed({
     // Set both onset and offset types to the same value
     model.value.onsetType = value
     model.value.offsetType = value
+  }
+})
+
+// Computed property to gang attack and decay times together as "Duration"
+const duration = computed({
+  get: () => model.value.onsetTime,
+  set: (value: number) => {
+    // Set both onset and offset times to the same value
+    model.value.onsetTime = value
+    model.value.offsetTime = value
   }
 })
 </script>

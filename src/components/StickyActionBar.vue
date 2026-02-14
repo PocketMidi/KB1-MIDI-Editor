@@ -59,7 +59,7 @@ defineEmits<{
 .sticky-action-bar {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
   display: flex;
   gap: 0.5rem;
   padding: 0.75rem;
@@ -141,7 +141,7 @@ defineEmits<{
 
 @media (min-width: 769px) {
   .sticky-action-bar {
-    position: relative;
+    position: sticky;
     padding: 1rem;
   }
   

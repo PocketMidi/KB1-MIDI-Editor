@@ -102,7 +102,7 @@ async function handleDisconnect() {
       <header class="app-header">
         <div class="header-content">
           <div class="logo-section">
-            <h1>KB1 config</h1>
+            <img src="/src/assets/ui/KB1-title.svg" alt="KB1" class="header-logo" />
           </div>
           
           <div class="header-actions">
@@ -181,13 +181,13 @@ async function handleDisconnect() {
 
 <style>
 :root {
-  --color-background: #1a1a1a;
-  --color-background-soft: #242424;
-  --color-background-mute: #2a2a2a;
-  --color-border: #3a3a3a;
-  --color-border-hover: #4a4a4a;
-  --color-text: #ffffff;
-  --color-text-muted: #a0a0a0;
+  --color-background: #0F0F0F;
+  --color-background-soft: #0F0F0F;
+  --color-background-mute: #0F0F0F;
+  --color-border: transparent;
+  --color-border-hover: transparent;
+  --color-text: #EAEAEA;
+  --color-text-muted: rgba(234, 234, 234, 0.32);
 }
 
 * {
@@ -330,7 +330,7 @@ body {
 
 .app-header {
   background: var(--color-background-soft);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: none;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -344,6 +344,16 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 2rem;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+}
+
+.header-logo {
+  height: 40px;
+  width: auto;
 }
 
 .logo-section h1 {
@@ -379,7 +389,7 @@ body {
 
 .app-nav {
   background: var(--color-background-mute);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: none;
   display: flex;
   gap: 0;
   max-width: 1400px;
@@ -393,21 +403,26 @@ body {
   padding: 1rem 1.5rem;
   background: transparent;
   border: none;
-  color: var(--color-text-muted);
-  font-weight: 500;
+  border-radius: 0;
+  color: var(--color-text);
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
   cursor: pointer;
   border-bottom: 2px solid transparent;
+  opacity: 0.32;
   transition: all 0.2s;
 }
 
 .nav-tab:hover {
-  color: var(--color-text);
-  background: var(--color-background-soft);
+  opacity: 0.6;
+  background: transparent;
 }
 
 .nav-tab.active {
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
+  color: var(--color-text);
+  border-bottom: 2px solid var(--color-text);
+  opacity: 1;
 }
 
 .app-main {
@@ -417,7 +432,7 @@ body {
 
 .app-footer {
   background: var(--color-background-soft);
-  border-top: 1px solid var(--color-border);
+  border-top: none;
   padding: 2rem;
   text-align: center;
   margin-top: auto;

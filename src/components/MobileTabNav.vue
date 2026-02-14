@@ -35,7 +35,7 @@ defineEmits<{
   z-index: 200;
   display: flex;
   background: var(--color-background-mute);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: none;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -45,11 +45,15 @@ defineEmits<{
   padding: 0.75rem 0.5rem;
   background: transparent;
   border: none;
-  color: var(--color-text-muted);
-  font-weight: 500;
+  border-radius: 0;
+  color: var(--color-text);
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 700;
   font-size: 0.875rem;
+  text-transform: uppercase;
   cursor: pointer;
   border-bottom: 2px solid transparent;
+  opacity: 0.32;
   transition: all 0.2s;
   white-space: nowrap;
   min-height: 44px; /* Mobile touch target */
@@ -57,14 +61,15 @@ defineEmits<{
 }
 
 .tab-button:hover {
-  color: var(--color-text);
-  background: var(--color-background-soft);
+  opacity: 0.6;
+  background: transparent;
 }
 
 .tab-button.active {
-  color: var(--kb1-primary, #3b82f6);
-  border-bottom-color: var(--kb1-primary, #3b82f6);
-  background: var(--color-background-soft);
+  color: var(--color-text);
+  border-bottom: 2px solid var(--color-text);
+  opacity: 1;
+  background: transparent;
 }
 
 .tab-button:active {

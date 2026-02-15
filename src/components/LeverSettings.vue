@@ -489,7 +489,7 @@ const duration = computed({
 
 .toggle-image {
   display: block;
-  height: 40px;
+  height: 30px;
   width: auto;
   cursor: pointer;
   transition: opacity 0.2s ease;
@@ -538,19 +538,17 @@ const duration = computed({
 
 .profile-visualization {
   margin: 2rem auto;
-  padding: 1rem;
+  padding: 1.5rem;
   background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
-  max-width: 500px;
   width: 100%;
 }
 
 .profile-visualization img {
-  max-width: 100%;
   width: 100%;
   height: auto;
   display: block;

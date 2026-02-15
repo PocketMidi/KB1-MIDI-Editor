@@ -1,52 +1,35 @@
 <template>
   <header class="mobile-header">
     <div class="header-top">
-      <img src="/src/assets/ui/KB1-title.svg" alt="KB1" class="header-logo" />
-    </div>
-    
-    <!-- Connection status bar showing device connection state and optional timeout warnings.
-         The timeout prop displays a warning when BLE connection might time out soon,
-         alerting users to check their device connection. -->
-    <div class="connection-bar" :class="connectionClass">
-      <div class="connection-status">
-        <span class="status-indicator" :class="{ connected: isConnected }"></span>
-        <span class="status-text">
-          {{ statusText }}
-        </span>
-      </div>
-      <div v-if="timeout" class="timeout-warning">
-        ⚠️ Timeout: {{ timeout }}s
-      </div>
+      <!-- Disconnected state: Show BLUETOOTH CONNECT button -->
+      <button 
+        v-if="!isConnected" 
+        class="bluetooth-connect-btn"
+        @click="$emit('connect')"
+      >
+        BLUETOOTH CONNECT
+      </button>
+      
+      <!-- Always show KB1 logo -->
+      <img src="/kb1-title.svg" alt="KB1 CONFIGURATOR" class="header-logo" />
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-
-const props = defineProps<{
+defineProps<{
   isConnected: boolean;
   deviceName?: string;
-  timeout?: number;
 }>();
 
-const statusText = computed(() => {
-  if (props.isConnected) {
-    return props.deviceName ? `Connected: ${props.deviceName}` : 'Connected';
-  }
-  return 'Disconnected';
-});
-
-const connectionClass = computed(() => ({
-  'is-connected': props.isConnected,
-  'is-disconnected': !props.isConnected,
-  'has-warning': props.timeout && props.timeout > 0,
-}));
+defineEmits<{
+  connect: [];
+}>();
 </script>
 
 <style scoped>
 .mobile-header {
-  background: var(--color-background-soft);
+  background: #0F0F0F;
   border-bottom: none;
   position: sticky;
   top: 0;
@@ -56,78 +39,41 @@ const connectionClass = computed(() => ({
 .header-top {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+  gap: 2rem;
+}
+
+/* When only logo is present (connected state), center it */
+.header-top:not(:has(.bluetooth-connect-btn)) {
   justify-content: center;
-  padding: 0.75rem 1rem;
+}
+
+/* Bluetooth Connect Button - Disconnected State */
+.bluetooth-connect-btn {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 2px solid #47708E;
+  border-radius: 6px;
+  color: #47708E;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.bluetooth-connect-btn:hover {
+  background: rgba(71, 112, 142, 0.1);
+}
+
+.bluetooth-connect-btn:active {
+  transform: scale(0.98);
 }
 
 .header-logo {
-  height: 32px;
+  height: 40px;
   width: auto;
-}
-
-.connection-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  border-top: none;
-  gap: 1rem;
-  font-size: 0.8125rem;
-}
-
-.connection-bar.is-connected {
-  background: rgba(34, 197, 94, 0.1);
-}
-
-.connection-bar.is-disconnected {
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.connection-bar.has-warning {
-  background: rgba(251, 191, 36, 0.1);
-}
-
-.connection-status {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.status-indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ef4444;
-  animation: pulse 2s infinite;
-}
-
-.status-indicator.connected {
-  background: #22c55e;
-  animation: none;
-}
-
-.status-text {
-  font-weight: 500;
-  color: var(--color-text);
-}
-
-.timeout-warning {
-  color: #f59e0b;
-  font-weight: 500;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@media (min-width: 769px) {
-  .header-title {
-    font-size: 1.25rem;
-  }
 }
 </style>

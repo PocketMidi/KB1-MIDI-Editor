@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import ConnectionStatus from './components/ConnectionStatus.vue';
 import MobileHeader from './components/MobileHeader.vue';
 import MobileTabNav from './components/MobileTabNav.vue';
 import MobileControls from './pages/MobileControls.vue';
@@ -13,7 +12,6 @@ const {
   isBluetoothAvailable, 
   isConnected, 
   deviceName, 
-  connectionStatus,
   connect, 
   disconnect,
   isLoading
@@ -28,9 +26,9 @@ type MobileTab = 'controls' | 'scales' | 'sliders';
 const activeMobileTab = ref<MobileTab>('controls');
 
 const mobileTabs = [
-  { id: 'controls', label: 'Controls' },
-  { id: 'scales', label: 'Scales' },
-  { id: 'sliders', label: 'Sliders' }
+  { id: 'controls', label: 'CONTROLS' },
+  { id: 'scales', label: 'SCALES' },
+  { id: 'sliders', label: 'SLIDERS' }
 ];
 
 async function handleConnect() {
@@ -59,6 +57,7 @@ async function handleDisconnect() {
       <MobileHeader
         :is-connected="isConnected"
         :device-name="deviceName"
+        @connect="handleConnect"
       />
       
       <div v-if="!isBluetoothAvailable" class="warning-banner">
@@ -87,6 +86,7 @@ async function handleDisconnect() {
       
       <MobileTabNav
         :tabs="mobileTabs"
+        :is-connected="isConnected"
         v-model="activeMobileTab"
       />
       
@@ -101,35 +101,20 @@ async function handleDisconnect() {
     <div class="desktop-layout">
       <header class="app-header">
         <div class="header-content">
-          <div class="logo-section">
-            <img src="/src/assets/ui/KB1-title.svg" alt="KB1" class="header-logo" />
-          </div>
+          <!-- Disconnected state: Show BLUETOOTH CONNECT button -->
+          <button 
+            v-if="!isConnected"
+            class="btn btn-bluetooth-connect"
+            @click="handleConnect"
+            :disabled="!isBluetoothAvailable || isLoading"
+          >
+            <span v-if="isLoading">CONNECTING...</span>
+            <span v-else>BLUETOOTH CONNECT</span>
+          </button>
           
-          <div class="header-actions">
-            <ConnectionStatus 
-              :is-connected="isConnected"
-              :device-name="deviceName"
-              :error="connectionStatus.error"
-            />
-            
-            <button 
-              v-if="!isConnected"
-              class="btn btn-connect"
-              @click="handleConnect"
-              :disabled="!isBluetoothAvailable || isLoading"
-            >
-              <span v-if="isLoading">Connecting...</span>
-              <span v-else>Connect Device</span>
-            </button>
-            
-            <button 
-              v-else
-              class="btn btn-disconnect"
-              @click="handleDisconnect"
-              :disabled="isLoading"
-            >
-              Disconnect
-            </button>
+          <!-- Always show KB1 logo -->
+          <div class="logo-section">
+            <img src="/kb1-title.svg" alt="KB1 CONFIGURATOR" class="header-logo" />
           </div>
         </div>
         
@@ -139,27 +124,38 @@ async function handleDisconnect() {
       </header>
       
       <nav class="app-nav">
-        <button 
-          class="nav-tab"
-          :class="{ active: activeDesktopTab === 'controls' }"
-          @click="activeDesktopTab = 'controls'"
-        >
-          Controls
-        </button>
-        <button 
-          class="nav-tab"
-          :class="{ active: activeDesktopTab === 'scales' }"
-          @click="activeDesktopTab = 'scales'"
-        >
-          Scales
-        </button>
-        <button 
-          class="nav-tab"
-          :class="{ active: activeDesktopTab === 'sliders' }"
-          @click="activeDesktopTab = 'sliders'"
-        >
-          Sliders
-        </button>
+        <div class="nav-tabs">
+          <button 
+            class="nav-tab"
+            :class="{ active: activeDesktopTab === 'controls' }"
+            @click="activeDesktopTab = 'controls'"
+          >
+            CONTROLS
+          </button>
+          <button 
+            class="nav-tab"
+            :class="{ active: activeDesktopTab === 'scales' }"
+            @click="activeDesktopTab = 'scales'"
+          >
+            SCALES
+          </button>
+          <button 
+            class="nav-tab"
+            :class="{ active: activeDesktopTab === 'sliders' }"
+            @click="activeDesktopTab = 'sliders'"
+          >
+            SLIDERS
+          </button>
+        </div>
+        
+        <!-- Bluetooth status section -->
+        <div class="bluetooth-status">
+          <div class="separator"></div>
+          <span class="status-text" :class="{ connected: isConnected }">
+            {{ isConnected ? 'CONNECTED' : 'DISCONNECTED' }}
+          </span>
+          <img src="/bluetooth-icon.svg" alt="Bluetooth" class="bluetooth-icon" />
+        </div>
       </nav>
       
       <main class="app-main">
@@ -329,7 +325,7 @@ body {
 }
 
 .app-header {
-  background: var(--color-background-soft);
+  background: #0F0F0F;
   border-bottom: none;
   position: sticky;
   top: 0;
@@ -346,6 +342,11 @@ body {
   gap: 2rem;
 }
 
+/* When only logo is present (connected state), center it */
+.header-content:not(:has(.btn-bluetooth-connect)) {
+  justify-content: center;
+}
+
 .logo-section {
   display: flex;
   align-items: center;
@@ -354,28 +355,6 @@ body {
 .header-logo {
   height: 40px;
   width: auto;
-}
-
-.logo-section h1 {
-  margin: 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.tagline {
-  margin: 0.25rem 0 0 0;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 }
 
 .warning-banner {
@@ -388,15 +367,20 @@ body {
 }
 
 .app-nav {
-  background: var(--color-background-mute);
+  background: #0F0F0F;
   border-bottom: none;
   display: flex;
-  gap: 0;
+  justify-content: space-between;
+  align-items: stretch;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
   padding: 0 2rem;
-  /* Not sticky on desktop - only header is sticky */
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 0;
 }
 
 .nav-tab {
@@ -404,14 +388,14 @@ body {
   background: transparent;
   border: none;
   border-radius: 0;
-  color: var(--color-text);
+  color: #EAEAEA;
   font-family: 'Roboto Mono', monospace;
   font-weight: 700;
   text-transform: uppercase;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
   opacity: 0.32;
   transition: all 0.2s;
+  position: relative;
 }
 
 .nav-tab:hover {
@@ -420,9 +404,52 @@ body {
 }
 
 .nav-tab.active {
-  color: var(--color-text);
-  border-bottom: 2px solid var(--color-text);
+  color: #EAEAEA;
   opacity: 1;
+}
+
+.nav-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #EAEAEA;
+  border-radius: 1px;
+}
+
+/* Bluetooth status section in nav */
+.bluetooth-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  white-space: nowrap;
+}
+
+.separator {
+  width: 2px;
+  height: 1.25rem;
+  background: #EAEAEA;
+  align-self: center;
+}
+
+.status-text {
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #47708E;
+  opacity: 0.5;
+}
+
+.status-text.connected {
+  opacity: 1;
+}
+
+.bluetooth-icon {
+  height: 20px;
+  width: auto;
 }
 
 .app-main {
@@ -461,6 +488,33 @@ body {
 }
 
 .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-bluetooth-connect {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 2px solid #47708E;
+  border-radius: 6px;
+  color: #47708E;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-bluetooth-connect:hover:not(:disabled) {
+  background: rgba(71, 112, 142, 0.1);
+}
+
+.btn-bluetooth-connect:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-bluetooth-connect:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }

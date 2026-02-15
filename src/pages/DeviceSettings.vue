@@ -5,12 +5,6 @@
       <p>Configure KB1 lever, touch, and scale settings</p>
     </div>
     
-    <!-- Subtle connection status indicator -->
-    <div v-if="!isConnected" class="connection-status-bar">
-      <span class="status-dot disconnected"></span>
-      <span class="status-text">Disconnected - Preview mode</span>
-    </div>
-    
     <!-- Always show content, but apply disconnected styling -->
     <div class="settings-content" :class="{ 'disconnected-state': !isConnected }">
       <div class="action-bar">

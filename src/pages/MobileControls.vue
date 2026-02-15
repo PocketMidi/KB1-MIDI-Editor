@@ -6,15 +6,8 @@
       :has-changes="hasChanges"
       @load="handleLoadClick"
       @reset-defaults="handleResetDefaults"
-      @reset-changes="handleReset"
       @save="handleSaveToDevice"
     />
-    
-    <!-- Subtle connection status indicator -->
-    <div v-if="!isConnected" class="connection-status-bar">
-      <span class="status-dot disconnected"></span>
-      <span class="status-text">Disconnected - Preview mode</span>
-    </div>
     
     <!-- Always show content, but apply disconnected styling -->
     <div v-if="isCCMapLoaded()" class="controls-accordion" :class="{ 'disconnected-state': !isConnected }">
@@ -266,11 +259,6 @@ async function handleResetDefaults() {
       alert('Failed to reset to defaults');
     }
   }
-}
-
-function handleReset() {
-  localSettings.value = { ...deviceSettings.value };
-  hasChanges.value = false;
 }
 
 async function handleSaveToDevice() {

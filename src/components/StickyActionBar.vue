@@ -1,41 +1,33 @@
 <template>
   <div class="sticky-action-bar">
     <button
-      class="action-btn action-btn-secondary"
+      class="action-icon-btn"
+      title="Load"
+      aria-label="Load"
       @click="$emit('load')"
       :disabled="!isConnected || isLoading"
     >
-      <span class="action-icon">🔄</span>
-      <span v-if="isLoading">Loading...</span>
-      <span v-else>Load</span>
+      <img src="/load.svg" alt="" class="action-icon" />
     </button>
     
     <button
-      class="action-btn action-btn-secondary"
+      class="action-icon-btn"
+      title="Reset"
+      aria-label="Reset"
       @click="$emit('reset-defaults')"
       :disabled="!isConnected || isLoading"
     >
-      <span class="action-icon">↺</span>
-      <span>Reset</span>
+      <img src="/reset.svg" alt="" class="action-icon" />
     </button>
     
     <button
-      class="action-btn action-btn-secondary"
-      @click="$emit('reset-changes')"
-      :disabled="!isConnected || isLoading || !hasChanges"
-    >
-      <span class="action-icon">↶</span>
-      <span>Undo</span>
-    </button>
-    
-    <button
-      class="action-btn action-btn-primary"
+      class="action-icon-btn"
+      title="Save"
+      aria-label="Save"
       @click="$emit('save')"
       :disabled="!isConnected || isLoading || !hasChanges"
     >
-      <span class="action-icon">💾</span>
-      <span v-if="isLoading">Saving...</span>
-      <span v-else>Save</span>
+      <img src="/save.svg" alt="" class="action-icon" />
     </button>
   </div>
 </template>
@@ -50,7 +42,6 @@ defineProps<{
 defineEmits<{
   load: [];
   'reset-defaults': [];
-  'reset-changes': [];
   save: [];
 }>();
 </script>
@@ -61,83 +52,57 @@ defineEmits<{
   top: 44px; /* Height of mobile tab nav */
   z-index: 199;
   display: flex;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  gap: 1rem;
+  padding: 1rem 0.75rem;
   background: var(--color-background);
-  border-bottom: 1px solid var(--color-border);
-  flex-wrap: wrap;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  justify-content: center;
+  align-items: center;
 }
 
-.action-btn {
-  flex: 1;
-  min-width: 80px;
+.action-icon-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.3;
+  transition: opacity 0.3s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
-  padding: 0.5rem 0.625rem;
-  border: none;
-  border-radius: var(--kb1-radius-sm, 6px);
-  font-weight: 500;
-  font-size: 0.8125rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-  min-height: 40px; /* Compressed from 44px */
 }
 
-.action-btn:disabled {
-  opacity: 0.4;
+.action-icon-btn:hover:not(:disabled) {
+  opacity: 1.0;
+}
+
+.action-icon-btn:focus-visible {
+  opacity: 1.0;
+  outline: 2px solid #74C4FF;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.action-icon-btn:disabled {
+  opacity: 0.15;
   cursor: not-allowed;
 }
 
-.action-btn-primary {
-  background: var(--kb1-primary, #3b82f6);
-  color: white;
-}
-
-.action-btn-primary:hover:not(:disabled) {
-  background: var(--kb1-primary-hover, #2563eb);
-}
-
-.action-btn-primary:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.action-btn-secondary {
-  background: var(--color-background-mute);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-}
-
-.action-btn-secondary:hover:not(:disabled) {
-  background: var(--color-background-soft);
-}
-
-.action-btn-secondary:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
 .action-icon {
-  font-size: 1rem;
+  width: 24px;
+  height: 24px;
+  display: block;
+  pointer-events: none;
 }
 
 @media (max-width: 480px) {
   .sticky-action-bar {
-    padding: 0.5rem;
-    gap: 0.375rem;
-  }
-  
-  .action-btn {
-    font-size: 0.75rem;
-    padding: 0.5rem 0.5rem;
-    min-width: 70px;
-    min-height: 38px;
+    padding: 0.75rem;
+    gap: 0.75rem;
   }
   
   .action-icon {
-    font-size: 0.875rem;
+    width: 22px;
+    height: 22px;
   }
 }
 
@@ -145,12 +110,12 @@ defineEmits<{
   .sticky-action-bar {
     /* Not sticky on desktop - nav bar is not sticky */
     position: static;
-    padding: 1rem;
+    padding: 1.5rem;
   }
   
-  .action-btn {
-    flex: 0 1 auto;
-    min-width: 120px;
+  .action-icon {
+    width: 28px;
+    height: 28px;
   }
 }
 </style>

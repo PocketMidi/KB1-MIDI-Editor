@@ -217,7 +217,7 @@ body {
   border-bottom: none;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1;
 }
 
 .header-content {
@@ -253,7 +253,7 @@ body {
 .tab-nav-wrapper {
   position: sticky;
   top: 0;
-  z-index: 200;
+  z-index: 10;
   background: #0F0F0F;
 }
 
@@ -333,8 +333,9 @@ body {
 /* Vertical separator (divider) after tabs */
 .separator {
   width: 2px;
+  height: 70%;
   background: rgba(234, 234, 234, 0.3);
-  align-self: stretch;
+  align-self: center;
   flex-shrink: 0;
   margin: 0 0.5rem;
 }

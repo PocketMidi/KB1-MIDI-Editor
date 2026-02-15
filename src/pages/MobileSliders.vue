@@ -1,11 +1,5 @@
 <template>
   <div class="mobile-sliders-tab">
-    <!-- Subtle connection status indicator -->
-    <div v-if="!isConnected" class="connection-status-bar">
-      <span class="status-dot disconnected"></span>
-      <span class="status-text">Disconnected - Preview mode</span>
-    </div>
-    
     <!-- Always show content, but apply disconnected styling -->
     <div class="sliders-wrapper" :class="{ 'disconnected-state': !isConnected }">
       <PerformanceSliders />

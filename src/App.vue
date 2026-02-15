@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import MobileHeader from './components/MobileHeader.vue';
-import MobileTabNav from './components/MobileTabNav.vue';
 import MobileControls from './pages/MobileControls.vue';
 import MobileScales from './pages/MobileScales.vue';
 import MobileSliders from './pages/MobileSliders.vue';
@@ -11,24 +9,17 @@ import './styles/themes/kb1.css';
 const { 
   isBluetoothAvailable, 
   isConnected, 
-  deviceName, 
-  connect, 
-  disconnect,
-  isLoading
+  connect,
 } = useDeviceState();
 
-// Desktop tabs - now matching mobile structure
-type DesktopTab = 'controls' | 'scales' | 'sliders';
-const activeDesktopTab = ref<DesktopTab>('controls');
+// Single unified tab state
+type Tab = 'controls' | 'scales' | 'sliders';
+const activeTab = ref<Tab>('controls');
 
-// Mobile tabs
-type MobileTab = 'controls' | 'scales' | 'sliders';
-const activeMobileTab = ref<MobileTab>('controls');
-
-const mobileTabs = [
-  { id: 'controls', label: 'CONTROLS' },
-  { id: 'scales', label: 'SCALES' },
-  { id: 'sliders', label: 'SLIDERS' }
+const tabs = [
+  { id: 'controls' as Tab, label: 'CONTROLS' },
+  { id: 'scales' as Tab, label: 'SCALES' },
+  { id: 'sliders' as Tab, label: 'SLIDERS' }
 ];
 
 // Hover state for bluetooth status text
@@ -42,115 +33,52 @@ async function handleConnect() {
   }
 }
 
-async function handleDisconnect() {
-  try {
-    await disconnect();
-  } catch (error) {
-    console.error('Disconnect failed:', error);
-  }
-}
-
-
 </script>
 
 <template>
   <div class="app theme-kb1">
-    <!-- Mobile Layout (< 769px) -->
-    <div class="mobile-layout">
-      <MobileHeader
-        :is-connected="isConnected"
-        :device-name="deviceName"
-        @connect="handleConnect"
-      />
+    <!-- Unified Responsive Layout -->
+    <header class="app-header">
+      <div class="header-content">
+        <!-- KB1 logo - centered, no buttons -->
+        <div class="logo-section">
+          <img src="/kb1-title.svg" alt="KB1 CONFIGURATOR" class="header-logo" />
+        </div>
+      </div>
       
       <div v-if="!isBluetoothAvailable" class="warning-banner">
         ⚠️ Web Bluetooth is not supported in this browser. Please use Chrome, Edge, or Opera.
       </div>
-      
-      <div class="mobile-connect-section" v-if="!isConnected">
-        <button 
-          class="btn btn-connect mobile-connect-btn"
-          @click="handleConnect"
-          :disabled="!isBluetoothAvailable || isLoading"
-        >
-          <span v-if="isLoading">Connecting...</span>
-          <span v-else>Connect Device</span>
-        </button>
-      </div>
-      
-      <button 
-        v-if="isConnected"
-        class="btn btn-disconnect mobile-disconnect-btn"
-        @click="handleDisconnect"
-        :disabled="isLoading"
-      >
-        Disconnect
-      </button>
-      
-      <MobileTabNav
-        :tabs="mobileTabs"
-        :is-connected="isConnected"
-        v-model="activeMobileTab"
-        @connect="handleConnect"
-      />
-      
-      <main class="mobile-main">
-        <MobileControls v-if="activeMobileTab === 'controls'" />
-        <MobileScales v-if="activeMobileTab === 'scales'" />
-        <MobileSliders v-if="activeMobileTab === 'sliders'" />
-      </main>
-    </div>
+    </header>
     
-    <!-- Desktop Layout (>= 769px) -->
-    <div class="desktop-layout">
-      <header class="app-header">
-        <div class="header-content">
-          <!-- Always show KB1 logo - centered, no button -->
-          <div class="logo-section">
-            <img src="/kb1-title.svg" alt="KB1 CONFIGURATOR" class="header-logo" />
-          </div>
-        </div>
-        
-        <div v-if="!isBluetoothAvailable" class="warning-banner">
-          ⚠️ Web Bluetooth is not supported in this browser. Please use Chrome, Edge, or Opera.
-        </div>
-      </header>
-      
+    <!-- Unified Tab Navigation with Bluetooth Controls -->
+    <div class="tab-nav-wrapper">
       <nav class="app-nav">
         <div class="nav-tabs">
           <button 
+            v-for="tab in tabs"
+            :key="tab.id"
             class="nav-tab"
-            :class="{ active: activeDesktopTab === 'controls' }"
-            @click="activeDesktopTab = 'controls'"
+            :class="{ active: activeTab === tab.id }"
+            @click="activeTab = tab.id"
           >
-            CONTROLS
+            {{ tab.label }}
           </button>
-          <button 
-            class="nav-tab"
-            :class="{ active: activeDesktopTab === 'scales' }"
-            @click="activeDesktopTab = 'scales'"
-          >
-            SCALES
-          </button>
-          <button 
-            class="nav-tab"
-            :class="{ active: activeDesktopTab === 'sliders' }"
-            @click="activeDesktopTab = 'sliders'"
-          >
-            SLIDERS
-          </button>
+          <!-- Vertical divider after tabs -->
+          <div class="separator"></div>
         </div>
         
         <!-- Bluetooth status section -->
-        <div class="bluetooth-status" :class="{ connected: isConnected }">
-          <div class="separator"></div>
-          <span 
-            class="status-text" 
-            :class="{ connected: isConnected, hoverable: !isConnected }"
-            @click="!isConnected && handleConnect()"
-            @mouseenter="!isConnected && (isHoveringStatus = true)"
-            @mouseleave="isHoveringStatus = false"
-          >
+        <div 
+          class="bluetooth-status" 
+          :class="{ connected: isConnected, hoverable: !isConnected }"
+          @click="!isConnected && handleConnect()"
+          @touchstart="!isConnected && (isHoveringStatus = true)"
+          @touchend="isHoveringStatus = false"
+          @mouseenter="!isConnected && (isHoveringStatus = true)"
+          @mouseleave="isHoveringStatus = false"
+        >
+          <span class="status-text">
             {{ isConnected ? 'CONNECTED' : (isHoveringStatus ? 'CONNECT' : 'DISCONNECTED') }}
           </span>
           <img src="/bluetooth-icon.svg" alt="Bluetooth" class="bluetooth-icon" />
@@ -159,25 +87,28 @@ async function handleDisconnect() {
       
       <!-- Horizontal divider under navigation -->
       <div class="nav-divider"></div>
-      
-      <main class="app-main">
-        <MobileControls v-if="activeDesktopTab === 'controls'" />
-        <MobileScales v-if="activeDesktopTab === 'scales'" />
-        <MobileSliders v-if="activeDesktopTab === 'sliders'" />
-      </main>
-      
-      <footer class="app-footer">
-        <p>KB1 config - Web Bluetooth Configuration Tool</p>
-        <p class="footer-note">
-          <strong>Note:</strong> This app requires HTTPS and a Bluetooth-enabled device. 
-          Ensure your browser supports Web Bluetooth API.
-        </p>
-      </footer>
     </div>
+    
+    <main class="app-main">
+      <MobileControls v-if="activeTab === 'controls'" />
+      <MobileScales v-if="activeTab === 'scales'" />
+      <MobileSliders v-if="activeTab === 'sliders'" />
+    </main>
+    
+    <footer class="app-footer">
+      <p>KB1 config - Web Bluetooth Configuration Tool</p>
+      <p class="footer-note">
+        <strong>Note:</strong> This app requires HTTPS and a Bluetooth-enabled device. 
+        Ensure your browser supports Web Bluetooth API.
+      </p>
+    </footer>
   </div>
 </template>
 
 <style>
+/* Import Roboto Mono font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
 :root {
   --color-background: #0F0F0F;
   --color-background-soft: #0F0F0F;
@@ -280,52 +211,7 @@ body {
   flex-direction: column;
 }
 
-/* Mobile Layout - Show by default, hide on desktop */
-.mobile-layout {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.mobile-connect-section {
-  padding: 1rem;
-  display: flex;
-  justify-content: center;
-}
-
-.mobile-connect-btn {
-  width: 100%;
-  max-width: 400px;
-}
-
-.mobile-disconnect-btn {
-  margin: 0.5rem 1rem;
-  width: calc(100% - 2rem);
-}
-
-.mobile-main {
-  flex: 1;
-  overflow-y: auto;
-  background: var(--color-background);
-}
-
-/* Desktop Layout - Hidden by default, show on tablet/desktop */
-.desktop-layout {
-  display: none;
-}
-
-@media (min-width: 769px) {
-  .mobile-layout {
-    display: none;
-  }
-  
-  .desktop-layout {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-}
-
+/* Header - Unified for all screen sizes */
 .app-header {
   background: #0F0F0F;
   border-bottom: none;
@@ -341,7 +227,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
 }
 
 .logo-section {
@@ -349,8 +234,9 @@ body {
   align-items: center;
 }
 
+/* Logo - consistent size across all screens (mobile size from original) */
 .header-logo {
-  height: 90px; /* 150% of original 60px */
+  height: 60px;
   width: auto;
 }
 
@@ -363,6 +249,15 @@ body {
   font-size: 0.875rem;
 }
 
+/* Tab Navigation Wrapper - sticky with background */
+.tab-nav-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: #0F0F0F;
+}
+
+/* Tab Navigation - Unified responsive layout */
 .app-nav {
   background: #0F0F0F;
   border-bottom: none;
@@ -373,10 +268,13 @@ body {
   margin: 0 auto;
   width: 100%;
   padding: 0 2rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .nav-tabs {
   display: flex;
+  align-items: stretch;
   gap: 0;
 }
 
@@ -391,8 +289,10 @@ body {
   text-transform: uppercase;
   cursor: pointer;
   opacity: 0.32;
-  transition: all 0.2s;
+  transition: opacity 0.2s;
   position: relative;
+  white-space: nowrap;
+  font-size: 0.875rem;
 }
 
 .nav-tab:hover {
@@ -405,6 +305,7 @@ body {
   opacity: 1;
 }
 
+/* Active tab underline */
 .nav-tab.active::after {
   content: '';
   position: absolute;
@@ -429,6 +330,15 @@ body {
   border-radius: 1px;
 }
 
+/* Vertical separator (divider) after tabs */
+.separator {
+  width: 2px;
+  background: rgba(234, 234, 234, 0.3);
+  align-self: stretch;
+  flex-shrink: 0;
+  margin: 0 0.5rem;
+}
+
 /* Bluetooth status section in nav */
 .bluetooth-status {
   display: flex;
@@ -438,12 +348,8 @@ body {
   white-space: nowrap;
 }
 
-.separator {
-  width: 2px;
-  height: 1.25rem;
-  background: rgba(234, 234, 234, 0.3);
-  align-self: center;
-  flex-shrink: 0; /* Prevent separator from moving */
+.bluetooth-status.hoverable {
+  cursor: pointer;
 }
 
 .status-text {
@@ -452,33 +358,35 @@ body {
   font-size: 0.875rem;
   color: #47708E;
   opacity: 0.5;
-  transition: color 0.5s ease-in-out, opacity 0.5s ease-in-out, transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition: color 0.5s ease-in-out, 
+              opacity 0.5s ease-in-out, 
+              font-weight 0.5s ease-in-out;
   transform-origin: center;
 }
 
-.status-text.hoverable {
-  cursor: pointer;
-}
-
-.status-text.hoverable:hover {
+.bluetooth-status.hoverable:hover .status-text,
+.bluetooth-status.hoverable:active .status-text {
   color: #74C4FF;
   opacity: 1;
-  transform: scale(1.1);
+  font-weight: bold;
+  /* NO transform scale */
 }
 
-.status-text.connected {
+.bluetooth-status.connected .status-text {
   opacity: 1;
 }
 
 .bluetooth-icon {
-  height: 32px; /* Scaled up by 60% per requirements (160% of original) */
+  height: 32px; /* Scaled up by 60% per requirements */
   width: auto;
-  transition: filter 0.5s ease-in-out, transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition: filter 0.5s ease-in-out, 
+              transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   transform-origin: center;
 }
 
-/* Bluetooth status hover effect for icon */
-.bluetooth-status:hover .bluetooth-icon {
+/* Bluetooth icon hover effect - with bounce animation */
+.bluetooth-status.hoverable:hover .bluetooth-icon,
+.bluetooth-status.hoverable:active .bluetooth-icon {
   filter: brightness(0) saturate(100%) invert(65%) sepia(45%) saturate(1154%) hue-rotate(174deg) brightness(101%) contrast(101%);
   transform: scale(1.15);
 }
@@ -525,74 +433,60 @@ body {
   font-size: 0.75rem;
 }
 
-.btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-  min-height: 44px; /* Mobile touch target */
+/* Responsive adjustments using CSS media queries only */
+@media (max-width: 640px) {
+  .app-nav {
+    padding: 0 1rem;
+  }
+  
+  .nav-tab {
+    font-size: 0.8125rem;
+    padding: 0.75rem 1rem;
+  }
+  
+  .bluetooth-status {
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+  }
+  
+  .status-text {
+    font-size: 0.8125rem;
+  }
+  
+  .bluetooth-icon {
+    height: 28px;
+  }
+  
+  .separator {
+    margin: 0 0.25rem;
+  }
 }
 
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-bluetooth-connect {
-  padding: 0.75rem 1.5rem;
-  background: transparent;
-  border: 2px solid #47708E;
-  border-radius: 6px;
-  color: #47708E;
-  font-family: 'Roboto Mono', monospace;
-  font-weight: 700;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.btn-bluetooth-connect:hover:not(:disabled) {
-  background: rgba(71, 112, 142, 0.1);
-}
-
-.btn-bluetooth-connect:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.btn-bluetooth-connect:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-connect {
-  background: #3b82f6;
-  color: white;
-}
-
-.btn-connect:hover:not(:disabled) {
-  background: #2563eb;
-}
-
-.btn-connect:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.btn-disconnect {
-  background: transparent;
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-}
-
-.btn-disconnect:hover:not(:disabled) {
-  background: var(--color-background-mute);
-}
-
-.btn-disconnect:active:not(:disabled) {
-  transform: scale(0.98);
+@media (max-width: 480px) {
+  .header-content {
+    padding: 1rem 1.5rem;
+  }
+  
+  .header-logo {
+    height: 50px;
+  }
+  
+  .nav-tab {
+    font-size: 0.75rem;
+    padding: 0.75rem 0.75rem;
+  }
+  
+  .bluetooth-status {
+    padding: 0.75rem 0.75rem;
+    gap: 0.4rem;
+  }
+  
+  .status-text {
+    font-size: 0.75rem;
+  }
+  
+  .bluetooth-icon {
+    height: 24px;
+  }
 }
 </style>

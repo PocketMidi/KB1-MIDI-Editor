@@ -1,5 +1,5 @@
 <template>
-  <div class="sticky-action-bar">
+  <div class="footer-action-bar">
     <button
       class="action-icon-btn"
       title="Load"
@@ -47,16 +47,19 @@ defineEmits<{
 </script>
 
 <style scoped>
-.sticky-action-bar {
-  position: sticky;
-  top: 44px; /* Height of mobile tab nav */
+.footer-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   z-index: 199;
   display: flex;
-  gap: 1rem;
-  padding: 1rem 0.75rem;
+  gap: 50px; /* Increased spacing between icons (40-60px range) */
+  padding: 20px 0;
   background: var(--color-background);
   justify-content: center;
   align-items: center;
+  border-top: 1px solid rgba(234, 234, 234, 0.1);
 }
 
 .action-icon-btn {
@@ -88,34 +91,33 @@ defineEmits<{
 }
 
 .action-icon {
-  width: 24px;
-  height: 24px;
+  width: 41px; /* Increased by ~70% from 24px */
+  height: 41px;
   display: block;
   pointer-events: none;
 }
 
-@media (max-width: 480px) {
-  .sticky-action-bar {
-    padding: 0.75rem;
-    gap: 0.75rem;
+@media (max-width: 640px) {
+  .footer-action-bar {
+    padding: 16px 0;
+    gap: 40px; /* Slightly smaller gap on mobile but still increased */
   }
   
   .action-icon {
-    width: 22px;
-    height: 22px;
+    width: 36px; /* Slightly smaller on mobile but still larger than original */
+    height: 36px;
   }
 }
 
-@media (min-width: 769px) {
-  .sticky-action-bar {
-    /* Not sticky on desktop - nav bar is not sticky */
-    position: static;
-    padding: 1.5rem;
+@media (max-width: 480px) {
+  .footer-action-bar {
+    padding: 12px 0;
+    gap: 35px;
   }
   
   .action-icon {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
   }
 }
 </style>

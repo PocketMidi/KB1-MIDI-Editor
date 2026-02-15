@@ -1,31 +1,34 @@
 <template>
   <div class="sticky-action-bar">
-    <img
-      src="/load.svg"
-      class="action-icon"
+    <button
+      class="action-icon-btn"
       title="Load"
-      alt="Load"
+      aria-label="Load"
       @click="$emit('load')"
-      :class="{ disabled: !isConnected || isLoading }"
-    />
+      :disabled="!isConnected || isLoading"
+    >
+      <img src="/load.svg" alt="" class="action-icon" />
+    </button>
     
-    <img
-      src="/reset.svg"
-      class="action-icon"
+    <button
+      class="action-icon-btn"
       title="Reset"
-      alt="Reset"
+      aria-label="Reset"
       @click="$emit('reset-defaults')"
-      :class="{ disabled: !isConnected || isLoading }"
-    />
+      :disabled="!isConnected || isLoading"
+    >
+      <img src="/reset.svg" alt="" class="action-icon" />
+    </button>
     
-    <img
-      src="/save.svg"
-      class="action-icon"
+    <button
+      class="action-icon-btn"
       title="Save"
-      alt="Save"
+      aria-label="Save"
       @click="$emit('save')"
-      :class="{ disabled: !isConnected || isLoading || !hasChanges }"
-    />
+      :disabled="!isConnected || isLoading || !hasChanges"
+    >
+      <img src="/save.svg" alt="" class="action-icon" />
+    </button>
   </div>
 </template>
 
@@ -56,21 +59,38 @@ defineEmits<{
   align-items: center;
 }
 
-.action-icon {
-  width: 24px;
-  height: 24px;
+.action-icon-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   opacity: 0.3;
   transition: opacity 0.3s ease-in-out;
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.action-icon:hover:not(.disabled) {
+.action-icon-btn:hover:not(:disabled) {
   opacity: 1.0;
 }
 
-.action-icon.disabled {
+.action-icon-btn:focus-visible {
+  opacity: 1.0;
+  outline: 2px solid #74C4FF;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.action-icon-btn:disabled {
   opacity: 0.15;
   cursor: not-allowed;
+}
+
+.action-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
   pointer-events: none;
 }
 

@@ -108,11 +108,6 @@ async function handleResetDefaults() {
   }
 }
 
-function handleReset() {
-  localSettings.value = { ...deviceSettings.value };
-  hasChanges.value = false;
-}
-
 async function handleSaveToDevice() {
   try {
     await sendSettings(localSettings.value);

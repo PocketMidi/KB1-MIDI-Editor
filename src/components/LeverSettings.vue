@@ -1,12 +1,60 @@
 <template>
   <div class="settings-lever" :class="`lever-${lever}`">
     <div class="title">
-      <h2>{{ title }} {{ lever }}</h2>
-      <div v-if="isValidCC" class="parameter-header">
-        <div class="parameter-name">{{ parameterDisplayName }}</div>
-        <div v-if="parameterRange" class="parameter-range">{{ parameterRange }}</div>
-        <div class="cc-reference">MIDI CC {{ model.ccNumber }}</div>
+      <div class="title-left">LEVER {{ lever }}</div>
+      <div class="title-right">MIDI CC <span class="cc-number">{{ model.ccNumber }}</span></div>
+    </div>
+
+    <!-- Toggle and Profile Selection -->
+    <div class="controls-row">
+      <!-- Unipolar/Bipolar Toggle -->
+      <div class="toggle-container">
+        <img 
+          :src="toggleImage" 
+          alt="Polarity Toggle"
+          class="toggle-image"
+          @click="handleToggleClick"
+          @mouseenter="toggleHovered = true"
+          @mouseleave="toggleHovered = false"
+        />
       </div>
+
+      <!-- Profile Text Selection -->
+      <div class="profile-selector">
+        <button 
+          class="profile-btn"
+          :class="{ active: isProfileActive('lin') }"
+          @click="selectProfile('lin')"
+        >
+          Lin
+        </button>
+        <button 
+          class="profile-btn"
+          :class="{ active: isProfileActive('exp') }"
+          @click="selectProfile('exp')"
+        >
+          Exp
+        </button>
+        <button 
+          class="profile-btn"
+          :class="{ active: isProfileActive('log') }"
+          @click="selectProfile('log')"
+        >
+          Log
+        </button>
+        <button 
+          class="profile-btn"
+          :class="{ active: isProfileActive('inc') }"
+          @click="selectProfile('inc')"
+        >
+          Inc
+        </button>
+      </div>
+    </div>
+
+    <!-- Profile Visualization -->
+    <div class="profile-visualization">
+      <img :src="profileImage" alt="Profile Graph" />
     </div>
 
     <div class="inputs">
@@ -21,20 +69,6 @@
         <label :for="`lever-ccNumber-${lever}`">Parameter</label>
         <select :id="`lever-ccNumber-${lever}`" v-model.number="model.ccNumber">
           <option v-for="opt in filteredOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-        </select>
-      </div>
-
-      <div class="group">
-        <label :for="`lever-valueMode-${lever}`">Polarity</label>
-        <select :id="`lever-valueMode-${lever}`" v-model.number="model.valueMode">
-          <option v-for="opt in valueModes" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-        </select>
-      </div>
-
-      <div class="group">
-        <label :for="`lever-functionMode-${lever}`">Profile</label>
-        <select :id="`lever-functionMode-${lever}`" v-model.number="model.functionMode">
-          <option v-for="opt in functionModes" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
         </select>
       </div>
 
@@ -90,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import { type CCEntry } from '../data/ccMap'
 import ValueControl from './ValueControl.vue'
 
@@ -128,7 +162,113 @@ const model = computed({
   set: v => emit('update:modelValue', v)
 })
 
-const isValidCC = computed(() => model.value.ccNumber >= 0 && model.value.ccNumber <= 128)
+// Constants
+const BASE_PATH = '/KB1-config'
+const TOGGLE_ANIMATION_DURATION = 60 // milliseconds for toggle transition
+
+// Toggle state and animation
+// toggleHovered: tracks hover state for visual feedback (shows float state)
+// isAnimating: prevents rapid toggle clicks during transition animation
+const toggleHovered = ref(false)
+const isAnimating = ref(false)
+const animationTimeoutId = ref<number | null>(null)
+
+const toggleImage = computed(() => {
+  const isUnipolar = model.value.valueMode === 0
+  
+  if (isAnimating.value) {
+    // During animation, show transition frames
+    return isUnipolar 
+      ? `${BASE_PATH}/uni_bi_toggle/l-r_trans.svg`
+      : `${BASE_PATH}/uni_bi_toggle/r-l_trans.svg`
+  }
+  
+  if (toggleHovered.value) {
+    return isUnipolar 
+      ? `${BASE_PATH}/uni_bi_toggle/l_float.svg`
+      : `${BASE_PATH}/uni_bi_toggle/r_float.svg`
+  }
+  
+  return isUnipolar 
+    ? `${BASE_PATH}/uni_bi_toggle/l_active.svg`
+    : `${BASE_PATH}/uni_bi_toggle/r_active.svg`
+})
+
+const handleToggleClick = () => {
+  if (isAnimating.value) return
+  
+  isAnimating.value = true
+  
+  // Animate for specified duration then switch
+  animationTimeoutId.value = window.setTimeout(() => {
+    model.value.valueMode = model.value.valueMode === 0 ? 1 : 0
+    isAnimating.value = false
+    animationTimeoutId.value = null
+  }, TOGGLE_ANIMATION_DURATION)
+}
+
+// Cleanup timeout on unmount to prevent memory leaks
+onBeforeUnmount(() => {
+  if (animationTimeoutId.value !== null) {
+    clearTimeout(animationTimeoutId.value)
+  }
+})
+
+// Profile selection logic
+type ProfileType = 'lin' | 'exp' | 'log' | 'inc'
+
+const isProfileActive = (profile: ProfileType): boolean => {
+  if (model.value.functionMode === 2) {
+    return profile === 'inc'
+  } else if (model.value.functionMode === 0) {
+    if (model.value.onsetType === 1) return profile === 'exp'
+    if (model.value.onsetType === 2) return profile === 'log'
+    return profile === 'lin'
+  }
+  return false
+}
+
+const selectProfile = (profile: ProfileType) => {
+  if (profile === 'inc') {
+    model.value.functionMode = 2
+  } else {
+    model.value.functionMode = 0
+    
+    // Set onsetType and offsetType based on profile
+    if (profile === 'exp') {
+      model.value.onsetType = 1
+      model.value.offsetType = 1
+    } else if (profile === 'log') {
+      model.value.onsetType = 2
+      model.value.offsetType = 2
+    } else {
+      // lin
+      model.value.onsetType = 0
+      model.value.offsetType = 0
+    }
+  }
+}
+
+// Profile visualization
+const profileImage = computed(() => {
+  const polarity = model.value.valueMode === 1 ? 'bi' : 'uni'
+  let profile = 'lin' // default
+  
+  if (model.value.functionMode === 2) {
+    profile = 'inc'
+  } else if (model.value.functionMode === 0) {
+    // Interpolated mode - check type
+    if (model.value.onsetType === 1) profile = 'exp'
+    else if (model.value.onsetType === 2) profile = 'log'
+    else profile = 'lin'
+  }
+  
+  // Note: Asset file naming uses dash for inc-uni but underscore for all others
+  // This matches the existing file naming convention in public/lever_profiles/
+  // Consider standardizing to use consistent separator in future asset updates
+  const separator = profile === 'inc' && polarity === 'uni' ? '-' : '_'
+  return `${BASE_PATH}/lever_profiles/${profile}${separator}${polarity}.svg`
+})
 
 // Initialize selectedCategory from current ccNumber's category (fallback to first available category)
 const initialCategory = computed(() => {
@@ -168,29 +308,6 @@ watch(selectedCategory, (cat) => {
     const first = filteredOptions.value.find(o => o.value >= 0)
     if (first) model.value.ccNumber = first.value
   }
-})
-
-// Get current parameter entry from ccMapByNumber
-const currentEntry = computed(() => {
-  return props.ccMapByNumber.get(model.value.ccNumber)
-})
-
-// Display parameter name or fallback to CC number
-const parameterDisplayName = computed(() => {
-  const entry = currentEntry.value
-  if (entry) {
-    return entry.parameter
-  }
-  return `CC ${model.value.ccNumber}`
-})
-
-// Display Polyend range if available
-const parameterRange = computed(() => {
-  const entry = currentEntry.value
-  if (entry?.range) {
-    return entry.range.text
-  }
-  return undefined
 })
 
 // Computed properties for mode detection
@@ -375,33 +492,98 @@ const duration = computed({
   border-bottom: 1px solid var(--color-border);
 }
 
-.title h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
+.title-left {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #848484;
+  text-transform: uppercase;
 }
 
-.parameter-header {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.25rem;
+.title-right {
   font-size: 0.875rem;
+  font-weight: 400;
+  color: #848484;
 }
 
-.parameter-name {
+.cc-number {
+  color: #F9AC20;
   font-weight: 600;
-  color: var(--color-text);
 }
 
-.parameter-range {
-  color: var(--color-text-muted);
-  font-style: italic;
+.controls-row {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
 }
 
-.cc-reference {
-  color: var(--color-text-muted);
-  font-size: 0.75rem;
+.toggle-container {
+  flex-shrink: 0;
+}
+
+.toggle-image {
+  display: block;
+  height: 40px;
+  width: auto;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.toggle-image:hover {
+  opacity: 0.9;
+}
+
+.profile-selector {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.profile-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #848484;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.profile-btn:hover {
+  color: #CDCDCD;
+}
+
+.profile-btn.active {
+  color: #CDCDCD;
+}
+
+.profile-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #CDCDCD;
+}
+
+.profile-visualization {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-visualization img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
 .inputs {

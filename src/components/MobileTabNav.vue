@@ -87,8 +87,8 @@ const isHovering = ref(false);
   border: none;
   border-radius: 0;
   color: #EAEAEA;
-  font-family: 'Roboto Mono', monospace;
-  font-weight: 700;
+  font-family: var(--kb1-font-family-mono);
+  font-weight: 400;
   font-size: 0.875rem;
   text-transform: uppercase;
   cursor: pointer;
@@ -109,6 +109,7 @@ const isHovering = ref(false);
   color: #EAEAEA;
   opacity: 1;
   background: transparent;
+  font-weight: 700;
 }
 
 .tab-button.active::after {
@@ -161,12 +162,12 @@ const isHovering = ref(false);
 }
 
 .status-text {
-  font-family: 'Roboto Mono', monospace;
-  font-weight: 700;
+  font-family: var(--kb1-font-family-mono);
+  font-weight: 400;
   font-size: 0.875rem;
   color: #47708E;
   opacity: 0.5;
-  transition: color 0.5s ease-in-out, opacity 0.5s ease-in-out, transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition: color 0.5s ease-in-out, opacity 0.5s ease-in-out, transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55), font-weight 0.5s ease-in-out;
   transform-origin: center;
 }
 
@@ -175,6 +176,7 @@ const isHovering = ref(false);
   color: #74C4FF;
   opacity: 1;
   transform: scale(1.1);
+  font-weight: 700;
 }
 
 .bluetooth-status.connected .status-text {

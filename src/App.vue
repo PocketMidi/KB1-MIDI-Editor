@@ -31,6 +31,9 @@ const mobileTabs = [
   { id: 'sliders', label: 'SLIDERS' }
 ];
 
+// Hover state for bluetooth status text
+const isHoveringStatus = ref(false);
+
 async function handleConnect() {
   try {
     await connect();
@@ -101,18 +104,7 @@ async function handleDisconnect() {
     <div class="desktop-layout">
       <header class="app-header">
         <div class="header-content">
-          <!-- Disconnected state: Show BLUETOOTH CONNECT button -->
-          <button 
-            v-if="!isConnected"
-            class="btn btn-bluetooth-connect"
-            @click="handleConnect"
-            :disabled="!isBluetoothAvailable || isLoading"
-          >
-            <span v-if="isLoading">CONNECTING...</span>
-            <span v-else>BLUETOOTH CONNECT</span>
-          </button>
-          
-          <!-- Always show KB1 logo -->
+          <!-- Always show KB1 logo - centered, no button -->
           <div class="logo-section">
             <img src="/kb1-title.svg" alt="KB1 CONFIGURATOR" class="header-logo" />
           </div>
@@ -151,12 +143,21 @@ async function handleDisconnect() {
         <!-- Bluetooth status section -->
         <div class="bluetooth-status">
           <div class="separator"></div>
-          <span class="status-text" :class="{ connected: isConnected }">
-            {{ isConnected ? 'CONNECTED' : 'DISCONNECTED' }}
+          <span 
+            class="status-text" 
+            :class="{ connected: isConnected, hoverable: !isConnected }"
+            @click="!isConnected && handleConnect()"
+            @mouseenter="!isConnected && (isHoveringStatus = true)"
+            @mouseleave="isHoveringStatus = false"
+          >
+            {{ isConnected ? 'CONNECTED' : (isHoveringStatus ? 'CONNECT' : 'DISCONNECTED') }}
           </span>
           <img src="/bluetooth-icon.svg" alt="Bluetooth" class="bluetooth-icon" />
         </div>
       </nav>
+      
+      <!-- Horizontal divider under navigation -->
+      <div class="nav-divider"></div>
       
       <main class="app-main">
         <MobileControls v-if="activeDesktopTab === 'controls'" />
@@ -337,14 +338,9 @@ body {
   margin: 0 auto;
   padding: 1.5rem 2rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   gap: 2rem;
-}
-
-/* When only logo is present (connected state), center it */
-.header-content:not(:has(.btn-bluetooth-connect)) {
-  justify-content: center;
 }
 
 .logo-section {
@@ -353,7 +349,7 @@ body {
 }
 
 .header-logo {
-  height: 40px;
+  height: 60px;
   width: auto;
 }
 
@@ -419,6 +415,19 @@ body {
   border-radius: 1px;
 }
 
+/* Inactive tab underline */
+.nav-tab:not(.active)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #EAEAEA;
+  opacity: 0.32;
+  border-radius: 1px;
+}
+
 /* Bluetooth status section in nav */
 .bluetooth-status {
   display: flex;
@@ -431,7 +440,7 @@ body {
 .separator {
   width: 2px;
   height: 1.25rem;
-  background: #EAEAEA;
+  background: rgba(234, 234, 234, 0.3);
   align-self: center;
 }
 
@@ -441,6 +450,16 @@ body {
   font-size: 0.875rem;
   color: #47708E;
   opacity: 0.5;
+  transition: all 0.2s;
+}
+
+.status-text.hoverable {
+  cursor: pointer;
+}
+
+.status-text.hoverable:hover {
+  color: #74C4FF;
+  opacity: 1;
 }
 
 .status-text.connected {
@@ -448,8 +467,17 @@ body {
 }
 
 .bluetooth-icon {
-  height: 20px;
+  height: 32px;
   width: auto;
+}
+
+/* Horizontal divider under navigation */
+.nav-divider {
+  height: 3px;
+  background: rgba(234, 234, 234, 0.3);
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .app-main {

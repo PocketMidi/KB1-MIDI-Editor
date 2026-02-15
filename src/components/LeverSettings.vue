@@ -460,6 +460,28 @@ const duration = computed({
 </script>
 
 <style scoped>
+
+  .polarity-toggle img {
+  /* Reduce to 70-75% of original size */
+  width: 70%;
+  height: auto;
+}
+
+.profile-display img {
+  /* Increase to 180-200% of original size */
+  width: 190%;
+  height: auto;
+  transform: scale(1.9);
+  transform-origin: center;
+}
+
+/* If overflow occurs, you may need to add: */
+.profile-display {
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .settings-lever {
   padding: 1.5rem;
   background: var(--color-background-soft);

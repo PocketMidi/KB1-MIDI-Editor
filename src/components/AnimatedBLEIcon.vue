@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const FRAME_COUNT = 83;
 const currentFrameIndex = ref(0);
-let animationInterval: number | null = null;
+let animationInterval: ReturnType<typeof setInterval> | null = null;
 
 // Generate frame path based on current index
 const currentFrame = computed(() => {
@@ -38,9 +38,9 @@ const currentFrame = computed(() => {
 onMounted(() => {
   const frameDelay = 1000 / props.fps; // Convert FPS to milliseconds per frame
   
-  animationInterval = window.setInterval(() => {
+  animationInterval = setInterval(() => {
     currentFrameIndex.value = (currentFrameIndex.value + 1) % FRAME_COUNT;
-  }, frameDelay);
+  }, frameDelay) as ReturnType<typeof setInterval>;
   
   // Preload all frames for smooth animation
   preloadFrames();

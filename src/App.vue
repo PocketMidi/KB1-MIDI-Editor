@@ -6,6 +6,7 @@ import MobileSliders from './pages/MobileSliders.vue';
 import FirstTimeOverlay from './components/FirstTimeOverlay.vue';
 import ContextualConnectionModal from './components/ContextualConnectionModal.vue';
 import { useDeviceState } from './composables/useDeviceState';
+import { FIRST_TIME_BLE_INTRO_KEY } from './constants';
 import './styles/themes/kb1.css';
 
 const { 
@@ -29,7 +30,6 @@ const tabs = [
 const isHoveringStatus = ref(false);
 
 // Modal states
-const FIRST_TIME_KEY = 'kb1-ble-intro-seen';
 const showFirstTimeOverlay = ref(false);
 const showContextualModal = ref(false);
 
@@ -43,7 +43,7 @@ const bluetoothStatusText = computed(() => {
 
 // Check if first-time overlay should be shown
 onMounted(() => {
-  const hasSeenIntro = localStorage.getItem(FIRST_TIME_KEY);
+  const hasSeenIntro = localStorage.getItem(FIRST_TIME_BLE_INTRO_KEY);
   if (!hasSeenIntro && !isConnected.value) {
     showFirstTimeOverlay.value = true;
   }
@@ -70,45 +70,55 @@ async function handleDisconnect() {
 
 function handleFirstTimeDismiss() {
   showFirstTimeOverlay.value = false;
-  localStorage.setItem(FIRST_TIME_KEY, 'true');
+  localStorage.setItem(FIRST_TIME_BLE_INTRO_KEY, 'true');
 }
 
 function handleContextualDismiss() {
   showContextualModal.value = false;
 }
 
-function handleDisabledControlClick() {
-  if (!isConnected.value) {
-    showContextualModal.value = true;
-  }
+/**
+ * Check if a click event was on a disabled control that should trigger the contextual modal.
+ * 
+ * Detects clicks on:
+ * - Input elements (text, number, etc.)
+ * - Select dropdowns
+ * - Buttons (excluding accordion headers)
+ * - Elements with .value-control class (custom value controls)
+ * - Elements with .slider-control class (sliders)
+ * - Elements with .form-control class (general form controls)
+ * 
+ * @param target - The HTML element that was clicked
+ * @returns true if the click should trigger the contextual modal
+ */
+function isDisabledControlClick(target: HTMLElement): boolean {
+  // Check for basic form elements
+  const isBasicControl = target.tagName === 'INPUT' || 
+                         target.tagName === 'SELECT' || 
+                         target.tagName === 'BUTTON';
+  
+  // Check for custom control components
+  const isCustomControl = target.closest('.value-control') ||
+                          target.closest('.slider-control') ||
+                          target.closest('.form-control');
+  
+  // Don't trigger for accordion headers (they should still work when disconnected)
+  const isAccordionHeader = target.closest('.accordion-header');
+  
+  return (isBasicControl || Boolean(isCustomControl)) && !isAccordionHeader;
 }
 
 function handleMainClick(event: MouseEvent) {
   if (!isConnected.value) {
     const target = event.target as HTMLElement;
     
-    // Check if the click was on a disabled control (input, select, button, slider, etc.)
-    const isControl = target.tagName === 'INPUT' || 
-                      target.tagName === 'SELECT' || 
-                      target.tagName === 'BUTTON' ||
-                      target.closest('.value-control') ||
-                      target.closest('.slider-control') ||
-                      target.closest('.form-control');
-    
-    // Don't trigger for accordion headers (they should still work when disconnected)
-    const isAccordionHeader = target.closest('.accordion-header');
-    
-    if (isControl && !isAccordionHeader) {
+    if (isDisabledControlClick(target)) {
       event.preventDefault();
       event.stopPropagation();
       showContextualModal.value = true;
     }
   }
 }
-
-// Make handleDisabledControlClick available globally for child components
-// This allows any component to trigger the contextual modal
-(window as any).__kb1_showConnectionModal = handleDisabledControlClick;
 
 </script>
 

@@ -73,13 +73,16 @@ const emit = defineEmits<{
 
 const connectButtonRef = ref<HTMLButtonElement | null>(null);
 
+// Small delay to ensure modal is fully rendered before focusing
+const FOCUS_DELAY_MS = 100;
+
 // Focus management
 watch(() => props.show, (isShown) => {
   if (isShown) {
     // Focus the connect button when modal opens
     setTimeout(() => {
       connectButtonRef.value?.focus();
-    }, 100);
+    }, FOCUS_DELAY_MS);
     
     // Add keyboard listener
     document.addEventListener('keydown', handleKeyDown);

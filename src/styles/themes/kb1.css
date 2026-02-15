@@ -57,7 +57,7 @@
   
   /* ===== Typography ===== */
   --kb1-font-family: 'Roboto Mono', 'Courier New', Courier, monospace;
-  --kb1-font-family-mono: 'Roboto Mono', 'Courier New', Courier, monospace;
+  --kb1-font-family-mono: var(--kb1-font-family);
   --kb1-font-size-xs: 0.75rem;
   --kb1-font-size-sm: 0.875rem;
   --kb1-font-size-base: 1rem;

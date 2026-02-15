@@ -87,7 +87,7 @@ const isHovering = ref(false);
   border: none;
   border-radius: 0;
   color: #EAEAEA;
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--kb1-font-family-mono);
   font-weight: 400;
   font-size: 0.875rem;
   text-transform: uppercase;
@@ -162,7 +162,7 @@ const isHovering = ref(false);
 }
 
 .status-text {
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--kb1-font-family-mono);
   font-weight: 400;
   font-size: 0.875rem;
   color: #47708E;

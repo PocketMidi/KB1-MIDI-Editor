@@ -56,7 +56,7 @@ defineEmits<{
   display: flex;
   gap: 50px; /* Increased spacing between icons (40-60px range) */
   padding: 20px 0;
-  background: #0F0F0F;
+  background: var(--color-background);
   justify-content: center;
   align-items: center;
   border-top: 1px solid rgba(234, 234, 234, 0.1);

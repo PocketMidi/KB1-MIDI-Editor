@@ -5,6 +5,7 @@ import MobileScales from './pages/MobileScales.vue';
 import MobileSliders from './pages/MobileSliders.vue';
 import { useDeviceState } from './composables/useDeviceState';
 import './styles/themes/kb1.css';
+import { computed } from 'vue';
 
 const { 
   isBluetoothAvailable, 
@@ -25,6 +26,14 @@ const tabs = [
 
 // Hover state for bluetooth connection section (text and icon)
 const isHoveringStatus = ref(false);
+
+// Computed property for bluetooth status text
+const bluetoothStatusText = computed(() => {
+  if (isConnected.value) {
+    return isHoveringStatus.value ? 'DISCONNECT' : 'CONNECTED';
+  }
+  return isHoveringStatus.value ? 'CONNECT' : 'DISCONNECTED';
+});
 
 async function handleConnect() {
   try {
@@ -88,7 +97,7 @@ async function handleDisconnect() {
           @mouseleave="isHoveringStatus = false"
         >
           <span class="status-text">
-            {{ isConnected ? (isHoveringStatus ? 'DISCONNECT' : 'CONNECTED') : (isHoveringStatus ? 'CONNECT' : 'DISCONNECTED') }}
+            {{ bluetoothStatusText }}
           </span>
           <img src="/bluetooth-icon.svg" alt="Bluetooth" class="bluetooth-icon" />
         </div>

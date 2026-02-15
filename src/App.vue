@@ -227,7 +227,7 @@ function handleMainClick(event: MouseEvent) {
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Roboto Mono', 'Courier New', Courier, monospace;
   background: var(--color-background);
   color: var(--color-text);
   line-height: 1.6;
@@ -387,11 +387,11 @@ body {
   border-radius: 0;
   color: #EAEAEA;
   font-family: 'Roboto Mono', monospace;
-  font-weight: 700;
+  font-weight: 400;
   text-transform: uppercase;
   cursor: pointer;
   opacity: 0.32;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, font-weight 0.2s;
   position: relative;
   white-space: nowrap;
   font-size: 0.875rem;
@@ -405,6 +405,7 @@ body {
 .nav-tab.active {
   color: #EAEAEA;
   opacity: 1;
+  font-weight: 700;
 }
 
 /* Active tab underline */
@@ -457,7 +458,7 @@ body {
 
 .status-text {
   font-family: 'Roboto Mono', monospace;
-  font-weight: 700;
+  font-weight: 400;
   font-size: 0.875rem;
   color: #47708E;
   opacity: 0.5;
@@ -471,7 +472,7 @@ body {
 .bluetooth-status.hoverable:active .status-text {
   color: #74C4FF;
   opacity: 1;
-  font-weight: bold;
+  font-weight: 700;
   /* NO transform scale */
 }
 

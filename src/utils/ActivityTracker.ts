@@ -17,7 +17,7 @@ export function throttle<T extends (...args: any[]) => void>(
   delay: number
 ): (...args: Parameters<T>) => void {
   let lastCall = 0;
-  let timeoutId: NodeJS.Timeout | null = null;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
   return function (...args: Parameters<T>) {
     const now = Date.now();

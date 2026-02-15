@@ -21,7 +21,7 @@ export interface KeepAliveConfig {
  * Service for managing keep-alive pings to maintain BLE connection
  */
 export class KeepAliveService {
-  private pingInterval: NodeJS.Timeout | null = null;
+  private pingInterval: ReturnType<typeof setInterval> | null = null;
   private activityTracker: ActivityTracker;
   private sendPingCallback: (() => Promise<void>) | null = null;
   private isRunning: boolean = false;

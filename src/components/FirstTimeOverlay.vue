@@ -183,7 +183,7 @@ function handleBackdropClick() {
   font-weight: 700;
   color: #EAEAEA;
   margin: 0;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto', sans-serif;
 }
 
 .modal-description {
@@ -209,7 +209,7 @@ function handleBackdropClick() {
   padding: 14px 32px;
   font-size: 16px;
   font-weight: 700;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto', sans-serif;
   cursor: pointer;
   transition: all 0.2s;
   text-transform: uppercase;
@@ -236,7 +236,7 @@ function handleBackdropClick() {
   border: none;
   padding: 12px 24px;
   font-size: 14px;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto', sans-serif;
   cursor: pointer;
   transition: color 0.2s;
   text-decoration: underline;

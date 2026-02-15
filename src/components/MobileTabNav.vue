@@ -87,8 +87,8 @@ const isHovering = ref(false);
   border: none;
   border-radius: 0;
   color: #EAEAEA;
-  font-family: 'Roboto Mono', monospace;
-  font-weight: 700;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
   font-size: 0.875rem;
   text-transform: uppercase;
   cursor: pointer;
@@ -108,6 +108,7 @@ const isHovering = ref(false);
 .tab-button.active {
   color: #EAEAEA;
   opacity: 1;
+  font-weight: 700;
   background: transparent;
 }
 
@@ -161,8 +162,8 @@ const isHovering = ref(false);
 }
 
 .status-text {
-  font-family: 'Roboto Mono', monospace;
-  font-weight: 700;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
   font-size: 0.875rem;
   color: #47708E;
   opacity: 0.5;
@@ -174,6 +175,7 @@ const isHovering = ref(false);
 .bluetooth-status.hoverable:active .status-text {
   color: #74C4FF;
   opacity: 1;
+  font-weight: 700;
   transform: scale(1.1);
 }
 

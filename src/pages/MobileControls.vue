@@ -14,6 +14,7 @@
       <AccordionSection
         :title="`Lever 1`"
         :subtitle="getLeverSubtitle(localSettings.lever1)"
+        :midi-cc="localSettings.lever1.ccNumber"
         :id="'lever-1'"
         :default-open="false"
       >
@@ -34,6 +35,7 @@
       <AccordionSection
         :title="`Press 1`"
         :subtitle="getLeverPushSubtitle(localSettings.leverPush1)"
+        :midi-cc="localSettings.leverPush1.ccNumber"
         :id="'lever-push-1'"
         :default-open="false"
       >
@@ -53,6 +55,7 @@
       <AccordionSection
         :title="`Lever 2`"
         :subtitle="getLeverSubtitle(localSettings.lever2)"
+        :midi-cc="localSettings.lever2.ccNumber"
         :id="'lever-2'"
         :default-open="false"
       >
@@ -73,6 +76,7 @@
       <AccordionSection
         :title="`Press 2`"
         :subtitle="getLeverPushSubtitle(localSettings.leverPush2)"
+        :midi-cc="localSettings.leverPush2.ccNumber"
         :id="'lever-push-2'"
         :default-open="false"
       >

@@ -1,10 +1,5 @@
 <template>
   <div class="settings-lever" :class="`lever-${lever}`">
-    <div class="title">
-      <div class="title-left">LEVER {{ lever }}</div>
-      <div class="title-right">MIDI CC <span class="cc-number">{{ model.ccNumber }}</span></div>
-    </div>
-
     <!-- Toggle and Profile Selection -->
     <div class="controls-row">
       <!-- Unipolar/Bipolar Toggle -->
@@ -470,51 +465,21 @@ const duration = computed({
   background: var(--color-background-soft);
   border: 1px solid var(--color-border);
   border-radius: 8px;
+  font-family: 'Roboto Mono', monospace;
 }
 
 @media (max-width: 768px) {
   .settings-lever {
     padding: 1rem;
   }
-  
-  .title {
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-  }
-}
-
-.title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.title-left {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #848484;
-  text-transform: uppercase;
-}
-
-.title-right {
-  font-size: 0.875rem;
-  font-weight: 400;
-  color: #848484;
-}
-
-.cc-number {
-  color: #F9AC20;
-  font-weight: 600;
 }
 
 .controls-row {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 2rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .toggle-container {
@@ -549,6 +514,7 @@ const duration = computed({
   cursor: pointer;
   position: relative;
   transition: color 0.2s ease;
+  font-family: 'Roboto Mono', monospace;
 }
 
 .profile-btn:hover {
@@ -570,7 +536,7 @@ const duration = computed({
 }
 
 .profile-visualization {
-  margin-bottom: 1.5rem;
+  margin: 2rem auto;
   padding: 1rem;
   background: var(--color-background);
   border: 1px solid var(--color-border);
@@ -578,10 +544,13 @@ const duration = computed({
   display: flex;
   justify-content: center;
   align-items: center;
+  max-width: 500px;
+  width: 100%;
 }
 
 .profile-visualization img {
   max-width: 100%;
+  width: 100%;
   height: auto;
   display: block;
 }
@@ -622,6 +591,7 @@ const duration = computed({
   font-weight: 500;
   font-size: 0.875rem;
   color: var(--color-text);
+  font-family: 'Roboto Mono', monospace;
 }
 
 .group input,

@@ -1,14 +1,5 @@
 <template>
   <div class="settings-leverpush" :class="`lever-${lever}`">
-    <div class="title">
-      <h2>{{ title }} {{ lever }}</h2>
-      <div v-if="isValidCC" class="parameter-header">
-        <div class="parameter-name">{{ parameterDisplayName }}</div>
-        <div v-if="parameterRange" class="parameter-range">{{ parameterRange }}</div>
-        <div class="cc-reference">MIDI CC {{ model.ccNumber }}</div>
-      </div>
-    </div>
-
     <div class="inputs">
       <div class="group">
         <label :for="`push-category-${lever}`">Category</label>
@@ -126,8 +117,6 @@ const model = computed({
   set: v => emit('update:modelValue', v)
 })
 
-const isValidCC = computed(() => model.value.ccNumber >= 0 && model.value.ccNumber <= 128)
-
 // Initialize selectedCategory from current ccNumber's category (fallback to first available category)
 const initialCategory = computed(() => {
   const cat = props.ccMapByNumber.get(model.value.ccNumber)?.category
@@ -166,29 +155,6 @@ watch(selectedCategory, (cat) => {
     const first = filteredOptions.value.find(o => o.value >= 0)
     if (first) model.value.ccNumber = first.value
   }
-})
-
-// Get current parameter entry from ccMapByNumber
-const currentEntry = computed(() => {
-  return props.ccMapByNumber.get(model.value.ccNumber)
-})
-
-// Display parameter name or fallback to CC number
-const parameterDisplayName = computed(() => {
-  const entry = currentEntry.value
-  if (entry) {
-    return entry.parameter
-  }
-  return `CC ${model.value.ccNumber}`
-})
-
-// Display Polyend range if available
-const parameterRange = computed(() => {
-  const entry = currentEntry.value
-  if (entry?.range) {
-    return entry.range.text
-  }
-  return undefined
 })
 
 // Function mode constants
@@ -268,55 +234,13 @@ const pressType = computed({
   background: var(--color-background-soft);
   border: 1px solid var(--color-border);
   border-radius: 8px;
+  font-family: 'Roboto Mono', monospace;
 }
 
 @media (max-width: 768px) {
   .settings-leverpush {
     padding: 1rem;
   }
-  
-  .title {
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-  }
-}
-
-.title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.title h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.parameter-header {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.25rem;
-  font-size: 0.875rem;
-}
-
-.parameter-name {
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.parameter-range {
-  color: var(--color-text-muted);
-  font-style: italic;
-}
-
-.cc-reference {
-  color: var(--color-text-muted);
-  font-size: 0.75rem;
 }
 
 .inputs {
@@ -355,6 +279,7 @@ const pressType = computed({
   font-weight: 500;
   font-size: 0.875rem;
   color: var(--color-text);
+  font-family: 'Roboto Mono', monospace;
 }
 
 .group input,

@@ -10,6 +10,9 @@
         <h3>{{ title }}</h3>
         <div v-if="subtitle" class="accordion-subtitle">{{ subtitle }}</div>
       </div>
+      <div v-if="midiCc !== undefined" class="midi-cc-display">
+        MIDI CC <span class="midi-cc-number">{{ midiCc }}</span>
+      </div>
       <span class="accordion-icon">{{ isOpen ? '−' : '+' }}</span>
     </button>
     <div 
@@ -30,6 +33,7 @@ import { ref } from 'vue';
 const props = defineProps<{
   title: string;
   subtitle?: string;
+  midiCc?: number;
   id?: string;
   defaultOpen?: boolean;
 }>();
@@ -63,6 +67,7 @@ function toggle() {
   text-align: left;
   transition: background 0.2s;
   min-height: 44px; /* Mobile touch target */
+  font-family: 'Roboto Mono', monospace;
 }
 
 .accordion-header:hover {
@@ -79,9 +84,11 @@ function toggle() {
 
 .accordion-title h3 {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text);
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #848484;
+  text-transform: uppercase;
+  font-family: 'Roboto Mono', monospace;
 }
 
 .accordion-subtitle {
@@ -89,6 +96,19 @@ function toggle() {
   font-size: 0.875rem;
   color: var(--color-text-muted);
   line-height: 1.4;
+}
+
+.midi-cc-display {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #848484;
+  font-family: 'Roboto Mono', monospace;
+  margin-right: 1rem;
+}
+
+.midi-cc-number {
+  color: #F9AC20;
+  font-weight: 600;
 }
 
 .accordion-icon {

@@ -30,7 +30,8 @@ let animationInterval: number | null = null;
 // Generate frame path based on current index
 const currentFrame = computed(() => {
   const frameNum = String(currentFrameIndex.value).padStart(5, '0');
-  return `/ble_1/ble_2_${frameNum}.png`;
+  // Use import.meta.env.BASE_URL to get the correct base path
+  return `${import.meta.env.BASE_URL}ble_1/ble_2_${frameNum}.png`;
 });
 
 // Start animation
@@ -54,10 +55,11 @@ onBeforeUnmount(() => {
 
 // Preload all frames
 function preloadFrames() {
+  const baseUrl = import.meta.env.BASE_URL;
   for (let i = 0; i < FRAME_COUNT; i++) {
     const img = new Image();
     const frameNum = String(i).padStart(5, '0');
-    img.src = `/ble_1/ble_2_${frameNum}.png`;
+    img.src = `${baseUrl}ble_1/ble_2_${frameNum}.png`;
   }
 }
 </script>

@@ -4,8 +4,6 @@
       <h2>{{ title }}</h2>
     </div>
 
-    <div class="section-divider"></div>
-
     <div class="inputs">
       <div class="group">
         <label for="scale-scaletype">Scale</label>
@@ -128,17 +126,5 @@ const model = computed({
 .group select:focus {
   outline: none;
   border-color: var(--color-border-hover);
-}
-
-.section-divider {
-  height: 2px;
-  background: rgba(234, 234, 234, 0.3);
-  margin: 1.5rem 0;
-}
-
-@media (max-width: 768px) {
-  .section-divider {
-    margin: 1rem 0;
-  }
 }
 </style>

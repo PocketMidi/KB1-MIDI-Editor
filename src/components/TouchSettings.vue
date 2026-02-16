@@ -9,9 +9,6 @@
       </div>
     </div>
 
-    <!-- Divider -->
-    <div class="section-divider"></div>
-
     <div class="inputs">
       <div class="group">
         <label for="touch-category">Category</label>
@@ -323,20 +320,6 @@ const userThreshold = computed({
   font-size: 0.8125rem; /* 13px */
   color: var(--color-text);
   font-family: 'Roboto Mono';
-}
-
-/* Section divider */
-.section-divider {
-  height: 2px;
-  background: rgba(234, 234, 234, 0.3);
-  margin: 1.5rem 0;
-  width: 100%;
-}
-
-@media (max-width: 768px) {
-  .section-divider {
-    margin: 1rem 0;
-  }
 }
 
 .group select {

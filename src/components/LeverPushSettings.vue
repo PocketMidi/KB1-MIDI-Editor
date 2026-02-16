@@ -1,8 +1,5 @@
 <template>
   <div class="settings-leverpush" :class="`lever-${lever}`">
-    <!-- Divider -->
-    <div class="section-divider"></div>
-
     <div class="inputs">
       <div class="group">
         <label :for="`push-category-${lever}`">Category</label>
@@ -341,17 +338,5 @@ const pressType = computed({
   background: var(--color-background-mute) !important;
   cursor: not-allowed;
   color: var(--color-text-muted);
-}
-
-.section-divider {
-  height: 2px;
-  background: rgba(234, 234, 234, 0.3);
-  margin: 1.5rem 0;
-}
-
-@media (max-width: 768px) {
-  .section-divider {
-    margin: 1rem 0;
-  }
 }
 </style>

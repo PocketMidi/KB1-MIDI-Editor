@@ -496,6 +496,7 @@ const duration = computed({
   display: flex;
   align-items: center;
   flex-shrink: 0; /* Don't let it shrink too much */
+  margin-right: 1rem; /* Add spacing after toggle to separate from profile buttons */
 }
 
 .toggle-image {
@@ -503,11 +504,11 @@ const duration = computed({
   height: 22px;
   width: auto;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease-in-out;
 }
 
 .toggle-image:hover {
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
 .profile-selector {

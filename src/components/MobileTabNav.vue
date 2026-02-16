@@ -89,7 +89,7 @@ const isHovering = ref(false);
   color: #EAEAEA;
   font-family: var(--kb1-font-family-mono);
   font-weight: 400;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   text-transform: uppercase;
   cursor: pointer;
   border-bottom: 2px solid transparent;
@@ -164,7 +164,7 @@ const isHovering = ref(false);
 .status-text {
   font-family: var(--kb1-font-family-mono);
   font-weight: 400;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   color: #47708E;
   opacity: 0.5;
   transition: color 0.5s ease-in-out, opacity 0.5s ease-in-out, transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55), font-weight 0.5s ease-in-out;

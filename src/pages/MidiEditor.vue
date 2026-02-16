@@ -172,7 +172,7 @@ async function handleSave() {
 
 .page-header h2 {
   margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 600;
 }
 

@@ -220,7 +220,7 @@ const userThreshold = computed({
   background: var(--color-background-soft);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
   font-size: 0.8125rem; /* 13px */
   width: 100%;
   max-width: 100%;
@@ -252,7 +252,7 @@ const userThreshold = computed({
   margin: 0;
   font-size: 0.8125rem; /* 13px */
   font-weight: 600;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
 }
 
 .parameter-header {
@@ -261,7 +261,7 @@ const userThreshold = computed({
   align-items: flex-end;
   gap: 0.25rem;
   font-size: 0.8125rem; /* 13px */
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
 }
 
 .parameter-name {
@@ -277,7 +277,7 @@ const userThreshold = computed({
 .cc-reference {
   color: var(--color-text-muted);
   font-size: 0.8125rem; /* 13px */
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
 }
 
 .inputs {
@@ -322,7 +322,7 @@ const userThreshold = computed({
   font-weight: 500;
   font-size: 0.8125rem; /* 13px */
   color: var(--color-text);
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
 }
 
 /* Section divider */
@@ -346,7 +346,7 @@ const userThreshold = computed({
   background: var(--color-background);
   color: var(--color-text);
   font-size: 0.8125rem; /* 13px */
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
 }
 
 @media (max-width: 768px) {
@@ -365,6 +365,6 @@ const userThreshold = computed({
   font-style: italic;
   color: var(--color-text-muted);
   margin-top: 0.25rem;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
 }
 </style>

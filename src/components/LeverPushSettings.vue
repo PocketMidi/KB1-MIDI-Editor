@@ -237,7 +237,7 @@ const pressType = computed({
   background: var(--color-background-soft);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
   font-size: 0.8125rem; /* 13px */
   width: 100%;
   max-width: 100%;
@@ -293,7 +293,7 @@ const pressType = computed({
   font-weight: 500;
   font-size: 0.8125rem; /* 13px */
   color: var(--color-text);
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
 }
 
 .group input,
@@ -304,7 +304,7 @@ const pressType = computed({
   background: var(--color-background);
   color: var(--color-text);
   font-size: 0.8125rem; /* 13px */
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
 }
 
 @media (max-width: 768px) {
@@ -333,7 +333,7 @@ const pressType = computed({
 .number-with-unit span {
   font-size: 0.8125rem; /* 13px */
   color: var(--color-text-muted);
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
   min-width: 2rem;
 }
 

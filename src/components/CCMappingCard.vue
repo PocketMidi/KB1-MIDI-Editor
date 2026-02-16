@@ -241,13 +241,13 @@ function updateField(field: keyof CCMapping, event: Event) {
 
 .card-header h3 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 600;
 }
 
 .parameter-info {
   margin-top: 0.25rem;
-  font-size: 0.75rem;
+  font-size: 0.8125rem; /* 13px */
   color: var(--color-text-mute);
 }
 
@@ -276,7 +276,7 @@ function updateField(field: keyof CCMapping, event: Event) {
 }
 
 label {
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 500;
   color: var(--color-text);
 }
@@ -289,7 +289,7 @@ select {
   border-radius: 4px;
   background: var(--color-background);
   color: var(--color-text);
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
 }
 
 input[type="number"]:focus,

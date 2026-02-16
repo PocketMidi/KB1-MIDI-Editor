@@ -227,7 +227,8 @@ function handleMainClick(event: MouseEvent) {
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Roboto Mono', 'Courier New', Courier, monospace;
+  font-family: 'Roboto Mono';
+  font-size: 13px;
   background: var(--color-background);
   color: var(--color-text);
   line-height: 1.6;
@@ -265,7 +266,7 @@ body {
   padding: 0.5rem 1rem;
   background: var(--color-background-mute);
   border-bottom: 1px solid var(--color-border);
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   color: var(--color-text-muted);
 }
 
@@ -347,7 +348,7 @@ body {
   border-top: 1px solid #ef4444;
   color: #fca5a5;
   text-align: center;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
 }
 
 /* Tab Navigation Wrapper - sticky with background */
@@ -458,7 +459,7 @@ body {
 .status-text {
   font-family: var(--kb1-font-family-mono);
   font-weight: 400;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   color: #47708E;
   opacity: 0.5;
   transition: color 0.5s ease-in-out, 
@@ -534,12 +535,12 @@ body {
 
 .app-footer p {
   margin: 0.5rem 0;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   color: var(--color-text-muted);
 }
 
 .footer-note {
-  font-size: 0.75rem;
+  font-size: 0.8125rem; /* 13px */
 }
 
 /* Responsive adjustments using CSS media queries only */
@@ -581,7 +582,7 @@ body {
   }
   
   .nav-tab {
-    font-size: 0.75rem;
+    font-size: 0.8125rem; /* 13px */
     padding: 0.75rem 0.75rem;
   }
   
@@ -591,7 +592,7 @@ body {
   }
   
   .status-text {
-    font-size: 0.75rem;
+    font-size: 0.8125rem; /* 13px */
   }
   
   .bluetooth-icon {

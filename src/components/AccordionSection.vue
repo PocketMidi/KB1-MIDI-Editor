@@ -70,7 +70,7 @@ function toggle() {
   text-align: left;
   transition: background 0.2s;
   min-height: 44px; /* Mobile touch target */
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
 }
 
 .accordion-header:hover {
@@ -91,7 +91,7 @@ function toggle() {
   font-weight: 500;
   color: #848484;
   text-transform: uppercase;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
 }
 
 .accordion-subtitle {
@@ -99,14 +99,14 @@ function toggle() {
   font-size: 0.8125rem; /* 13px */
   color: var(--color-text-muted);
   line-height: 1.4;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
 }
 
 .midi-cc-display {
   font-size: 0.8125rem; /* 13px */
   font-weight: 400;
   color: #848484;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
   margin-right: 1rem;
 }
 
@@ -116,7 +116,7 @@ function toggle() {
 }
 
 .accordion-icon {
-  font-size: 1.5rem;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 300;
   color: var(--color-text-muted);
   margin-left: 1rem;

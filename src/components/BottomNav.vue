@@ -86,12 +86,12 @@ defineEmits<{
 }
 
 .bottom-nav-icon {
-  font-size: 1.25rem;
+  font-size: 0.8125rem; /* 13px */
   margin-bottom: 0.25rem;
 }
 
 .bottom-nav-label {
-  font-size: 0.6875rem;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 600;
   letter-spacing: 0.5px;
 }

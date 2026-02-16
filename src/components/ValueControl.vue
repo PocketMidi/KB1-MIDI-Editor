@@ -169,7 +169,7 @@ function validateAndUpdate(event: Event) {
   color: var(--color-text);
   cursor: pointer;
   font-size: 0.8125rem; /* 13px */
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
   transition: all 0.2s;
   min-width: 2.5rem;
 }
@@ -196,7 +196,7 @@ function validateAndUpdate(event: Event) {
   background: var(--color-background);
   color: var(--color-text);
   font-size: 0.8125rem; /* 13px */
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
   text-align: center;
   min-width: 0;
 }
@@ -254,7 +254,7 @@ function validateAndUpdate(event: Event) {
   display: flex;
   justify-content: space-between;
   font-size: 0.8125rem; /* 13px */
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
   color: var(--color-text-muted);
   padding: 0 0.5rem;
 }

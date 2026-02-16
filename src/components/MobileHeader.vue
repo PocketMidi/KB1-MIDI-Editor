@@ -56,7 +56,7 @@ defineEmits<{
   border: 2px solid #47708E;
   border-radius: 6px;
   color: #47708E;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
   font-weight: 700;
   text-transform: uppercase;
   cursor: pointer;

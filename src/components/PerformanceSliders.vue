@@ -370,7 +370,7 @@ function getSliderPercent(slider: SliderConfig): number {
 
 .header-left h2 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 600;
 }
 
@@ -386,7 +386,7 @@ function getSliderPercent(slider: SliderConfig): number {
   border-radius: 6px;
   background: var(--color-background-soft, #242424);
   color: var(--color-text, #ffffff);
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -516,7 +516,7 @@ function getSliderPercent(slider: SliderConfig): number {
 }
 
 .cc-label {
-  font-size: 0.75rem;
+  font-size: 0.8125rem; /* 13px */
   color: var(--color-text-muted, #a0a0a0);
 }
 
@@ -542,7 +542,7 @@ function getSliderPercent(slider: SliderConfig): number {
   border-radius: 4px;
   background: var(--color-background-mute, #2a2a2a);
   color: var(--color-text-muted, #a0a0a0);
-  font-size: 0.75rem;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 400;
   cursor: pointer;
   transition: all 0.2s;

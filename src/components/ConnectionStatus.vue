@@ -79,7 +79,7 @@ const statusClass = computed(() => ({
 
 .status-text {
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
 }
 
 .device-info {
@@ -89,13 +89,13 @@ const statusClass = computed(() => ({
 }
 
 .device-name {
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   color: var(--color-text-muted);
 }
 
 .error-message {
   margin-left: auto;
   color: #ef4444;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
 }
 </style>

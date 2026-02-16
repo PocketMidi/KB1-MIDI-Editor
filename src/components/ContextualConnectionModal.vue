@@ -148,7 +148,7 @@ function handleBackdropClick() {
   background: transparent;
   border: none;
   color: #EAEAEA;
-  font-size: 24px;
+  font-size: 0.8125rem; /* 13px */
   cursor: pointer;
   opacity: 0.5;
   transition: opacity 0.2s;
@@ -181,15 +181,15 @@ function handleBackdropClick() {
 }
 
 .modal-title {
-  font-size: 20px;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 700;
   color: #EAEAEA;
   margin: 0;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
 }
 
 .modal-description {
-  font-size: 14px;
+  font-size: 0.8125rem; /* 13px */
   color: rgba(234, 234, 234, 0.7);
   margin: 0;
   line-height: 1.5;
@@ -209,9 +209,9 @@ function handleBackdropClick() {
   border: none;
   border-radius: 6px;
   padding: 12px 20px;
-  font-size: 14px;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 700;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
   cursor: pointer;
   transition: all 0.2s;
   text-transform: uppercase;
@@ -239,8 +239,8 @@ function handleBackdropClick() {
   border: 1px solid rgba(234, 234, 234, 0.2);
   border-radius: 6px;
   padding: 12px 20px;
-  font-size: 14px;
-  font-family: 'Roboto Mono', monospace;
+  font-size: 0.8125rem; /* 13px */
+  font-family: 'Roboto Mono';
   cursor: pointer;
   transition: all 0.2s;
   text-transform: uppercase;
@@ -275,11 +275,11 @@ function handleBackdropClick() {
   }
   
   .modal-title {
-    font-size: 18px;
+    font-size: 0.8125rem; /* 13px */
   }
   
   .modal-description {
-    font-size: 13px;
+    font-size: 0.8125rem; /* 13px */
   }
   
   .modal-actions {

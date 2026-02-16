@@ -68,7 +68,7 @@ const model = computed({
 
 .title h2 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 600;
 }
 
@@ -106,7 +106,7 @@ const model = computed({
 
 .group label {
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   color: var(--color-text);
 }
 
@@ -116,7 +116,7 @@ const model = computed({
   border-radius: 6px;
   background: var(--color-background);
   color: var(--color-text);
-  font-size: 1rem;
+  font-size: 0.8125rem; /* 13px */
 }
 
 @media (max-width: 768px) {

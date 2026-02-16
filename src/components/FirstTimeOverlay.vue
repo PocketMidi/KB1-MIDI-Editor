@@ -146,7 +146,7 @@ function handleBackdropClick() {
   background: transparent;
   border: none;
   color: #EAEAEA;
-  font-size: 32px;
+  font-size: 0.8125rem; /* 13px */
   cursor: pointer;
   opacity: 0.5;
   transition: opacity 0.2s;
@@ -179,15 +179,15 @@ function handleBackdropClick() {
 }
 
 .modal-title {
-  font-size: 24px;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 700;
   color: #EAEAEA;
   margin: 0;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
 }
 
 .modal-description {
-  font-size: 16px;
+  font-size: 0.8125rem; /* 13px */
   color: rgba(234, 234, 234, 0.7);
   margin: 0;
   line-height: 1.5;
@@ -207,9 +207,9 @@ function handleBackdropClick() {
   border: none;
   border-radius: 6px;
   padding: 14px 32px;
-  font-size: 16px;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 700;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono';
   cursor: pointer;
   transition: all 0.2s;
   text-transform: uppercase;
@@ -235,8 +235,8 @@ function handleBackdropClick() {
   color: rgba(234, 234, 234, 0.5);
   border: none;
   padding: 12px 24px;
-  font-size: 14px;
-  font-family: 'Roboto Mono', monospace;
+  font-size: 0.8125rem; /* 13px */
+  font-family: 'Roboto Mono';
   cursor: pointer;
   transition: color 0.2s;
   text-decoration: underline;
@@ -271,11 +271,11 @@ function handleBackdropClick() {
   }
   
   .modal-title {
-    font-size: 20px;
+    font-size: 0.8125rem; /* 13px */
   }
   
   .modal-description {
-    font-size: 14px;
+    font-size: 0.8125rem; /* 13px */
   }
 }
 
@@ -289,16 +289,16 @@ function handleBackdropClick() {
   }
   
   .modal-title {
-    font-size: 18px;
+    font-size: 0.8125rem; /* 13px */
   }
   
   .modal-description {
-    font-size: 13px;
+    font-size: 0.8125rem; /* 13px */
   }
   
   .connect-button {
     padding: 12px 24px;
-    font-size: 14px;
+    font-size: 0.8125rem; /* 13px */
   }
 }
 </style>

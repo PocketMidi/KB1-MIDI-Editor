@@ -56,14 +56,14 @@
   --kb1-color-error: #ef4444;
   
   /* ===== Typography ===== */
-  --kb1-font-family: 'Roboto Mono', 'Courier New', Courier, monospace;
-  --kb1-font-family-mono: var(--kb1-font-family);
-  --kb1-font-size-xs: 0.75rem;
-  --kb1-font-size-sm: 0.875rem;
-  --kb1-font-size-base: 1rem;
-  --kb1-font-size-lg: 1.125rem;
-  --kb1-font-size-xl: 1.25rem;
-  --kb1-font-size-2xl: 1.5rem;
+  --kb1-font-family: 'Roboto Mono';
+  --kb1-font-family-mono: 'Roboto Mono';
+  --kb1-font-size-xs: 0.8125rem; /* 13px */
+  --kb1-font-size-sm: 0.8125rem; /* 13px */
+  --kb1-font-size-base: 0.8125rem; /* 13px */
+  --kb1-font-size-lg: 0.8125rem; /* 13px */
+  --kb1-font-size-xl: 0.8125rem; /* 13px */
+  --kb1-font-size-2xl: 0.8125rem; /* 13px */
   
   /* ===== Spacing ===== */
   --kb1-spacing-xs: 0.25rem;

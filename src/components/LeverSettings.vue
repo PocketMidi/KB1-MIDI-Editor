@@ -296,11 +296,8 @@ const profileImage = computed(() => {
     else profile = 'lin'
   }
   
-  // Note: Asset file naming uses dash for inc-uni but underscore for all others
-  // This matches the existing file naming convention in public/lever_profiles/
-  // Consider standardizing to use consistent separator in future asset updates
-  const separator = profile === 'inc' && polarity === 'uni' ? '-' : '_'
-  return `${BASE_PATH}/lever_profiles/${profile}${separator}${polarity}.svg`
+  // All lever profile SVG files use underscore separator
+  return `${BASE_PATH}/lever_profiles/${profile}_${polarity}.svg`
 })
 
 // Initialize selectedCategory from current ccNumber's category (fallback to first available category)

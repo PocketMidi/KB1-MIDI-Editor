@@ -143,7 +143,7 @@ function handleMainClick(event: MouseEvent) {
       <div class="header-content">
         <!-- KB1 logo - centered, no buttons -->
         <div class="logo-section">
-          <img src="/kb1-title.svg" alt="KB1 CONFIGURATOR" class="header-logo" />
+          <img src="/KB1-config/kb1_title.svg" alt="KB1 CONFIGURATOR" class="header-logo" />
         </div>
       </div>
       
@@ -338,8 +338,8 @@ body {
 
 /* Logo - consistent size across all screens (mobile size from original) */
 .header-logo {
-  height: 60px;
-  width: auto;
+  width: 100%;
+  height: 40px;
 }
 
 .warning-banner {
@@ -578,7 +578,8 @@ body {
   }
   
   .header-logo {
-    height: 50px;
+    width: 100%;
+    height: 40px;
   }
   
   .nav-tab {

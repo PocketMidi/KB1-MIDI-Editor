@@ -11,7 +11,7 @@
       </button>
       
       <!-- Always show KB1 logo -->
-      <img src="/kb1-title.svg" alt="KB1 CONFIGURATOR" class="header-logo" />
+      <img src="/KB1-config/kb1_title.svg" alt="KB1 CONFIGURATOR" class="header-logo" />
     </div>
   </header>
 </template>
@@ -73,7 +73,7 @@ defineEmits<{
 }
 
 .header-logo {
+  width: 100%;
   height: 40px;
-  width: auto;
 }
 </style>

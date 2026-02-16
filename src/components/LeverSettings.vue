@@ -493,8 +493,6 @@ const duration = computed({
   align-items: center;
   gap: 1rem;
   margin-bottom: 1.5rem;
-  margin-left: 0;
-  padding-left: 0;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -560,9 +558,7 @@ const duration = computed({
 
 .profile-visualization {
   margin: 1.5rem 0; /* Remove auto left/right margin */
-  margin-left: 0;
   padding: 0; /* Remove padding that creates space */
-  padding-left: 0;
   background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: 6px;
@@ -606,8 +602,6 @@ const duration = computed({
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
-  padding-left: 0;
-  margin-left: 0;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;

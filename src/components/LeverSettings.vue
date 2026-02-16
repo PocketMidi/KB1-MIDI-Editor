@@ -68,33 +68,23 @@
 
     <div class="inputs">
       <div class="group">
-        <label :for="`lever-category-${lever}`">Category</label>
+        <label :for="`lever-category-${lever}`">CATEGORY</label>
         <select :id="`lever-category-${lever}`" v-model="selectedCategory">
           <option v-for="cat in props.categories" :key="cat" :value="cat">{{ cat }}</option>
         </select>
       </div>
+      <div class="input-divider"></div>
 
       <div class="group">
-        <label :for="`lever-ccNumber-${lever}`">Parameter</label>
+        <label :for="`lever-ccNumber-${lever}`">PARAMETER</label>
         <select :id="`lever-ccNumber-${lever}`" v-model.number="model.ccNumber">
           <option v-for="opt in filteredOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
         </select>
       </div>
+      <div class="input-divider"></div>
 
       <div class="group">
-        <label :for="`lever-min-${lever}`">Min</label>
-        <ValueControl
-          v-model="userMin"
-          :min="minRange"
-          :max="maxRange"
-          :step="1"
-          :small-step="5"
-          :large-step="10"
-        />
-      </div>
-
-      <div class="group">
-        <label :for="`lever-max-${lever}`">Max</label>
+        <label :for="`lever-max-${lever}`">MAX</label>
         <ValueControl
           v-model="userMax"
           :min="minRange"
@@ -104,9 +94,23 @@
           :large-step="10"
         />
       </div>
+      <div class="input-divider"></div>
 
       <div class="group">
-        <label :for="`lever-duration-${lever}`">Duration</label>
+        <label :for="`lever-min-${lever}`">MIN</label>
+        <ValueControl
+          v-model="userMin"
+          :min="minRange"
+          :max="maxRange"
+          :step="1"
+          :small-step="5"
+          :large-step="10"
+        />
+      </div>
+      <div class="input-divider"></div>
+
+      <div class="group">
+        <label :for="`lever-duration-${lever}`">DURATION</label>
         <div class="number-with-unit">
           <input type="number" :id="`lever-duration-${lever}`" v-model.number="duration" min="0" max="10000" step="10" />
           <span>ms</span>
@@ -114,20 +118,26 @@
       </div>
 
       <!-- Mode-specific Type dropdown for Interpolated and Peak & Decay modes -->
-      <div v-if="showTypeControl" class="group">
-        <label :for="`lever-type-${lever}`">Type</label>
-        <select :id="`lever-type-${lever}`" v-model.number="gangedType">
-          <option v-for="opt in interpolations" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-        </select>
-      </div>
+      <template v-if="showTypeControl">
+        <div class="input-divider"></div>
+        <div class="group">
+          <label :for="`lever-type-${lever}`">TYPE</label>
+          <select :id="`lever-type-${lever}`" v-model.number="gangedType">
+            <option v-for="opt in interpolations" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+      </template>
 
       <!-- Mode-specific Steps dropdown for Incremental mode -->
-      <div v-if="isIncrementalMode" class="group">
-        <label :for="`lever-steps-${lever}`">Steps</label>
-        <select :id="`lever-steps-${lever}`" v-model.number="stepsValue">
-          <option v-for="opt in stepOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-        </select>
-      </div>
+      <template v-if="isIncrementalMode">
+        <div class="input-divider"></div>
+        <div class="group">
+          <label :for="`lever-steps-${lever}`">STEPS</label>
+          <select :id="`lever-steps-${lever}`" v-model.number="stepsValue">
+            <option v-for="opt in stepOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -620,89 +630,112 @@ const duration = computed({
 }
 
 .inputs {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  margin-top: 1.5rem;
 }
 
-@media (min-width: 769px) {
-  .inputs {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .inputs {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .inputs {
-    grid-template-columns: 1fr;
-  }
+.input-divider {
+  height: 1px;
+  background: var(--color-border);
+  width: 100%;
 }
 
 .group {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  gap: 1rem;
 }
 
 .group label {
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.8125rem; /* 13px */
-  color: var(--color-text);
+  color: #848484;
   font-family: 'Roboto Mono';
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  min-width: 120px;
 }
 
 .group input,
 .group select {
-  padding: 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: var(--color-background);
-  color: var(--color-text);
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #EAEAEA;
   font-size: 0.8125rem; /* 13px */
   font-family: 'Roboto Mono';
+  font-weight: 400;
+  flex: 1;
+  text-align: right;
+  appearance: none;
+  cursor: pointer;
 }
 
-@media (max-width: 768px) {
-  .group input,
-  .group select {
-    padding: 0.625rem 0.5rem;
-  }
+.group select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EAEAEA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1rem;
+  padding-right: 2rem;
 }
 
 .group input:focus,
 .group select:focus {
   outline: none;
-  border-color: var(--color-border-hover);
 }
 
 .number-with-unit {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  justify-content: flex-end;
+  flex: 1;
 }
 
 .number-with-unit input {
-  flex: 1;
+  width: 60px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #EAEAEA;
+  font-size: 0.8125rem;
+  font-family: 'Roboto Mono';
+  font-weight: 400;
+  text-align: right;
+}
+
+.number-with-unit input:focus {
+  outline: none;
+}
+
+/* Hide number input spinners */
+.number-with-unit input::-webkit-inner-spin-button,
+.number-with-unit input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.number-with-unit input[type=number] {
+  -moz-appearance: textfield;
 }
 
 .number-with-unit span {
   font-size: 0.8125rem; /* 13px */
-  color: var(--color-text-muted);
+  color: #EAEAEA;
   font-family: 'Roboto Mono';
-  min-width: 2rem;
+  font-weight: 400;
 }
 
 .readonly-field {

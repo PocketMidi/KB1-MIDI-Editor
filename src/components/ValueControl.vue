@@ -1,64 +1,31 @@
 <template>
   <div class="value-control">
-    <div class="control-row">
-      <button 
-        class="stepper-btn"
-        :disabled="isAtMin"
-        @click="decreaseLarge"
-        :title="`Decrease by ${largeStep}`"
-      >
-        ◄◄
-      </button>
-      <button 
-        class="stepper-btn"
-        :disabled="isAtMin"
-        @click="decreaseSmall"
-        :title="`Decrease by ${smallStep}`"
-      >
-        ◄
-      </button>
-      <input
-        type="number"
-        class="value-input"
-        :value="modelValue"
-        :min="min"
-        :max="max"
-        :step="step"
-        @input="handleInput"
-        @blur="validateAndUpdate"
-      />
-      <button 
-        class="stepper-btn"
-        :disabled="isAtMax"
-        @click="increaseSmall"
-        :title="`Increase by ${smallStep}`"
-      >
-        ►
-      </button>
-      <button 
-        class="stepper-btn"
-        :disabled="isAtMax"
-        @click="increaseLarge"
-        :title="`Increase by ${largeStep}`"
-      >
-        ►►
-      </button>
-    </div>
-    <div class="slider-row">
-      <input
-        type="range"
-        class="value-slider"
-        :value="modelValue"
-        :min="min"
-        :max="max"
-        :step="step"
-        @input="handleSliderInput"
-      />
-    </div>
-    <div class="range-labels">
-      <span>{{ min }}</span>
-      <span>{{ max }}</span>
-    </div>
+    <button 
+      class="stepper-btn"
+      :disabled="isAtMin"
+      @click="decreaseSmall"
+      :title="`Decrease by ${smallStep}`"
+    >
+      ◄
+    </button>
+    <input
+      type="number"
+      class="value-input"
+      :value="modelValue"
+      :min="min"
+      :max="max"
+      :step="step"
+      @input="handleInput"
+      @blur="validateAndUpdate"
+    />
+    <button 
+      class="stepper-btn"
+      :disabled="isAtMax"
+      @click="increaseSmall"
+      :title="`Increase by ${smallStep}`"
+    >
+      ►
+    </button>
   </div>
 </template>
 
@@ -148,114 +115,60 @@ function validateAndUpdate(event: Event) {
 <style scoped>
 .value-control {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.control-row {
-  display: flex;
   align-items: center;
   gap: 0.5rem;
+  justify-content: flex-end;
 }
 
 .stepper-btn {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  background: var(--color-background);
-  color: var(--color-text);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #EAEAEA;
   cursor: pointer;
   font-size: 0.8125rem; /* 13px */
   font-family: 'Roboto Mono';
-  transition: all 0.2s;
-  min-width: 2.5rem;
+  transition: opacity 0.2s;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .stepper-btn:hover:not(:disabled) {
-  background: var(--color-background-soft);
-  border-color: var(--color-border-hover);
-}
-
-.stepper-btn:active:not(:disabled) {
-  transform: scale(0.95);
+  opacity: 0.7;
 }
 
 .stepper-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
 .value-input {
-  flex: 1;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  background: var(--color-background);
-  color: var(--color-text);
+  width: 60px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #EAEAEA;
   font-size: 0.8125rem; /* 13px */
   font-family: 'Roboto Mono';
+  font-weight: 400;
   text-align: center;
-  min-width: 0;
 }
 
 .value-input:focus {
   outline: none;
-  border-color: var(--color-border-hover);
 }
 
-.slider-row {
-  display: flex;
-  padding: 0 0.5rem;
-}
-
-.value-slider {
-  flex: 1;
+/* Hide number input spinners */
+.value-input::-webkit-inner-spin-button,
+.value-input::-webkit-outer-spin-button {
   -webkit-appearance: none;
-  appearance: none;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--color-background-soft);
-  outline: none;
+  margin: 0;
 }
 
-.value-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--color-border-hover);
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.value-slider::-webkit-slider-thumb:hover {
-  background: var(--vt-c-text-1);
-}
-
-.value-slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--color-border-hover);
-  cursor: pointer;
-  border: none;
-  transition: background 0.2s;
-}
-
-.value-slider::-moz-range-thumb:hover {
-  background: var(--vt-c-text-1);
-}
-
-.range-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8125rem; /* 13px */
-  font-family: 'Roboto Mono';
-  color: var(--color-text-muted);
-  padding: 0 0.5rem;
+.value-input[type=number] {
+  -moz-appearance: textfield;
 }
 </style>

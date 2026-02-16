@@ -15,6 +15,10 @@ import type { BLEClient } from '../ble/bleClient';
 export function useKeepAlive(bleClient: BLEClient) {
   const keepAliveService = new KeepAliveService();
   const isKeepAliveActive = ref(false);
+  let stabilizationTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  // Delay to allow BLE connection to stabilize before starting keep-alive
+  const STABILIZATION_DELAY_MS = 3000;
 
   /**
    * Initialize keep-alive service with ping callback
@@ -26,12 +30,36 @@ export function useKeepAlive(bleClient: BLEClient) {
   };
 
   /**
+   * Start keep-alive after stabilization delay
+   */
+  const startKeepAliveWithDelay = () => {
+    // Clear any existing timeout to prevent race conditions
+    if (stabilizationTimeout !== null) {
+      clearTimeout(stabilizationTimeout);
+      stabilizationTimeout = null;
+    }
+
+    // Add stabilization delay before starting keep-alive
+    console.log(`Connection successful - waiting ${STABILIZATION_DELAY_MS / 1000} seconds before starting keep-alive...`);
+    stabilizationTimeout = setTimeout(() => {
+      stabilizationTimeout = null;
+      // Double-check connection is still valid after delay
+      if (bleClient.isConnected()) {
+        keepAliveService.startKeepAlive();
+        isKeepAliveActive.value = true;
+        console.log('Keep-alive started after stabilization period');
+      } else {
+        console.warn('Connection lost during stabilization period');
+      }
+    }, STABILIZATION_DELAY_MS);
+  };
+
+  /**
    * Start keep-alive if connected
    */
   const startIfConnected = () => {
     if (bleClient.isConnected()) {
-      keepAliveService.startKeepAlive();
-      isKeepAliveActive.value = true;
+      startKeepAliveWithDelay();
     }
   };
 
@@ -39,6 +67,11 @@ export function useKeepAlive(bleClient: BLEClient) {
    * Stop keep-alive
    */
   const stop = () => {
+    // Clear any pending stabilization timeout
+    if (stabilizationTimeout !== null) {
+      clearTimeout(stabilizationTimeout);
+      stabilizationTimeout = null;
+    }
     keepAliveService.stopKeepAlive();
     isKeepAliveActive.value = false;
   };
@@ -70,8 +103,7 @@ export function useKeepAlive(bleClient: BLEClient) {
     // Listen for connection status changes
     bleClient.setStatusChangeCallback((status) => {
       if (status.connected) {
-        keepAliveService.startKeepAlive();
-        isKeepAliveActive.value = true;
+        startKeepAliveWithDelay();
       } else {
         stop();
       }

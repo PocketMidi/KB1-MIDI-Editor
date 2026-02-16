@@ -517,6 +517,10 @@ body {
   flex: 1;
   background: var(--color-background);
   padding-bottom: 100px; /* Add padding to account for fixed footer bar */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .app-footer {

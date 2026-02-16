@@ -462,16 +462,21 @@ const duration = computed({
 <style scoped>
 
 .settings-lever {
-  padding: 1.5rem;
+  padding: 1rem;
   background: var(--color-background-soft);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   font-family: 'Roboto Mono', monospace;
+  font-size: 0.8125rem; /* 13px */
+  width: 100%; /* Ensure it takes available width */
+  max-width: 100%; /* Don't exceed container */
+  box-sizing: border-box; /* Include padding in width calculation */
+  overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
 @media (max-width: 768px) {
   .settings-lever {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 }
 
@@ -481,9 +486,10 @@ const duration = computed({
   align-items: center;
   gap: 2rem;
   margin-bottom: 1.5rem;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  flex-wrap: nowrap; /* Keep in one row but allow shrinking */
 }
 
 .toggle-container {
@@ -553,23 +559,28 @@ const duration = computed({
   align-items: center;
   width: 100%;
   max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden; /* Contain the image */
+  /* NO min-width - allow it to scale down */
 }
 
 .profile-visualization img {
   width: 100%;
   height: auto;
   display: block;
+  max-width: 100%;
+  /* NO min-width - allow scaling */
 }
 
 /* Mobile-specific sizing */
 @media (max-width: 768px) {
   .controls-row {
-    gap: 1.5rem;
+    gap: 1rem;
   }
   
   .profile-visualization {
     margin: 1rem auto;
-    padding: 0.75rem 0.25rem;
+    padding: 0.5rem 0.25rem;
   }
 }
 
@@ -577,6 +588,9 @@ const duration = computed({
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 769px) {
@@ -603,11 +617,14 @@ const duration = computed({
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .group label {
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   color: var(--color-text);
   font-family: 'Roboto Mono', monospace;
 }
@@ -619,7 +636,8 @@ const duration = computed({
   border-radius: 6px;
   background: var(--color-background);
   color: var(--color-text);
-  font-size: 1rem;
+  font-size: 0.8125rem; /* 13px */
+  font-family: 'Roboto Mono', monospace;
 }
 
 @media (max-width: 768px) {
@@ -646,8 +664,9 @@ const duration = computed({
 }
 
 .number-with-unit span {
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   color: var(--color-text-muted);
+  font-family: 'Roboto Mono', monospace;
   min-width: 2rem;
 }
 

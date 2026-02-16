@@ -230,16 +230,21 @@ const pressType = computed({
 
 <style scoped>
 .settings-leverpush {
-  padding: 1.5rem;
+  padding: 1rem;
   background: var(--color-background-soft);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   font-family: 'Roboto Mono', monospace;
+  font-size: 0.8125rem; /* 13px */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 @media (max-width: 768px) {
   .settings-leverpush {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 }
 
@@ -247,6 +252,9 @@ const pressType = computed({
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 769px) {
@@ -273,11 +281,14 @@ const pressType = computed({
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .group label {
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   color: var(--color-text);
   font-family: 'Roboto Mono', monospace;
 }
@@ -289,7 +300,8 @@ const pressType = computed({
   border-radius: 6px;
   background: var(--color-background);
   color: var(--color-text);
-  font-size: 1rem;
+  font-size: 0.8125rem; /* 13px */
+  font-family: 'Roboto Mono', monospace;
 }
 
 @media (max-width: 768px) {
@@ -316,8 +328,9 @@ const pressType = computed({
 }
 
 .number-with-unit span {
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   color: var(--color-text-muted);
+  font-family: 'Roboto Mono', monospace;
   min-width: 2rem;
 }
 

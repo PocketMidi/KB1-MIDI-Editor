@@ -52,6 +52,9 @@ function toggle() {
   border-radius: var(--kb1-radius-md, 8px);
   margin-bottom: 1rem;
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .accordion-header {
@@ -84,7 +87,7 @@ function toggle() {
 
 .accordion-title h3 {
   margin: 0;
-  font-size: 1.125rem;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 500;
   color: #848484;
   text-transform: uppercase;
@@ -93,13 +96,14 @@ function toggle() {
 
 .accordion-subtitle {
   margin-top: 0.25rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   color: var(--color-text-muted);
   line-height: 1.4;
+  font-family: 'Roboto Mono', monospace;
 }
 
 .midi-cc-display {
-  font-size: 1rem;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 400;
   color: #848484;
   font-family: 'Roboto Mono', monospace;

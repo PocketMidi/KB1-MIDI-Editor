@@ -213,15 +213,21 @@ const userThreshold = computed({
 
 <style scoped>
 .settings-touch {
-  padding: 1.5rem;
+  padding: 1rem;
   background: var(--color-background-soft);
   border: 1px solid var(--color-border);
   border-radius: 8px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.8125rem; /* 13px */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 @media (max-width: 768px) {
   .settings-touch {
-    padding: 1rem;
+    padding: 0.75rem;
   }
   
   .title {
@@ -241,8 +247,9 @@ const userThreshold = computed({
 
 .title h2 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 0.8125rem; /* 13px */
   font-weight: 600;
+  font-family: 'Roboto Mono', monospace;
 }
 
 .parameter-header {
@@ -250,7 +257,8 @@ const userThreshold = computed({
   flex-direction: column;
   align-items: flex-end;
   gap: 0.25rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
+  font-family: 'Roboto Mono', monospace;
 }
 
 .parameter-name {
@@ -265,13 +273,17 @@ const userThreshold = computed({
 
 .cc-reference {
   color: var(--color-text-muted);
-  font-size: 0.75rem;
+  font-size: 0.8125rem; /* 13px */
+  font-family: 'Roboto Mono', monospace;
 }
 
 .inputs {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 769px) {
@@ -298,12 +310,16 @@ const userThreshold = computed({
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .group label {
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
   color: var(--color-text);
+  font-family: 'Roboto Mono', monospace;
 }
 
 .group select {
@@ -312,7 +328,8 @@ const userThreshold = computed({
   border-radius: 6px;
   background: var(--color-background);
   color: var(--color-text);
-  font-size: 1rem;
+  font-size: 0.8125rem; /* 13px */
+  font-family: 'Roboto Mono', monospace;
 }
 
 @media (max-width: 768px) {
@@ -327,9 +344,10 @@ const userThreshold = computed({
 }
 
 .hint-text {
-  font-size: 0.75rem;
+  font-size: 0.8125rem; /* 13px */
   font-style: italic;
   color: var(--color-text-muted);
   margin-top: 0.25rem;
+  font-family: 'Roboto Mono', monospace;
 }
 </style>

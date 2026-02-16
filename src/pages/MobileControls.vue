@@ -289,6 +289,10 @@ async function handleSaveToDevice() {
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .not-connected-message {
@@ -300,8 +304,12 @@ async function handleSaveToDevice() {
 .controls-accordion {
   padding: 1rem;
   overflow-y: auto;
+  overflow-x: hidden;
   /* Ensure content doesn't hide behind sticky bars */
   padding-top: 1rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {

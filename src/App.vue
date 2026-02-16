@@ -6,8 +6,6 @@ import MobileSliders from './pages/MobileSliders.vue';
 import FirstTimeOverlay from './components/FirstTimeOverlay.vue';
 import ContextualConnectionModal from './components/ContextualConnectionModal.vue';
 import { useDeviceState } from './composables/useDeviceState';
-import { useKeepAlive } from './composables/useKeepAlive';
-import { bleClient } from './ble/bleClient';
 import { FIRST_TIME_BLE_INTRO_KEY } from './constants';
 import './styles/themes/kb1.css';
 
@@ -17,9 +15,6 @@ const {
   connect,
   disconnect,
 } = useDeviceState();
-
-// Initialize keep-alive service
-useKeepAlive(bleClient);
 
 // Single unified tab state
 type Tab = 'controls' | 'scales' | 'sliders';

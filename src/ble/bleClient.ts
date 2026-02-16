@@ -20,7 +20,6 @@ const LEVERPUSH2_SETTINGS_UUID = '52629808-3d14-4ae8-a826-40bcec6467d5';
 const TOUCH_SETTINGS_UUID = '5612b54d-8bfe-4217-a079-c9c95ab32c41';
 const SCALE_SETTINGS_UUID = '297bd635-c3e8-4fb4-b5e0-93586da8f14c';
 const MIDI_UUID = 'eb58b31b-d963-4c7d-9a11-e8aabec2fe32';
-const KEEPALIVE_UUID = 'a8f3d5e2-9c4b-11ef-8e7a-325096b39f47';
 
 export interface BLEConnectionStatus {
   connected: boolean;
@@ -42,7 +41,6 @@ export class BLEClient {
   private leverPush2Characteristic: BluetoothRemoteGATTCharacteristic | null = null;
   private touchCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
   private scaleCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
-  private keepAliveCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
 
   /**
    * Register a callback for connection status changes
@@ -113,14 +111,6 @@ export class BLEClient {
         console.log('All settings characteristics obtained');
       } catch (e) {
         console.warn('Some settings characteristics not available:', e);
-      }
-
-      // Get keep-alive characteristic for connection maintenance
-      try {
-        this.keepAliveCharacteristic = await service.getCharacteristic(KEEPALIVE_UUID);
-        console.log('Keep-alive characteristic obtained');
-      } catch (e) {
-        console.warn('Keep-alive characteristic not available:', e);
       }
 
       // Start notifications if supported
@@ -328,24 +318,6 @@ export class BLEClient {
   }
 
   /**
-   * Send a keep-alive ping to prevent device from sleeping
-   */
-  async sendKeepAlivePing(): Promise<void> {
-    if (!this.keepAliveCharacteristic || !this.isConnected()) {
-      return;
-    }
-
-    try {
-      // Send minimal 1-byte ping
-      const pingData = new Uint8Array([0x01]);
-      await this.keepAliveCharacteristic.writeValue(pingData);
-      console.log('Keep-alive ping sent');
-    } catch (error) {
-      console.warn('Keep-alive ping failed:', error);
-    }
-  }
-
-  /**
    * Handle characteristic value changes (notifications)
    */
   private onCharacteristicValueChanged(event: Event): void {
@@ -380,7 +352,6 @@ export class BLEClient {
     this.leverPush2Characteristic = null;
     this.touchCharacteristic = null;
     this.scaleCharacteristic = null;
-    this.keepAliveCharacteristic = null;
     this.server = null;
     // Note: We don't set device to null to preserve device info
   }

@@ -164,16 +164,18 @@ const TOGGLE_ANIMATION_DURATION = 60 // milliseconds for toggle transition
 // Toggle state and animation
 // toggleHovered: tracks hover state for visual feedback (shows float state)
 // isAnimating: prevents rapid toggle clicks during transition animation
+// transitionDirection: tracks the direction of transition ('left-to-right' or 'right-to-left')
 const toggleHovered = ref(false)
 const isAnimating = ref(false)
 const animationTimeoutId = ref<number | null>(null)
+const transitionDirection = ref<'left-to-right' | 'right-to-left' | null>(null)
 
 const toggleImage = computed(() => {
   const isUnipolar = model.value.valueMode === 0
   
-  if (isAnimating.value) {
-    // During animation, show transition frames
-    return isUnipolar 
+  if (isAnimating.value && transitionDirection.value) {
+    // During animation, show transition frames based on direction
+    return transitionDirection.value === 'left-to-right'
       ? `${BASE_PATH}/uni_bi_toggle/l-r_trans.svg`
       : `${BASE_PATH}/uni_bi_toggle/r-l_trans.svg`
   }
@@ -192,12 +194,17 @@ const toggleImage = computed(() => {
 const handleToggleClick = () => {
   if (isAnimating.value) return
   
+  // Determine transition direction based on current state
+  const isCurrentlyUnipolar = model.value.valueMode === 0
+  transitionDirection.value = isCurrentlyUnipolar ? 'left-to-right' : 'right-to-left'
+  
   isAnimating.value = true
   
   // Animate for specified duration then switch
   animationTimeoutId.value = window.setTimeout(() => {
     model.value.valueMode = model.value.valueMode === 0 ? 1 : 0
     isAnimating.value = false
+    transitionDirection.value = null
     animationTimeoutId.value = null
   }, TOGGLE_ANIMATION_DURATION)
 }
@@ -484,7 +491,7 @@ const duration = computed({
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
   margin-bottom: 1.5rem;
   width: 100%;
   max-width: 100%;
@@ -576,7 +583,7 @@ const duration = computed({
 /* Tablet and mobile-specific sizing */
 @media (max-width: 768px) {
   .controls-row {
-    gap: 1.5rem; /* 24px gap on tablets */
+    gap: 0.75rem; /* 12px gap on tablets */
   }
   
   .profile-visualization {
@@ -587,7 +594,7 @@ const duration = computed({
 
 @media (max-width: 480px) {
   .controls-row {
-    gap: 1rem; /* 16px gap on very small screens */
+    gap: 0.5rem; /* 8px gap on very small screens */
   }
 }
 

@@ -557,7 +557,6 @@ const duration = computed({
   display: flex;
   justify-content: center;
   align-items: center;
-  max-width: 100%;
   width: 100%;
 }
 
@@ -574,7 +573,7 @@ const duration = computed({
   }
   
   .profile-visualization {
-    margin: 1rem auto 1rem auto;
+    margin: 1rem auto;
     padding: 0.5rem;
   }
 }

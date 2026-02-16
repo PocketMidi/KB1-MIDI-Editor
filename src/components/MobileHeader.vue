@@ -73,7 +73,7 @@ defineEmits<{
 }
 
 .header-logo {
-  height: 60px; /* 150% of original 40px */
+  height: 40px;
   width: auto;
 }
 </style>

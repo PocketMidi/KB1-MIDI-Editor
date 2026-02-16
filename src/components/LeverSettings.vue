@@ -59,6 +59,13 @@
       <img :src="profileImage" alt="Profile Graph" />
     </div>
 
+    <!-- Level Meter -->
+    <LevelMeter 
+      :min="userMin" 
+      :max="userMax" 
+      :is-bipolar="model.valueMode === 1"
+    />
+
     <div class="inputs">
       <div class="group">
         <label :for="`lever-category-${lever}`">Category</label>
@@ -129,6 +136,7 @@
 import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import { type CCEntry } from '../data/ccMap'
 import ValueControl from './ValueControl.vue'
+import LevelMeter from './LevelMeter.vue'
 
 type LeverModel = {
   ccNumber: number

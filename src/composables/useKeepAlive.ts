@@ -40,7 +40,7 @@ export function useKeepAlive(bleClient: BLEClient) {
     }
 
     // Add stabilization delay before starting keep-alive
-    console.log('Connection successful - waiting 3 seconds before starting keep-alive...');
+    console.log(`Connection successful - waiting ${STABILIZATION_DELAY_MS / 1000} seconds before starting keep-alive...`);
     stabilizationTimeout = setTimeout(() => {
       stabilizationTimeout = null;
       // Double-check connection is still valid after delay

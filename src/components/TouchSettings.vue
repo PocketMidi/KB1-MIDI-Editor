@@ -292,7 +292,7 @@ const userThreshold = computed({
 
 .input-divider {
   height: 1px;
-  background: var(--color-border);
+  background: var(--color-divider);
   width: 100%;
 }
 
@@ -301,7 +301,7 @@ const userThreshold = computed({
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0;
+  padding: 0.75rem 0;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;

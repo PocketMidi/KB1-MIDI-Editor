@@ -216,6 +216,7 @@ function handleMainClick(event: MouseEvent) {
   --color-background-mute: #0F0F0F;
   --color-border: transparent;
   --color-border-hover: transparent;
+  --color-divider: rgba(234, 234, 234, 0.2);
   --color-text: #EAEAEA;
   --color-text-muted: rgba(234, 234, 234, 0.32);
 }

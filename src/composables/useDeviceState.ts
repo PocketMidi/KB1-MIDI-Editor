@@ -9,16 +9,30 @@ import { ref, computed } from 'vue';
 import { bleClient, type BLEConnectionStatus } from '../ble/bleClient';
 import { kb1Protocol, type CCMapping, type DeviceSettings } from '../ble/kb1Protocol';
 
+// ============================================
+// DEV MODE - Set to true to work without hardware
+// ============================================
+const DEV_MODE = true;
+
 // Global reactive state
 const connectionStatus = ref<BLEConnectionStatus>({
-  connected: false,
-  device: null,
+  connected: DEV_MODE, // Auto-connect in dev mode
+  device: DEV_MODE ? { name: 'KB1 (Dev Mode)' } as BluetoothDevice : null,
   error: null,
 });
 
 const ccMappings = ref<CCMapping[]>([]);
 const deviceSettings = ref<DeviceSettings>(kb1Protocol.createDefaultSettings());
 const isLoading = ref(false);
+
+// Initialize mock data in dev mode
+if (DEV_MODE) {
+  console.log('🔧 DEV MODE: Simulating connected device with mock data');
+  deviceSettings.value = kb1Protocol.createDefaultSettings();
+  ccMappings.value = Array.from({ length: 8 }, (_, i) => 
+    kb1Protocol.createDefaultCCMapping(i)
+  );
+}
 
 // Snapshot state for restore functionality
 const SNAPSHOT_KEY = 'kb1_snapshot_v1';
@@ -52,6 +66,33 @@ export function useDeviceState() {
    * Connect to a KB1 device
    */
   const connect = async () => {
+    // In dev mode, simulate instant connection
+    if (DEV_MODE) {
+      console.log('🔧 DEV MODE: Simulating connection...');
+      isLoading.value = true;
+      
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          connectionStatus.value = {
+            connected: true,
+            device: { name: 'KB1 (Dev Mode)' } as BluetoothDevice,
+            error: null,
+          };
+          
+          // Initialize with mock data
+          deviceSettings.value = kb1Protocol.createDefaultSettings();
+          ccMappings.value = Array.from({ length: 8 }, (_, i) => 
+            kb1Protocol.createDefaultCCMapping(i)
+          );
+          
+          isLoading.value = false;
+          console.log('🔧 DEV MODE: Connected with mock data');
+          resolve();
+        }, 500); // Simulate brief connection delay
+      });
+    }
+    
+    // Real BLE connection
     isLoading.value = true;
     try {
       await bleClient.connect();
@@ -69,6 +110,16 @@ export function useDeviceState() {
    * Disconnect from the current device
    */
   const disconnect = async () => {
+    if (DEV_MODE) {
+      console.log('🔧 DEV MODE: Simulating disconnect');
+      connectionStatus.value = {
+        connected: false,
+        device: null,
+        error: null,
+      };
+      return;
+    }
+    
     await bleClient.disconnect();
   };
 
@@ -171,6 +222,14 @@ export function useDeviceState() {
       throw new Error('Not connected to device');
     }
 
+    // In dev mode, just update locally
+    if (DEV_MODE) {
+      console.log('🔧 DEV MODE: Simulating send settings');
+      await new Promise(resolve => setTimeout(resolve, 200));
+      updateSettings(settings);
+      return;
+    }
+
     try {
       const data = kb1Protocol.encodeSetSettings(settings);
       await bleClient.sendData(data);
@@ -187,6 +246,14 @@ export function useDeviceState() {
   const saveToFlash = async () => {
     if (!connectionStatus.value.connected) {
       throw new Error('Not connected to device');
+    }
+
+    // In dev mode, simulate save
+    if (DEV_MODE) {
+      console.log('🔧 DEV MODE: Simulating save to flash');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log('🔧 DEV MODE: Save complete');
+      return;
     }
 
     try {
@@ -275,8 +342,26 @@ export function useDeviceState() {
     }
 
     isLoading.value = true;
+    
     try {
-      // Read settings from BLE characteristics
+      // In dev mode, simulate loading
+      if (DEV_MODE) {
+        console.log('🔧 DEV MODE: Simulating load from device');
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Ensure we have fresh default data
+        deviceSettings.value = kb1Protocol.createDefaultSettings();
+        ccMappings.value = Array.from({ length: 8 }, (_, i) => 
+          kb1Protocol.createDefaultCCMapping(i)
+        );
+        
+        captureBaseline();
+        console.log('🔧 DEV MODE: Load complete with mock data');
+        isLoading.value = false;
+        return;
+      }
+      
+      // Real BLE read
       const settings = await bleClient.readAllSettings();
       
       // Update device settings with data from device
@@ -309,7 +394,7 @@ export function useDeviceState() {
   /**
    * Check if Web Bluetooth is available
    */
-  const isBluetoothAvailable = computed(() => bleClient.isBluetoothAvailable());
+  const isBluetoothAvailable = computed(() => DEV_MODE || bleClient.isBluetoothAvailable());
 
   /**
    * Check if connected

@@ -117,12 +117,47 @@
 
       <!-- Duration for non-incremental modes, Steps for incremental mode -->
       <template v-if="!isIncrementalMode">
+        <!-- Duration Meter Visual -->
+        <div class="duration-meter">
+          <div class="meter-bar-container">
+            <!-- Bipolar mode: blue and pink bars -->
+            <template v-if="model.valueMode === 1">
+              <div class="meter-bar-wrapper">
+                <div class="meter-bar blue-bar-base"></div>
+                <div 
+                  class="meter-bar blue-bar-active"
+                  :style="{ width: `${10 + ((duration - 100) / 1900) * 90}%` }"
+                ></div>
+              </div>
+              <div class="meter-divider"></div>
+              <div class="meter-bar-wrapper">
+                <div class="meter-bar pink-bar-base"></div>
+                <div 
+                  class="meter-bar pink-bar-active"
+                  :style="{ width: `${10 + ((duration - 100) / 1900) * 90}%` }"
+                ></div>
+              </div>
+            </template>
+            <!-- Unipolar mode: only pink bar -->
+            <template v-else>
+              <div class="meter-divider"></div>
+              <div class="meter-bar-wrapper">
+                <div class="meter-bar pink-bar-base"></div>
+                <div 
+                  class="meter-bar pink-bar-active"
+                  :style="{ width: `${10 + ((duration - 100) / 1900) * 90}%` }"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+
         <div class="group">
           <label :for="`lever-duration-${lever}`">DURATION</label>
           <div class="value-control">
             <button 
               class="stepper-btn"
-              :disabled="duration <= 0"
+              :disabled="duration <= 100"
               @click="decreaseDuration"
               title="Decrease by 10ms"
             >
@@ -133,8 +168,8 @@
                 type="number" 
                 :id="`lever-duration-${lever}`" 
                 v-model.number="duration" 
-                min="0" 
-                max="10000" 
+                min="100" 
+                max="2000" 
                 step="10"
                 class="duration-input"
                 @wheel="handleDurationWheel"
@@ -146,7 +181,7 @@
             </div>
             <button 
               class="stepper-btn"
-              :disabled="duration >= 10000"
+              :disabled="duration >= 2000"
               @click="increaseDuration"
               title="Increase by 10ms"
             >
@@ -552,7 +587,7 @@ const durationDragStartValue = ref(0)
 function handleDurationWheel(event: WheelEvent) {
   event.preventDefault()
   const delta = event.deltaY > 0 ? -10 : 10
-  const newValue = Math.max(0, Math.min(10000, duration.value + delta))
+  const newValue = Math.max(100, Math.min(2000, duration.value + delta))
   duration.value = newValue
 }
 
@@ -573,7 +608,7 @@ function handleDurationMouseMove(event: MouseEvent) {
   const deltaX = event.clientX - durationDragStartX.value
   // Scale: 2 pixels of movement = 10ms change
   const change = Math.round(deltaX / 2) * 10
-  const newValue = Math.max(0, Math.min(10000, durationDragStartValue.value + change))
+  const newValue = Math.max(100, Math.min(2000, durationDragStartValue.value + change))
   duration.value = newValue
 }
 
@@ -598,7 +633,7 @@ function handleDurationTouchMove(event: TouchEvent) {
   const deltaX = event.touches[0].clientX - durationDragStartX.value
   // Scale: 2 pixels of movement = 10ms change
   const change = Math.round(deltaX / 2) * 10
-  const newValue = Math.max(0, Math.min(10000, durationDragStartValue.value + change))
+  const newValue = Math.max(100, Math.min(2000, durationDragStartValue.value + change))
   duration.value = newValue
 }
 
@@ -673,12 +708,12 @@ function handleStepsTouchEnd() {
 
 // Arrow button functions for duration
 function decreaseDuration() {
-  const newValue = Math.max(0, duration.value - 10)
+  const newValue = Math.max(100, duration.value - 10)
   duration.value = newValue
 }
 
 function increaseDuration() {
-  const newValue = Math.min(10000, duration.value + 10)
+  const newValue = Math.min(2000, duration.value + 10)
   duration.value = newValue
 }
 
@@ -852,8 +887,73 @@ function increaseSteps() {
 
 .input-divider {
   height: 1px;
-  background: var(--color-border);
+  background: var(--color-divider);
   width: 100%;
+}
+
+/* Duration Meter Styles */
+.duration-meter {
+  width: 100%;
+  padding: 1.5rem 0 1rem 0;
+}
+
+.meter-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 9px;
+  width: 100%;
+}
+
+.meter-bar-wrapper {
+  position: relative;
+  height: 9px;
+  flex: 1;
+  border-radius: 4.5px;
+  overflow: hidden;
+}
+
+.meter-bar {
+  height: 9px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 4.5px;
+}
+
+/* Base bars at 40% opacity */
+.blue-bar-base {
+  width: 100%;
+  background: #1F498E;
+  opacity: 0.4;
+}
+
+.pink-bar-base {
+  width: 100%;
+  background: #B638B4;
+  opacity: 0.4;
+}
+
+/* Active bars at 100% opacity */
+.blue-bar-active {
+  background: #1F498E;
+  opacity: 1;
+  z-index: 1;
+  left: auto;
+  right: 0;
+}
+
+.pink-bar-active {
+  background: #B638B4;
+  opacity: 1;
+  z-index: 1;
+}
+
+.meter-divider {
+  width: 2px;
+  height: 17px;
+  background: #FFA500;
+  flex-shrink: 0;
 }
 
 .group {
@@ -861,7 +961,7 @@ function increaseSteps() {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0;
+  padding: 0.75rem 0;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -1044,7 +1144,7 @@ function increaseSteps() {
 }
 
 .duration-input {
-  width: 60px;
+  width: 75px;
   padding: 0;
   margin: 0;
   border: none;

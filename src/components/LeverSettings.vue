@@ -182,8 +182,8 @@ const toggleImage = computed(() => {
   
   if (toggleHovered.value) {
     return isUnipolar 
-      ? `${BASE_PATH}/uni_bi_toggle/l_float.svg`
-      : `${BASE_PATH}/uni_bi_toggle/r_float.svg`
+      ? `${BASE_PATH}/uni_bi_toggle/l-r_trans.svg`
+      : `${BASE_PATH}/uni_bi_toggle/r-l_trans.svg`
   }
   
   return isUnipolar 

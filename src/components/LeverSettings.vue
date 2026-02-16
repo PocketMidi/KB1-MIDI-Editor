@@ -495,7 +495,7 @@ const duration = computed({
 
 .toggle-image {
   display: block;
-  height: 32px;
+  height: 22px;
   width: auto;
   cursor: pointer;
   transition: opacity 0.2s ease;
@@ -515,7 +515,7 @@ const duration = computed({
   background: none;
   border: none;
   padding: 0.5rem 0;
-  font-size: 1rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: #848484;
   cursor: pointer;
@@ -544,7 +544,7 @@ const duration = computed({
 
 .profile-visualization {
   margin: 1.5rem auto;
-  padding: 1rem;
+  padding: 1rem 0.5rem;
   background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: 6px;
@@ -568,7 +568,7 @@ const duration = computed({
   
   .profile-visualization {
     margin: 1rem auto;
-    padding: 0.5rem;
+    padding: 0.75rem 0.25rem;
   }
 }
 

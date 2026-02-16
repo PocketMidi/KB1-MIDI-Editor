@@ -469,7 +469,7 @@ const duration = computed({
 <style scoped>
 
 .settings-lever {
-  padding: 1rem;
+  padding: 1rem 1rem 1rem 0.25rem; /* top right bottom left - minimal left padding */
   background: var(--color-background-soft);
   border: 1px solid var(--color-border);
   border-radius: 8px;

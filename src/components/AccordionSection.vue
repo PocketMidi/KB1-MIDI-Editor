@@ -141,7 +141,7 @@ function toggle() {
 }
 
 .accordion-body {
-  padding: 0 1.25rem 1.25rem 1.25rem;
+  padding: 0 1.25rem 1.25rem 0.25rem; /* Reduce left padding to match settings-lever */
 }
 
 @media (max-width: 768px) {
@@ -150,7 +150,7 @@ function toggle() {
   }
   
   .accordion-body {
-    padding: 0 1rem 1rem 1rem;
+    padding: 0 1rem 1rem 0.25rem; /* Match reduced left padding on mobile */
   }
   
   .accordion-icon {

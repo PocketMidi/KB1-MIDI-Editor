@@ -27,7 +27,6 @@
           :categories="categories"
           :functionModes="leverFunctionModes"
           :valueModes="valueModes"
-          :interpolations="interpolations"
           @update:modelValue="markChanged"
         />
       </AccordionSection>
@@ -72,7 +71,6 @@
           :categories="categories"
           :functionModes="leverFunctionModes"
           :valueModes="valueModes"
-          :interpolations="interpolations"
           @update:modelValue="markChanged"
         />
       </AccordionSection>

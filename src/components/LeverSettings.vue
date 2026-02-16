@@ -7,6 +7,7 @@
         <img 
           :src="toggleImage" 
           alt="Polarity Toggle"
+          :title="toggleTooltip"
           class="toggle-image"
           @click="handleToggleClick"
           @mouseenter="toggleHovered = true"
@@ -20,6 +21,7 @@
           class="profile-btn"
           :class="{ active: isProfileActive('lin') }"
           @click="selectProfile('lin')"
+          title="Linear"
         >
           Lin
         </button>
@@ -27,6 +29,7 @@
           class="profile-btn"
           :class="{ active: isProfileActive('exp') }"
           @click="selectProfile('exp')"
+          title="Exponential"
         >
           Exp
         </button>
@@ -34,6 +37,7 @@
           class="profile-btn"
           :class="{ active: isProfileActive('log') }"
           @click="selectProfile('log')"
+          title="Logarithmic"
         >
           Log
         </button>
@@ -41,6 +45,7 @@
           class="profile-btn"
           :class="{ active: isProfileActive('pd') }"
           @click="selectProfile('pd')"
+          title="Peak & Decay"
         >
           P&D
         </button>
@@ -48,6 +53,7 @@
           class="profile-btn"
           :class="{ active: isProfileActive('inc') }"
           @click="selectProfile('inc')"
+          title="Incremental"
         >
           Inc
         </button>
@@ -109,28 +115,19 @@
       </div>
       <div class="input-divider"></div>
 
-      <div class="group">
-        <label :for="`lever-duration-${lever}`">DURATION</label>
-        <div class="number-with-unit">
-          <input type="number" :id="`lever-duration-${lever}`" v-model.number="duration" min="0" max="10000" step="10" />
-          <span>ms</span>
-        </div>
-      </div>
-
-      <!-- Mode-specific Type dropdown for Interpolated and Peak & Decay modes -->
-      <template v-if="showTypeControl">
-        <div class="input-divider"></div>
+      <!-- Duration for non-incremental modes, Steps for incremental mode -->
+      <template v-if="!isIncrementalMode">
         <div class="group">
-          <label :for="`lever-type-${lever}`">TYPE</label>
-          <select :id="`lever-type-${lever}`" v-model.number="gangedType">
-            <option v-for="opt in interpolations" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-          </select>
+          <label :for="`lever-duration-${lever}`">DURATION</label>
+          <div class="number-with-unit">
+            <input type="number" :id="`lever-duration-${lever}`" v-model.number="duration" min="0" max="10000" step="10" />
+            <span>ms</span>
+          </div>
         </div>
       </template>
 
-      <!-- Mode-specific Steps dropdown for Incremental mode -->
-      <template v-if="isIncrementalMode">
-        <div class="input-divider"></div>
+      <!-- Steps for Incremental mode -->
+      <template v-else>
         <div class="group">
           <label :for="`lever-steps-${lever}`">STEPS</label>
           <select :id="`lever-steps-${lever}`" v-model.number="stepsValue">
@@ -170,7 +167,6 @@ const props = defineProps<{
   categories: string[]
   functionModes: { value: number, label: string }[]
   valueModes: { value: number, label: string }[]
-  interpolations: { value: number, label: string }[]
 }>()
 
 const emit = defineEmits<{
@@ -214,6 +210,11 @@ const toggleImage = computed(() => {
   return isUnipolar 
     ? `${BASE_PATH}/uni_bi_toggle/l_active.svg`
     : `${BASE_PATH}/uni_bi_toggle/r_active.svg`
+})
+
+const toggleTooltip = computed(() => {
+  // Show the mode you're about to switch TO, not the current mode
+  return model.value.valueMode === 0 ? 'Bipolar' : 'Unipolar'
 })
 
 const handleToggleClick = () => {
@@ -345,9 +346,6 @@ const isInterpolatedMode = computed(() => model.value.functionMode === 0)
 const isPeakDecayMode = computed(() => model.value.functionMode === 1)
 const isIncrementalMode = computed(() => model.value.functionMode === 2)
 
-// Show Type control for Interpolated and Peak & Decay modes
-const showTypeControl = computed(() => isInterpolatedMode.value || isPeakDecayMode.value)
-
 // Step options for Incremental mode
 // MIDI range is 0-127 (128 total values)
 // Display: number of steps, Value: stepSize (MIDI values per step)
@@ -472,15 +470,6 @@ watch(() => model.value.valueMode, (newMode, oldMode) => {
     // Keep MIDI values the same, they'll just display differently
     model.value.minCCValue = currentMinMidi
     model.value.maxCCValue = currentMaxMidi
-  }
-})
-
-// Computed property to gang both types together
-const gangedType = computed({
-  get: () => model.value.onsetType,
-  set: (value: number) => {
-    model.value.onsetType = value
-    model.value.offsetType = value
   }
 })
 

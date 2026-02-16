@@ -56,7 +56,6 @@
           :categories="categories"
           :functionModes="leverFunctionModes"
           :valueModes="valueModes"
-          :interpolations="interpolations"
           @update:modelValue="markChanged"
         />
         
@@ -81,7 +80,6 @@
           :categories="categories"
           :functionModes="leverFunctionModes"
           :valueModes="valueModes"
-          :interpolations="interpolations"
           @update:modelValue="markChanged"
         />
         

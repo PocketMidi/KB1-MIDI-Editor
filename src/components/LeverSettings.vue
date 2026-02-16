@@ -479,7 +479,7 @@ const duration = computed({
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1.5rem;
+  gap: 2rem;
   margin-bottom: 1.5rem;
   max-width: 600px;
   margin-left: auto;
@@ -552,7 +552,7 @@ const duration = computed({
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-width: min(583px, 100%); /* Native SVG size, but allow smaller on mobile */
+  max-width: 100%;
 }
 
 .profile-visualization img {
@@ -564,7 +564,7 @@ const duration = computed({
 /* Mobile-specific sizing */
 @media (max-width: 768px) {
   .controls-row {
-    gap: 1rem;
+    gap: 1.5rem;
   }
   
   .profile-visualization {

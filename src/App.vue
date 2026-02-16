@@ -315,7 +315,7 @@ body {
 
 /* Header - Unified for all screen sizes */
 .app-header {
-  background: #0F0F0F;
+  background-color: #0F0F0F;
   border-bottom: none;
   position: relative;
   z-index: 100; /* Lower than sticky tabs */
@@ -355,12 +355,12 @@ body {
   position: sticky;
   top: 0;
   z-index: 200; /* High z-index to stay above header */
-  background: #0F0F0F;
+  background-color: #0F0F0F;
 }
 
 /* Tab Navigation - Unified responsive layout */
 .app-nav {
-  background: #0F0F0F;
+  background-color: #0F0F0F;
   border-bottom: none;
   display: flex;
   justify-content: space-between;

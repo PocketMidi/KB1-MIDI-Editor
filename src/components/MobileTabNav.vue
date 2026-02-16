@@ -63,14 +63,14 @@ const isHovering = ref(false);
   position: sticky;
   top: 0;
   z-index: 200;
-  background: #0F0F0F;
+  background-color: #0F0F0F;
 }
 
 .mobile-tab-nav {
   display: flex;
   justify-content: space-between;
   align-items: stretch;
-  background: #0F0F0F;
+  background-color: #0F0F0F;
   border-bottom: none;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;

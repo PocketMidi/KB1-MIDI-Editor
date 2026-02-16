@@ -59,6 +59,9 @@
       <img :src="profileImage" alt="Profile Graph" />
     </div>
 
+    <!-- Divider -->
+    <div class="section-divider"></div>
+
     <div class="inputs">
       <div class="group">
         <label :for="`lever-category-${lever}`">Category</label>
@@ -591,6 +594,20 @@ const duration = computed({
   display: block;
   max-width: 100%;
   /* NO min-width - allow scaling */
+}
+
+/* Section divider */
+.section-divider {
+  height: 2px;
+  background: rgba(234, 234, 234, 0.3);
+  margin: 1.5rem 0;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .section-divider {
+    margin: 1rem 0;
+  }
 }
 
 /* Tablet and mobile-specific sizing */

@@ -493,10 +493,9 @@ const duration = computed({
 }
 
 .toggle-container {
-  flex-shrink: 0;
-  max-width: 180px;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  flex-shrink: 0; /* Don't let it shrink too much */
 }
 
 .toggle-image {
@@ -513,8 +512,9 @@ const duration = computed({
 
 .profile-selector {
   display: flex;
-  gap: 1.5rem;
+  gap: 1.5rem; /* Internal spacing between Lin, Exp, Log, Inc buttons */
   align-items: center;
+  flex-shrink: 1; /* Allow buttons to shrink if needed */
 }
 
 .profile-btn {
@@ -572,15 +572,21 @@ const duration = computed({
   /* NO min-width - allow scaling */
 }
 
-/* Mobile-specific sizing */
+/* Tablet and mobile-specific sizing */
 @media (max-width: 768px) {
   .controls-row {
-    gap: 1rem;
+    gap: 1.5rem; /* 24px gap on tablets */
   }
   
   .profile-visualization {
     margin: 1rem auto;
     padding: 0.5rem 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .controls-row {
+    gap: 1rem; /* 16px gap on very small screens */
   }
 }
 

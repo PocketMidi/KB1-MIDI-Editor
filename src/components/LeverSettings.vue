@@ -39,6 +39,13 @@
         </button>
         <button 
           class="profile-btn"
+          :class="{ active: isProfileActive('pd') }"
+          @click="selectProfile('pd')"
+        >
+          P&D
+        </button>
+        <button 
+          class="profile-btn"
           :class="{ active: isProfileActive('inc') }"
           @click="selectProfile('inc')"
         >
@@ -217,11 +224,13 @@ onBeforeUnmount(() => {
 })
 
 // Profile selection logic
-type ProfileType = 'lin' | 'exp' | 'log' | 'inc'
+type ProfileType = 'lin' | 'exp' | 'log' | 'pd' | 'inc'
 
 const isProfileActive = (profile: ProfileType): boolean => {
   if (model.value.functionMode === 2) {
     return profile === 'inc'
+  } else if (model.value.functionMode === 1) {
+    return profile === 'pd'
   } else if (model.value.functionMode === 0) {
     if (model.value.onsetType === 1) return profile === 'exp'
     if (model.value.onsetType === 2) return profile === 'log'
@@ -233,6 +242,8 @@ const isProfileActive = (profile: ProfileType): boolean => {
 const selectProfile = (profile: ProfileType) => {
   if (profile === 'inc') {
     model.value.functionMode = 2
+  } else if (profile === 'pd') {
+    model.value.functionMode = 1
   } else {
     model.value.functionMode = 0
     
@@ -258,6 +269,8 @@ const profileImage = computed(() => {
   
   if (model.value.functionMode === 2) {
     profile = 'inc'
+  } else if (model.value.functionMode === 1) {
+    profile = 'pd'
   } else if (model.value.functionMode === 0) {
     // Interpolated mode - check type
     if (model.value.onsetType === 1) profile = 'exp'

@@ -317,9 +317,8 @@ body {
 .app-header {
   background: #0F0F0F;
   border-bottom: none;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+  position: relative;
+  z-index: 100; /* Lower than sticky tabs */
 }
 
 .header-content {
@@ -355,7 +354,7 @@ body {
 .tab-nav-wrapper {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 200; /* High z-index to stay above header */
   background: #0F0F0F;
 }
 

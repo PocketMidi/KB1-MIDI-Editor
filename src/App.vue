@@ -506,10 +506,10 @@ body {
 
 /* Horizontal divider under navigation */
 .nav-divider {
-  height: 3px;
+  height: 2px;
   background: rgba(234, 234, 234, 0.3);
   max-width: 1400px;
-  margin: 0 auto;
+  margin: -2px auto 0;
   width: 100%;
 }
 

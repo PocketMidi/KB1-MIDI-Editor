@@ -784,6 +784,19 @@ onBeforeUnmount(() => {
   cursor: ew-resize !important;
   touch-action: none;
   user-select: none;
+  /* Aggressive iOS Safari number input suppression */
+  -webkit-appearance: none !important;
+  -moz-appearance: textfield !important;
+  appearance: none !important;
+}
+
+.duration-input::-webkit-textfield-decoration-container {
+  display: none !important;
+}
+
+.duration-input::-webkit-contacts-auto-fill-button,
+.duration-input::-webkit-credentials-auto-fill-button {
+  display: none !important;
 }
 
 .duration-input:focus {
@@ -793,15 +806,18 @@ onBeforeUnmount(() => {
 /* Hide number input spinners for duration */
 .duration-input::-webkit-inner-spin-button,
 .duration-input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-  display: none;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  margin: 0 !important;
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .duration-input[type=number] {
-  -moz-appearance: textfield;
-  appearance: none;
-  -webkit-appearance: none;
+  -moz-appearance: textfield !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
 }
 
 .unit-label {
@@ -921,6 +937,19 @@ onBeforeUnmount(() => {
   font-family: 'Roboto Mono';
   font-weight: 400;
   text-align: right;
+  /* Aggressive iOS Safari number input suppression */
+  -webkit-appearance: none !important;
+  -moz-appearance: textfield !important;
+  appearance: none !important;
+}
+
+.number-with-unit input::-webkit-textfield-decoration-container {
+  display: none !important;
+}
+
+.number-with-unit input::-webkit-contacts-auto-fill-button,
+.number-with-unit input::-webkit-credentials-auto-fill-button {
+  display: none !important;
 }
 
 .number-with-unit input:focus {
@@ -930,15 +959,18 @@ onBeforeUnmount(() => {
 /* Hide number input spinners */
 .number-with-unit input::-webkit-inner-spin-button,
 .number-with-unit input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-  display: none;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  margin: 0 !important;
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .number-with-unit input[type=number] {
-  -moz-appearance: textfield;
-  appearance: none;
-  -webkit-appearance: none;
+  -moz-appearance: textfield !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
 }
 
 .number-with-unit span {

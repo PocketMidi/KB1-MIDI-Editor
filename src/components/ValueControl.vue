@@ -231,6 +231,19 @@ onBeforeUnmount(() => {
   cursor: ew-resize; /* Indicates horizontal dragging */
   touch-action: none; /* Prevent default touch behaviors */
   user-select: none; /* Prevent text selection while dragging */
+  /* Aggressive iOS Safari number input suppression */
+  -webkit-appearance: none !important;
+  -moz-appearance: textfield !important;
+  appearance: none !important;
+}
+
+.value-input::-webkit-textfield-decoration-container {
+  display: none !important;
+}
+
+.value-input::-webkit-contacts-auto-fill-button,
+.value-input::-webkit-credentials-auto-fill-button {
+  display: none !important;
 }
 
 .value-input:focus {
@@ -240,14 +253,17 @@ onBeforeUnmount(() => {
 /* Hide number input spinners */
 .value-input::-webkit-inner-spin-button,
 .value-input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-  display: none;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  margin: 0 !important;
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .value-input[type=number] {
-  -moz-appearance: textfield;
-  appearance: none;
-  -webkit-appearance: none;
+  -moz-appearance: textfield !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
 }
 </style>

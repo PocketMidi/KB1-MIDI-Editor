@@ -69,18 +69,18 @@ export interface ScaleSettings {
 
 /**
  * System/Power settings configuration
- * Note: These settings are stored in the web app but require firmware support to be functional.
- * Current firmware has these as compile-time constants.
+ * 
+ * Constraints:
+ * - Deep sleep must be at least 30s after light sleep
+ * - BT connection must be at least 30s after deep sleep (to maintain connection)
  */
 export interface SystemSettings {
-  /** Light sleep timeout in seconds (firmware default: 90s) */
+  /** Light sleep timeout in seconds (range: 30-300s, default: 90s) */
   lightSleepTimeout: number;
-  /** Deep sleep timeout in seconds (firmware default: 330s = 5.5 minutes) */
+  /** Deep sleep timeout in seconds (range: 120-1800s, must be >lightSleep+30s, default: 330s) */
   deepSleepTimeout: number;
-  /** Bluetooth keepalive timeout in seconds (firmware default: 120s = 2 minutes) */
+  /** Bluetooth keepalive timeout in seconds (range: 30-600s, must be >=deepSleep+30s, default: 600s) */
   bleTimeout: number;
-  /** Idle confirmation window in seconds (firmware default: 2s) */
-  idleConfirmTimeout: number;
 }
 
 /**
@@ -398,8 +398,7 @@ export class KB1Protocol {
       system: {
         lightSleepTimeout: 90, // 90 seconds (firmware: LIGHT_SLEEP_MAX_MS)
         deepSleepTimeout: 330, // 5.5 minutes (firmware: DEEP_SLEEP_IDLE_MS)
-        bleTimeout: 120, // 2 minutes (firmware: KEEPALIVE_GRACE_PERIOD_MS)
-        idleConfirmTimeout: 2, // 2 seconds (firmware: IDLE_CONFIRM_MS)
+        bleTimeout: 600, // 10 minutes (firmware: KEEPALIVE_GRACE_PERIOD_MS)
       },
     };
   }
@@ -475,12 +474,21 @@ export class KB1Protocol {
 
     // Helper to validate system settings
     const validateSystem = (system: SystemSettings): boolean => {
-      return (
+      // Individual range checks
+      const rangeValid = (
         system.lightSleepTimeout >= 30 && system.lightSleepTimeout <= 300 &&
         system.deepSleepTimeout >= 120 && system.deepSleepTimeout <= 1800 &&
-        system.bleTimeout >= 30 && system.bleTimeout <= 600 &&
-        system.idleConfirmTimeout >= 1 && system.idleConfirmTimeout <= 10
+        system.bleTimeout >= 30 && system.bleTimeout <= 600
       );
+      
+      // Relative constraints:
+      // 1. Deep sleep must be after light sleep (with 30s gap)
+      const deepAfterLight = system.deepSleepTimeout > system.lightSleepTimeout + 30;
+      
+      // 2. BT connection should stay alive 30s after deep sleep
+      const bleAfterDeep = system.bleTimeout >= system.deepSleepTimeout + 30;
+      
+      return rangeValid && deepAfterLight && bleAfterDeep;
     };
 
     return (

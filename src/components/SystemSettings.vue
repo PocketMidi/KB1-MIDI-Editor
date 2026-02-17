@@ -7,7 +7,7 @@
         <ValueControl
           v-model="model.lightSleepTimeout"
           :min="30"
-          :max="300"
+          :max="lightSleepMax"
           :step="5"
           :small-step="15"
           :large-step="30"
@@ -21,8 +21,8 @@
         <span class="time-display">{{ formatTime(model.deepSleepTimeout) }}</span>
         <ValueControl
           v-model="model.deepSleepTimeout"
-          :min="120"
-          :max="1800"
+          :min="deepSleepMin"
+          :max="deepSleepMax"
           :step="30"
           :small-step="60"
           :large-step="300"
@@ -32,11 +32,11 @@
       <div class="input-divider"></div>
 
       <div class="group">
-        <label for="ble-timeout">BLE TIMEOUT</label>
+        <label for="ble-timeout">BT CONNECTION</label>
         <span class="time-display">{{ formatTime(model.bleTimeout) }}</span>
         <ValueControl
           v-model="model.bleTimeout"
-          :min="30"
+          :min="btConnectionMin"
           :max="600"
           :step="10"
           :small-step="30"
@@ -44,23 +44,8 @@
           unit="s"
         />
       </div>
-      <div class="input-divider"></div>
-
-      <div class="group">
-        <label for="idle-confirm">IDLE CONFIRM</label>
-        <span class="time-display">{{ formatTime(model.idleConfirmTimeout) }}</span>
-        <ValueControl
-          v-model="model.idleConfirmTimeout"
-          :min="1"
-          :max="10"
-          :step="1"
-          :small-step="1"
-          :large-step="2"
-          unit="s"
-        />
-      </div>
       
-      <div class="hint-text">Note: Firmware update required for runtime adjustment of these timeouts</div>
+      <div class="hint-text">Timers: Light → Deep (+30s) → BT (+30s). Each must have 30s buffer from previous.</div>
     </div>
   </div>
 </template>
@@ -73,7 +58,6 @@ type SystemModel = {
   lightSleepTimeout: number
   deepSleepTimeout: number
   bleTimeout: number
-  idleConfirmTimeout: number
 }
 
 const props = defineProps<{
@@ -87,6 +71,29 @@ const emit = defineEmits<{
 const model = computed({
   get: () => props.modelValue,
   set: v => emit('update:modelValue', v)
+})
+
+// Dynamic constraints to prevent conflicting timer values
+// Light Sleep: max must be at least 30s before deep sleep
+const lightSleepMax = computed(() => {
+  const maxFromDeep = model.value.deepSleepTimeout - 30
+  return Math.min(300, Math.max(30, maxFromDeep))
+})
+
+// Deep Sleep: min must be 30s+ after light sleep, max limited by BT connection - 30s
+const deepSleepMin = computed(() => {
+  return Math.max(120, model.value.lightSleepTimeout + 30)
+})
+
+const deepSleepMax = computed(() => {
+  // Can't exceed BT connection timeout - 30s buffer
+  const maxFromBle = model.value.bleTimeout - 30
+  return Math.min(1800, Math.max(120, maxFromBle))
+})
+
+// BT Connection: must be at least 30s after deep sleep timeout
+const btConnectionMin = computed(() => {
+  return Math.max(30, model.value.deepSleepTimeout + 30)
 })
 
 // Format seconds into human-readable time (e.g., "1m 30s" or "45s")

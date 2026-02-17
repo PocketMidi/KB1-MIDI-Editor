@@ -6,7 +6,7 @@
  * connecting, disconnecting, and sending/receiving data.
  */
 
-import type { LeverSettings, LeverPushSettings, TouchSettings, ScaleSettings } from './kb1Protocol';
+import type { LeverSettings, LeverPushSettings, TouchSettings, ScaleSettings, SystemSettings } from './kb1Protocol';
 
 // KB1-specific BLE UUIDs (custom, not standard MIDI BLE)
 // These UUIDs are defined in the KB1 firmware (firmware/src/objects/Constants.h)
@@ -19,6 +19,7 @@ const LEVER2_SETTINGS_UUID = '13ffbea4-793f-40f5-82da-ac9eca5f0e09';
 const LEVERPUSH2_SETTINGS_UUID = '52629808-3d14-4ae8-a826-40bcec6467d5';
 const TOUCH_SETTINGS_UUID = '5612b54d-8bfe-4217-a079-c9c95ab32c41';
 const SCALE_SETTINGS_UUID = '297bd635-c3e8-4fb4-b5e0-93586da8f14c';
+const SYSTEM_SETTINGS_UUID = '8f7e6d5c-4b3a-2c1d-0e9f-8a7b6c5d4e3f';
 const MIDI_UUID = 'eb58b31b-d963-4c7d-9a11-e8aabec2fe32';
 const KEEPALIVE_UUID = 'a8f3d5e2-9c4b-11ef-8e7a-325096b39f47';
 
@@ -42,6 +43,7 @@ export class BLEClient {
   private leverPush2Characteristic: BluetoothRemoteGATTCharacteristic | null = null;
   private touchCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
   private scaleCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
+  private systemCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
   private keepAliveCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
 
   // Keep-alive mechanism (firmware expects writes within 10 minute grace period)
@@ -115,6 +117,7 @@ export class BLEClient {
         this.leverPush2Characteristic = await service.getCharacteristic(LEVERPUSH2_SETTINGS_UUID);
         this.touchCharacteristic = await service.getCharacteristic(TOUCH_SETTINGS_UUID);
         this.scaleCharacteristic = await service.getCharacteristic(SCALE_SETTINGS_UUID);
+        this.systemCharacteristic = await service.getCharacteristic(SYSTEM_SETTINGS_UUID);
         this.keepAliveCharacteristic = await service.getCharacteristic(KEEPALIVE_UUID);
         console.log('All settings characteristics obtained');
       } catch (e) {
@@ -195,6 +198,7 @@ export class BLEClient {
     leverPush2?: LeverPushSettings;
     touch?: TouchSettings;
     scale?: ScaleSettings;
+    system?: SystemSettings;
   }> {
     if (!this.server?.connected) {
       throw new Error('Not connected to device');
@@ -208,6 +212,7 @@ export class BLEClient {
         leverPush2?: LeverPushSettings;
         touch?: TouchSettings;
         scale?: ScaleSettings;
+        system?: SystemSettings;
       } = {};
 
       // Read Lever 1 settings
@@ -244,6 +249,12 @@ export class BLEClient {
       if (this.scaleCharacteristic) {
         const data = await this.scaleCharacteristic.readValue();
         settings.scale = this.parseScaleData(data);
+      }
+
+      // Read System settings
+      if (this.systemCharacteristic) {
+        const data = await this.systemCharacteristic.readValue();
+        settings.system = this.parseSystemData(data);
       }
 
       console.log('Read all settings from device:', settings);
@@ -308,6 +319,65 @@ export class BLEClient {
       scaleType: data.getInt32(0, true),
       rootNote: data.getInt32(4, true),
     };
+  }
+
+  /**
+   * Parse system settings data from DataView (little-endian int32)
+   * Note: Only reads first 3 values (light/deep sleep, BLE timeout)
+   * idleConfirmTimeout is kept internal to firmware
+   */
+  private parseSystemData(data: DataView): SystemSettings {
+    return {
+      lightSleepTimeout: data.getInt32(0, true),
+      deepSleepTimeout: data.getInt32(4, true),
+      bleTimeout: data.getInt32(8, true),
+    };
+  }
+
+  /**
+   * Encode system settings to binary format for writing to device
+   * Note: Only writes first 3 values, preserving firmware's idleConfirmTimeout
+   * Firmware expects 16 bytes (4 int32), so we pad with existing value
+   */
+  private async encodeSystemData(settings: SystemSettings): Promise<ArrayBuffer> {
+    // Read current settings from device to preserve idleConfirmTimeout
+    let existingIdleConfirm = 2; // default fallback
+    if (this.systemCharacteristic) {
+      try {
+        const currentData = await this.systemCharacteristic.readValue();
+        if (currentData.byteLength >= 16) {
+          existingIdleConfirm = currentData.getInt32(12, true);
+        }
+      } catch (e) {
+        console.warn('Could not read existing idleConfirmTimeout, using default');
+      }
+    }
+
+    const buffer = new ArrayBuffer(16); // 4 int32 values = 16 bytes
+    const view = new DataView(buffer);
+    view.setInt32(0, settings.lightSleepTimeout, true);
+    view.setInt32(4, settings.deepSleepTimeout, true);
+    view.setInt32(8, settings.bleTimeout, true);
+    view.setInt32(12, existingIdleConfirm, true); // preserve firmware value
+    return buffer;
+  }
+
+  /**
+   * Write system settings to device
+   */
+  async writeSystemSettings(settings: SystemSettings): Promise<void> {
+    if (!this.systemCharacteristic) {
+      throw new Error('System settings characteristic not available');
+    }
+
+    try {
+      const data = await this.encodeSystemData(settings);
+      await this.systemCharacteristic.writeValue(data);
+      console.log('System settings written to device:', settings);
+    } catch (error) {
+      console.error('Failed to write system settings:', error);
+      throw error;
+    }
   }
 
   /**
@@ -427,6 +497,7 @@ export class BLEClient {
     this.leverPush2Characteristic = null;
     this.touchCharacteristic = null;
     this.scaleCharacteristic = null;
+    this.systemCharacteristic = null;
     this.keepAliveCharacteristic = null;
     this.server = null;
     // Note: We don't set device to null to preserve device info

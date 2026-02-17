@@ -116,7 +116,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: flex-end;
   gap: 0.5rem;
-  padding: 1px 0.5rem 1px 0.875rem;
+  padding: 1px 0.5rem 1px 0.5rem;
   background: var(--color-background);
   border: none;
   color: #EAEAEA;
@@ -170,7 +170,7 @@ onUnmounted(() => {
 .dropdown-item {
   display: block;
   width: 100%;
-  padding: 1px 0.5rem 1px 0.875rem;
+  padding: 1px 0.5rem 1px 0.5rem;
   background: transparent;
   border: none;
   border-bottom: 3px solid #0F0F0F;

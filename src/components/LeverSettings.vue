@@ -163,7 +163,7 @@
               @click="decreaseDuration"
               title="Decrease by 10ms"
             >
-              ◄
+              ◀
             </button>
             <div class="duration-wrapper">
               <input 
@@ -187,7 +187,7 @@
               @click="increaseDuration"
               title="Increase by 10ms"
             >
-              ►
+              ▶
             </button>
           </div>
         </div>
@@ -205,7 +205,7 @@
               @click="decreaseSteps"
               title="Previous step value"
             >
-              ◄
+              ◀
             </button>
             <div 
               class="draggable-value-inline"
@@ -223,7 +223,7 @@
               @click="increaseSteps"
               title="Next step value"
             >
-              ►
+              ▶
             </button>
           </div>
         </div>
@@ -1130,7 +1130,7 @@ function increaseSteps() {
   background: transparent;
   color: #EAEAEA;
   cursor: pointer;
-  font-size: 0.8125rem; /* 13px */
+  font-size: 0.625rem; /* 10px - match dropdown triangle */
   font-family: 'Roboto Mono';
   transition: opacity 0.2s;
   width: 20px;

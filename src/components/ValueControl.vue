@@ -6,7 +6,7 @@
       @click="decreaseSmall"
       :title="`Decrease by ${smallStep}`"
     >
-      ◄
+      ◀
     </button>
     <input
       type="number"
@@ -29,7 +29,7 @@
       @click="increaseSmall"
       :title="`Increase by ${smallStep}`"
     >
-      ►
+      ▶
     </button>
   </div>
 </template>
@@ -186,7 +186,7 @@ onBeforeUnmount(() => {
   background: transparent;
   color: #EAEAEA;
   cursor: pointer;
-  font-size: 0.8125rem; /* 13px */
+  font-size: 0.625rem; /* 10px - match dropdown triangle */
   font-family: 'Roboto Mono';
   transition: opacity 0.2s;
   width: 20px;

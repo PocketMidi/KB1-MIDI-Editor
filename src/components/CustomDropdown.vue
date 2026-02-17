@@ -117,7 +117,7 @@ onUnmounted(() => {
   justify-content: flex-end;
   gap: 0.5rem;
   padding: 1px 0.5rem 1px 0.25rem;
-  background: var(--color-background);
+  background: transparent !important;
   border: none;
   color: #EAEAEA;
   font-size: 0.8125rem;

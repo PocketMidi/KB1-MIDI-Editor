@@ -100,14 +100,14 @@
       <div class="accordion-divider"></div>
       
       <AccordionSection
-        title="Touch Sensor"
+        title="TOUCH"
         :subtitle="getTouchSubtitle(localSettings.touch)"
         :midi-cc="localSettings.touch.ccNumber"
         :id="'touch-sensor'"
         :default-open="false"
       >
         <TouchSettings
-          title="Touch Sensor"
+          title="TOUCH"
           v-model="localSettings.touch"
           :ccOptions="ccOptions"
           :ccMapByNumber="ccMapByNumber"

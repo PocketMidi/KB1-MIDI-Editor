@@ -96,7 +96,7 @@
         />
         
         <TouchSettings
-          title="Touch Sensor"
+          title="TOUCH"
           v-model="localSettings.touch"
           :ccOptions="ccOptions"
           :ccMapByNumber="ccMapByNumber"

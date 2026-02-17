@@ -1,8 +1,8 @@
 <template>
-  <div class="value-control">
+  <div class="value-control" :class="{ disabled }">
     <button 
       class="stepper-btn"
-      :disabled="isAtMin"
+      :disabled="isAtMin || disabled"
       @click="decreaseSmall"
       :title="`Decrease by ${smallStep}`"
     >
@@ -15,6 +15,7 @@
       :min="min"
       :max="max"
       :step="step"
+      :disabled="disabled"
       @input="handleInput"
       @blur="validateAndUpdate"
       @wheel="handleWheel"
@@ -25,7 +26,7 @@
     />
     <button 
       class="stepper-btn"
-      :disabled="isAtMax"
+      :disabled="isAtMax || disabled"
       @click="increaseSmall"
       :title="`Increase by ${smallStep}`"
     >
@@ -44,12 +45,14 @@ const props = withDefaults(defineProps<{
   step?: number
   smallStep?: number
   largeStep?: number
+  disabled?: boolean
 }>(), {
   min: 0,
   max: 100,
   step: 1,
   smallStep: 5,
-  largeStep: 10
+  largeStep: 10,
+  disabled: false
 })
 
 const emit = defineEmits<{
@@ -178,6 +181,16 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.5rem;
   justify-content: flex-end;
+}
+
+.value-control.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.value-control.disabled .value-input {
+  color: #666;
+  cursor: not-allowed;
 }
 
 .stepper-btn {

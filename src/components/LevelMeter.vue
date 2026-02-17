@@ -1,16 +1,29 @@
 <template>
   <div class="level-meter">
-    <!-- Dots container -->
-    <div class="dots-container">
-      <div 
-        v-for="(dot, index) in dots" 
-        :key="index"
-        class="dot"
-        :style="{ 
-          left: `${dot.position}%`,
-          opacity: dot.highlighted ? 1 : 0.4
-        }"
-      ></div>
+    <!-- Dots/Triangles container -->
+    <div class="markers-container">
+      <!-- Reset mode: triangles -->
+      <template v-if="mode === 'reset'">
+        <div 
+          v-for="(marker, index) in markers" 
+          :key="index"
+          class="triangle"
+          :class="{ highlighted: marker.highlighted }"
+          :style="{ left: `${marker.position}%` }"
+        ></div>
+      </template>
+      <!-- Range mode: dots -->
+      <template v-else>
+        <div 
+          v-for="(marker, index) in markers" 
+          :key="index"
+          class="dot"
+          :style="{ 
+            left: `${marker.position}%`,
+            opacity: marker.highlighted ? 1 : 0.4
+          }"
+        ></div>
+      </template>
     </div>
     
     <!-- Labels container -->
@@ -30,13 +43,18 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   min: number
   max: number
   isBipolar: boolean
-}>()
+  mode?: 'range' | 'reset'
+  value?: number
+}>(), {
+  mode: 'range',
+  value: 70
+})
 
-interface Dot {
+interface Marker {
   position: number
   value: number
   highlighted: boolean
@@ -48,26 +66,32 @@ interface Label {
   text: string
 }
 
-// Generate dots based on polarity
-const dots = computed<Dot[]>(() => {
-  const totalDots = 41 // Creates dots at every 5% interval (0, 2.5%, 5%, ... 100%)
+// Generate markers (dots or triangles) based on mode and polarity
+const markers = computed<Marker[]>(() => {
+  const totalMarkers = 41 // Creates markers at every 5% interval (0, 2.5%, 5%, ... 100%)
   const rangeMin = props.isBipolar ? -100 : 0
   const rangeMax = 100
   const rangeSpan = rangeMax - rangeMin
   
-  const result: Dot[] = []
-  for (let i = 0; i < totalDots; i++) {
-    const position = (i / (totalDots - 1)) * 100 // Position in percentage (0% to 100%)
+  const result: Marker[] = []
+  for (let i = 0; i < totalMarkers; i++) {
+    const position = (i / (totalMarkers - 1)) * 100 // Position in percentage (0% to 100%)
     const value = rangeMin + (position / 100) * rangeSpan // Actual value in user range
     
-    // Determine if this dot should be highlighted (closest to min or max)
-    // Calculate distance to min and max values
-    const distanceToMin = Math.abs(value - props.min)
-    const distanceToMax = Math.abs(value - props.max)
+    let highlighted = false
     
-    // Highlight if within 5 units of min or max (allowing for some tolerance)
-    const tolerance = 6
-    const highlighted = distanceToMin <= tolerance || distanceToMax <= tolerance
+    if (props.mode === 'reset') {
+      // Reset mode: highlight only the marker closest to the reset value
+      const distanceToValue = Math.abs(value - props.value)
+      const tolerance = 3
+      highlighted = distanceToValue <= tolerance
+    } else {
+      // Range mode: highlight markers near min or max
+      const distanceToMin = Math.abs(value - props.min)
+      const distanceToMax = Math.abs(value - props.max)
+      const tolerance = 6
+      highlighted = distanceToMin <= tolerance || distanceToMax <= tolerance
+    }
     
     result.push({
       position,
@@ -107,9 +131,9 @@ const labels = computed<Label[]>(() => {
   position: relative;
 }
 
-.dots-container {
+.markers-container {
   position: relative;
-  height: 5px;
+  height: 13px;
   width: 100%;
   margin-bottom: 1rem;
 }
@@ -120,8 +144,25 @@ const labels = computed<Label[]>(() => {
   height: 5px;
   background: #F9AC20;
   border-radius: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(4px);
   transition: opacity 0.2s ease;
+}
+
+.triangle {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 13px solid #4A4A4A;
+  transform: translateX(-50%);
+  transition: border-bottom-color 0.2s ease;
+  opacity: 0.3;
+}
+
+.triangle.highlighted {
+  border-bottom-color: #F9AC20;
+  opacity: 1;
 }
 
 .labels-container {

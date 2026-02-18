@@ -59,10 +59,14 @@
     <div class="inputs">
       <div class="group">
         <label>SCALE</label>
-        <CustomDropdown
-          v-model.number="model.scaleType"
-          :options="scales"
-        />
+        <button 
+          ref="scaleTriggerRef"
+          class="picker-trigger"
+          :class="{ 'picker-open': scalePickerOpen }"
+          @click="scalePickerOpen = true"
+        >
+          {{ selectedScaleLabel }}
+        </button>
       </div>
       <div class="input-divider"></div>
 
@@ -74,13 +78,21 @@
         />
       </div>
     </div>
+
+    <!-- Scale Wheel Picker Modal -->
+    <OptionWheelPicker
+      v-model="model.scaleType"
+      v-model:isOpen="scalePickerOpen"
+      :options="scales"
+      :trigger-el="scaleTriggerRef"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, onBeforeUnmount } from 'vue'
-import CustomDropdown from './CustomDropdown.vue'
 import NotePickerControl from './NotePickerControl.vue'
+import OptionWheelPicker from './OptionWheelPicker.vue'
 
 type ScaleModel = {
   scaleType: number
@@ -101,6 +113,16 @@ const emit = defineEmits<{
 const model = computed({
   get: () => props.modelValue,
   set: v => emit('update:modelValue', v)
+})
+
+// Wheel picker state
+const scalePickerOpen = ref(false)
+const scaleTriggerRef = ref<HTMLElement | null>(null)
+
+// Get selected scale label
+const selectedScaleLabel = computed(() => {
+  const scale = props.scales.find(s => s.value === model.value.scaleType)
+  return scale?.label || 'Unknown'
 })
 
 // Constants

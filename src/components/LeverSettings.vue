@@ -88,10 +88,14 @@
 
       <div class="group">
         <label>PARAMETER</label>
-        <CustomDropdown
-          v-model="model.ccNumber"
-          :options="filteredOptions"
-        />
+        <button 
+          ref="parameterTriggerRef"
+          class="picker-trigger"
+          :class="{ 'picker-open': parameterPickerOpen }"
+          @click="parameterPickerOpen = true"
+        >
+          {{ selectedParameterLabel }}
+        </button>
       </div>
       <div class="input-divider"></div>
 
@@ -241,6 +245,14 @@
       :options="categoryOptions"
       :trigger-el="categoryTriggerRef"
     />
+
+    <!-- Parameter Wheel Picker Modal -->
+    <OptionWheelPicker
+      v-model="model.ccNumber"
+      v-model:isOpen="parameterPickerOpen"
+      :options="filteredOptions"
+      :trigger-el="parameterTriggerRef"
+    />
   </div>
 </template>
 
@@ -249,7 +261,6 @@ import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import { type CCEntry } from '../data/ccMap'
 import ValueControl from './ValueControl.vue'
 import LevelMeter from './LevelMeter.vue'
-import CustomDropdown from './CustomDropdown.vue'
 import OptionWheelPicker from './OptionWheelPicker.vue'
 
 type LeverModel = {
@@ -450,6 +461,16 @@ const categoryTriggerRef = ref<HTMLElement | null>(null)
 const categoryOptions = computed(() => 
   props.categories.map(cat => ({ label: cat, value: cat }))
 )
+
+// Parameter wheel picker state
+const parameterPickerOpen = ref(false)
+const parameterTriggerRef = ref<HTMLElement | null>(null)
+
+// Get selected parameter label
+const selectedParameterLabel = computed(() => {
+  const option = filteredOptions.value.find(opt => opt.value === model.value.ccNumber)
+  return option?.label || 'None'
+})
 
 // Watch for ccMapByNumber changes to initialize category when map loads
 watch(() => props.ccMapByNumber.size, () => {

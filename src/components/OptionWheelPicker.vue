@@ -169,11 +169,13 @@ function updateItemStyles() {
     // Calculate scale and opacity based on distance from center
     const distanceRatio = Math.min(distance / maxDistance, 1);
     const scale = 1 - (distanceRatio * 0.4); // Scale from 1.0 to 0.6
-    const opacity = 1 - (distanceRatio * 0.7); // Opacity from 1.0 to 0.3
+    const opacity = 1 - (distanceRatio * 0.9); // Opacity from 1.0 to 0.1
+    const blur = distanceRatio * 2; // Blur from 0px to 2px
     
     const element = item as HTMLElement;
     element.style.transform = `scale(${scale})`;
     element.style.opacity = `${opacity}`;
+    element.style.filter = `blur(${blur}px)`;
   });
 }
 
@@ -197,13 +199,13 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 9999;
   backdrop-filter: blur(4px);
 }
 
 .picker-overlay {
-  background: rgba(26, 26, 26, 0.75);
+  background: rgba(20, 20, 20, 0.5);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
@@ -224,7 +226,7 @@ onBeforeUnmount(() => {
   transform: translateY(-50%);
   background: rgba(40, 40, 40, 0.6);
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
 }
 
 .wheel-scroll {

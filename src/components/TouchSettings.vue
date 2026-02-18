@@ -11,28 +11,40 @@
     <div class="inputs">
       <div class="group">
         <label>CATEGORY</label>
-        <CustomDropdown 
-          v-model="selectedCategory" 
-          :options="categoryOptions"
-        />
+        <button 
+          ref="categoryTriggerRef"
+          class="picker-trigger"
+          :class="{ 'picker-open': categoryPickerOpen }"
+          @click="categoryPickerOpen = true"
+        >
+          {{ selectedCategory }}
+        </button>
       </div>
       <div class="input-divider"></div>
 
       <div class="group">
         <label>PARAMETER</label>
-        <CustomDropdown
-          v-model="model.ccNumber"
-          :options="filteredOptions"
-        />
+        <button 
+          ref="parameterTriggerRef"
+          class="picker-trigger"
+          :class="{ 'picker-open': parameterPickerOpen }"
+          @click="parameterPickerOpen = true"
+        >
+          {{ selectedParameterLabel }}
+        </button>
       </div>
       <div class="input-divider"></div>
 
       <div class="group">
         <label>MODE</label>
-        <CustomDropdown
-          v-model="model.functionMode"
-          :options="functionModes"
-        />
+        <button 
+          ref="modeTriggerRef"
+          class="picker-trigger"
+          :class="{ 'picker-open': modePickerOpen }"
+          @click="modePickerOpen = true"
+        >
+          {{ selectedModeLabel }}
+        </button>
       </div>
       <div class="input-divider"></div>
 
@@ -75,6 +87,30 @@
       </div>
       <div class="hint-text">Sensitivity: 0 = most sensitive, 100 = least sensitive</div>
     </div>
+
+    <!-- Category Wheel Picker Modal -->
+    <OptionWheelPicker
+      v-model="selectedCategory"
+      v-model:isOpen="categoryPickerOpen"
+      :options="categoryOptions"
+      :trigger-el="categoryTriggerRef"
+    />
+
+    <!-- Parameter Wheel Picker Modal -->
+    <OptionWheelPicker
+      v-model="model.ccNumber"
+      v-model:isOpen="parameterPickerOpen"
+      :options="filteredOptions"
+      :trigger-el="parameterTriggerRef"
+    />
+
+    <!-- Mode Wheel Picker Modal -->
+    <OptionWheelPicker
+      v-model="model.functionMode"
+      v-model:isOpen="modePickerOpen"
+      :options="functionModes"
+      :trigger-el="modeTriggerRef"
+    />
   </div>
 </template>
 
@@ -83,7 +119,7 @@ import { computed, ref, watch } from 'vue'
 import { type CCEntry } from '../data/ccMap'
 import ValueControl from './ValueControl.vue'
 import LevelMeter from './LevelMeter.vue'
-import CustomDropdown from './CustomDropdown.vue'
+import OptionWheelPicker from './OptionWheelPicker.vue'
 
 type TouchModel = {
   ccNumber: number
@@ -120,6 +156,25 @@ const selectedCategory = ref<string>(initialCategory.value)
 
 const categoryOptions = computed(() => {
   return props.categories.map(cat => ({ label: cat, value: cat }))
+})
+
+// Wheel picker state
+const categoryPickerOpen = ref(false)
+const categoryTriggerRef = ref<HTMLElement | null>(null)
+const parameterPickerOpen = ref(false)
+const parameterTriggerRef = ref<HTMLElement | null>(null)
+const modePickerOpen = ref(false)
+const modeTriggerRef = ref<HTMLElement | null>(null)
+
+// Get selected labels
+const selectedParameterLabel = computed(() => {
+  const option = filteredOptions.value.find(opt => opt.value === model.value.ccNumber)
+  return option?.label || 'None'
+})
+
+const selectedModeLabel = computed(() => {
+  const mode = props.functionModes.find(m => m.value === model.value.functionMode)
+  return mode?.label || 'Unknown'
 })
 
 // Watch for ccMapByNumber changes to initialize category when map loads

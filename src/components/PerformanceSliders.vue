@@ -1,83 +1,152 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import { midiBle } from '../services/midiBle';
+import { SliderPresetStore, type SliderPreset } from '../state/sliderPresets';
 
 // Slider configuration
 interface SliderConfig {
   cc: number;
-  zone: number;
   color: string;
   bipolar: boolean;
   momentary: boolean;
+  gangId: number; // Each slider belongs to a gang (solo = unique ID, linked = shared ID)
   value: number;
 }
 
 // Preset structure
 interface Preset {
   sliders: SliderConfig[];
+  links: boolean[]; // 11 booleans for links between adjacent sliders
 }
 
-// Color zones configuration
-const ZONE_COLORS = [
-  { zone: 1, color: '#9400D3', name: 'Violet', ccStart: 51 },
-  { zone: 2, color: '#0000FF', name: 'Blue', ccStart: 54 },
-  { zone: 3, color: '#00FF00', name: 'Green', ccStart: 57 },
-  { zone: 4, color: '#FF7F00', name: 'Orange', ccStart: 60 },
+// 12 rainbow colors for grouping
+const RAINBOW_COLORS = [
+  { id: 1, color: '#FF0000', name: 'Red' },
+  { id: 2, color: '#FF7F00', name: 'Orange' },
+  { id: 3, color: '#FFFF00', name: 'Yellow' },
+  { id: 4, color: '#7FFF00', name: 'Chartreuse' },
+  { id: 5, color: '#00FF00', name: 'Green' },
+  { id: 6, color: '#00FF7F', name: 'Spring Green' },
+  { id: 7, color: '#00FFFF', name: 'Cyan' },
+  { id: 8, color: '#007FFF', name: 'Azure' },
+  { id: 9, color: '#0000FF', name: 'Blue' },
+  { id: 10, color: '#7F00FF', name: 'Violet' },
+  { id: 11, color: '#FF00FF', name: 'Magenta' },
+  { id: 12, color: '#FF007F', name: 'Rose' },
 ];
 
-// Initialize sliders with default configuration
+// Default colors: 4 sets of 3 (Red, Chartreuse, Cyan, Violet)
+const DEFAULT_COLORS = [
+  '#FF0000', // Red 1
+  '#FF0000', // Red 2
+  '#FF0000', // Red 3
+  '#7FFF00', // Chartreuse 1
+  '#7FFF00', // Chartreuse 2
+  '#7FFF00', // Chartreuse 3
+  '#00FFFF', // Cyan 1
+  '#00FFFF', // Cyan 2
+  '#00FFFF', // Cyan 3
+  '#7F00FF', // Violet 1
+  '#7F00FF', // Violet 2
+  '#7F00FF', // Violet 3
+];
+
+// View mode
+type ViewMode = 'setup' | 'live';
+const viewMode = ref<ViewMode>('setup');
+
+// Initialize sliders
 const PRESET_KEY = 'kb1.performanceSliders.preset';
-const settingsVisible = ref(false);
 const sliders = ref<SliderConfig[]>([]);
 const dragging = ref<number | null>(null);
 const isDragging = ref(false);
 
+// Touch tracking for swipe-to-exit in live mode
+const touchStartY = ref<number>(0);
+const touchStartTime = ref<number>(0);
+
+// Color swatch dragging
+const colorDragStartY = ref<number>(0);
+const colorDragIndex = ref<number | null>(null);
+const currentColorIndex = ref<number>(0);
+
+// Color picker state
+const showColorPicker = ref<number | null>(null); // Index of slider showing picker
+const colorPickerRef = ref<HTMLElement | null>(null);
+
+// Explainer text for toggle changes
+const explainerText = ref('');
+const explainerFading = ref(false);
+let explainerTimeout: number | null = null;
+
+// Link state - 11 links between 12 sliders
+const links = ref<boolean[]>(new Array(11).fill(false));
+
 // Initialize sliders
 function initializeSliders() {
-  const savedPreset = localStorage.getItem(PRESET_KEY);
+  const savedPreset = SliderPresetStore.loadCurrentState();
   if (savedPreset) {
-    try {
-      const preset: Preset = JSON.parse(savedPreset);
-      sliders.value = preset.sliders;
-      
-      // Load settings visibility separately
-      const savedVisibility = localStorage.getItem(PRESET_KEY + '.settingsVisible');
-      if (savedVisibility) {
-        settingsVisible.value = JSON.parse(savedVisibility);
-      }
-      return;
-    } catch (e) {
-      console.error('Failed to load saved preset', e);
-    }
+    sliders.value = savedPreset.sliders;
+    links.value = savedPreset.links || new Array(11).fill(false);
+    return;
   }
   
-  // Default configuration
+  // Default configuration - 12 sliders with 4 sets of 3 colors, each solo
   sliders.value = [];
   for (let i = 0; i < 12; i++) {
-    const zone = Math.floor(i / 3) + 1;
-    const zoneColor = ZONE_COLORS.find(z => z.zone === zone);
     sliders.value.push({
       cc: 51 + i,
-      zone,
-      color: zoneColor?.color || '#9400D3',
+      color: DEFAULT_COLORS[i],
       bipolar: false,
       momentary: false,
+      gangId: i, // Each starts in its own gang
       value: 0,
     });
   }
+  links.value = new Array(11).fill(false);
 }
+
+// Reset to defaults
+function resetToDefaults() {
+  sliders.value = [];
+  for (let i = 0; i < 12; i++) {
+    sliders.value.push({
+      cc: 51 + i,
+      color: DEFAULT_COLORS[i],
+      bipolar: false,
+      momentary: false,
+      gangId: i,
+      value: 0,
+    });
+  }
+  links.value = new Array(11).fill(false);
+  savePreset();
+  showExplainerText('Reset to Defaults');
+}
+
+// Expose functions for parent component
+defineExpose({
+  resetToDefaults,
+  getCurrentPreset,
+  loadPreset,
+});
 
 onMounted(() => {
   initializeSliders();
+  
+  // Add global listeners for color swatch dragging
+  document.addEventListener('mousemove', handleColorSwatchMove);
+  document.addEventListener('mouseup', handleColorSwatchEnd);
+  document.addEventListener('touchmove', handleColorSwatchMove);
+  document.addEventListener('touchend', handleColorSwatchEnd);
 });
 
-// Group sliders by zone
-const slidersByZone = computed(() => {
-  const groups: Record<number, SliderConfig[]> = {};
-  for (let i = 1; i <= 4; i++) {
-    groups[i] = sliders.value.filter(s => s.zone === i);
-  }
-  return groups;
+onUnmounted(() => {
+  // Remove global listeners
+  document.removeEventListener('mousemove', handleColorSwatchMove);
+  document.removeEventListener('mouseup', handleColorSwatchEnd);
+  document.removeEventListener('touchmove', handleColorSwatchMove);
+  document.removeEventListener('touchend', handleColorSwatchEnd);
 });
 
 // Map slider value to CC value (0-127)
@@ -120,6 +189,21 @@ async function handleSliderChange(index: number, newValue: number, skipSave = fa
     await midiBle.sendControlChange(slider.cc, ccValue);
   } catch (e) {
     console.error('Failed to send CC', e);
+  }
+  
+  // Update all sliders in the same gang
+  const linkedSliders = sliders.value.filter(
+    (s, i) => i !== index && s.gangId === slider.gangId
+  );
+  
+  for (const linkedSlider of linkedSliders) {
+    linkedSlider.value = newValue;
+    try {
+      const ccValue = valueToCC(linkedSlider);
+      await midiBle.sendControlChange(linkedSlider.cc, ccValue);
+    } catch (e) {
+      console.error('Failed to send linked CC', e);
+    }
   }
   
   // Only save preset when explicitly requested (not during animations)
@@ -193,6 +277,9 @@ function toggleBipolar(index: number) {
   
   slider.bipolar = !slider.bipolar;
   
+  // Show explainer text
+  showExplainerText(slider.bipolar ? 'Bipolar' : 'Unipolar');
+  
   // Reset to appropriate default when switching modes
   slider.value = getDefaultValue(slider);
   
@@ -206,29 +293,322 @@ function toggleMomentary(index: number) {
   if (!slider) return;
   
   slider.momentary = !slider.momentary;
+  
+  // Show explainer text
+  showExplainerText(slider.momentary ? 'Momentary' : 'Latched');
+  
   savePreset();
 }
 
-// Toggle settings visibility
-function toggleSettings() {
-  settingsVisible.value = !settingsVisible.value;
+// Toggle link between adjacent sliders
+function toggleLink(linkIndex: number) {
+  const currentlyLinked = links.value[linkIndex];
+  
+  if (currentlyLinked) {
+    // Unlinking - split the gang
+    unlinkSliders(linkIndex);
+    showExplainerText('Unlinked');
+  } else {
+    // Linking - merge gangs and adopt settings
+    linkSliders(linkIndex);
+    showExplainerText('Linked');
+  }
+  
   savePreset();
 }
+
+// Link two adjacent sliders
+function linkSliders(linkIndex: number) {
+  const upperIndex = linkIndex;
+  const lowerIndex = linkIndex + 1;
+  
+  const upper = sliders.value[upperIndex];
+  const lower = sliders.value[lowerIndex];
+  
+  if (!upper || !lower) return;
+  
+  // Lower slider adopts upper slider's settings
+  lower.color = upper.color;
+  lower.bipolar = upper.bipolar;
+  lower.momentary = upper.momentary;
+  
+  // Merge gangs - all sliders with lower's gangId now get upper's gangId
+  const lowerGangId = lower.gangId;
+  const upperGangId = upper.gangId;
+  
+  sliders.value.forEach(slider => {
+    if (slider.gangId === lowerGangId) {
+      slider.gangId = upperGangId;
+    }
+  });
+  
+  // Set link
+  links.value[linkIndex] = true;
+}
+
+// Unlink two adjacent sliders
+function unlinkSliders(linkIndex: number) {
+  const upperIndex = linkIndex;
+  const lowerIndex = linkIndex + 1;
+  
+  const upper = sliders.value[upperIndex];
+  const lower = sliders.value[lowerIndex];
+  
+  if (!upper || !lower) return;
+  
+  // Clear the link
+  links.value[linkIndex] = false;
+  
+  // Check if lower slider is still connected to upper's gang through other links
+  const lowerGangId = upper.gangId;
+  const connectedIndices = new Set<number>();
+  
+  // Find all sliders connected through links starting from upper
+  function findConnected(startIndex: number, visited: Set<number>) {
+    if (visited.has(startIndex)) return;
+    visited.add(startIndex);
+    
+    // Check link to previous slider
+    if (startIndex > 0 && links.value[startIndex - 1]) {
+      findConnected(startIndex - 1, visited);
+    }
+    
+    // Check link to next slider
+    if (startIndex < 11 && links.value[startIndex]) {
+      findConnected(startIndex + 1, visited);
+    }
+  }
+  
+  findConnected(upperIndex, connectedIndices);
+  
+  // If lower is not in the connected set, give it a new gang ID
+  if (!connectedIndices.has(lowerIndex)) {
+    const newGangId = Math.max(...sliders.value.map(s => s.gangId)) + 1;
+    
+    // Find all sliders connected to lower
+    const lowerConnectedIndices = new Set<number>();
+    findConnected(lowerIndex, lowerConnectedIndices);
+    
+    // Assign new gang ID to lower and its connected sliders
+    lowerConnectedIndices.forEach(idx => {
+      if (sliders.value[idx]) {
+        sliders.value[idx].gangId = newGangId;
+      }
+    });
+  }
+}
+
+// Change slider color
+function changeSliderColor(index: number, colorId: number) {
+  const slider = sliders.value[index];
+  if (!slider) return;
+  
+  const color = RAINBOW_COLORS.find(c => c.id === colorId);
+  if (color) {
+    slider.color = color.color;
+    savePreset();
+  }
+}
+
+// Color swatch drag handlers
+function handleColorSwatchStart(index: number, event: MouseEvent | TouchEvent) {
+  // Prevent default to avoid text selection
+  event.preventDefault();
+  
+  colorDragIndex.value = index;
+  const slider = sliders.value[index];
+  if (!slider) return;
+  
+  // Find current color index
+  currentColorIndex.value = RAINBOW_COLORS.findIndex(c => c.color === slider.color);
+  
+  // Get Y position
+  if (event instanceof MouseEvent) {
+    colorDragStartY.value = event.clientY;
+  } else if (event.touches.length > 0) {
+    colorDragStartY.value = event.touches[0].clientY;
+  }
+}
+
+function handleColorSwatchClick(index: number, event: MouseEvent | TouchEvent) {
+  event.stopPropagation();
+  const wasOpen = showColorPicker.value === index;
+  
+  // Toggle picker for this slider
+  showColorPicker.value = wasOpen ? null : index;
+  
+  // If opening the picker, scroll to selected color
+  if (!wasOpen) {
+    nextTick(() => {
+      const slider = sliders.value[index];
+      if (!slider) return;
+      
+      const colorIndex = RAINBOW_COLORS.findIndex(c => c.color === slider.color);
+      const scrollContainer = document.querySelector(`[data-picker-index="${index}"] .color-picker-scroll`) as HTMLElement;
+      
+      if (scrollContainer && colorIndex >= 0) {
+        // Scroll to center the selected item (32px item height + 4px margin)
+        scrollContainer.scrollTop = colorIndex * 34;
+        
+        // Trigger initial opacity/blur calculation
+        handlePickerScroll({ target: scrollContainer } as Event);
+      }
+    });
+  }
+}
+
+function selectColorFromPicker(index: number, colorId: number) {
+  changeSliderColor(index, colorId);
+  showColorPicker.value = null;
+}
+
+function closeColorPicker() {
+  showColorPicker.value = null;
+}
+
+function handlePickerScroll(event: Event) {
+  const scrollContainer = event.target as HTMLElement;
+  const items = scrollContainer.querySelectorAll('.color-picker-item');
+  const containerCenter = scrollContainer.offsetHeight / 2;
+  
+  items.forEach((item: Element) => {
+    const htmlItem = item as HTMLElement;
+    const itemRect = htmlItem.getBoundingClientRect();
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const itemCenter = itemRect.top - containerRect.top + itemRect.height / 2;
+    const distance = Math.abs(itemCenter - containerCenter);
+    
+    // Calculate opacity and blur based on distance from center
+    const maxDistance = 60; // Max distance for full fade
+    const normalizedDistance = Math.min(distance / maxDistance, 1);
+    
+    const opacity = 1 - (normalizedDistance * 0.7); // 1 at center, 0.3 at max distance
+    const blur = normalizedDistance * 2; // 0px at center, 2px at max distance
+    
+    htmlItem.style.opacity = opacity.toString();
+    htmlItem.style.filter = `blur(${blur}px)`;
+  });
+}
+
+function handleColorSwatchMove(event: MouseEvent | TouchEvent) {
+  if (colorDragIndex.value === null) return;
+  
+  const slider = sliders.value[colorDragIndex.value];
+  if (!slider) return;
+  
+  // Get current Y position
+  let currentY = 0;
+  if (event instanceof MouseEvent) {
+    currentY = event.clientY;
+  } else if (event.touches.length > 0) {
+    currentY = event.touches[0].clientY;
+  }
+  
+  // Calculate delta and determine color index change
+  const deltaY = colorDragStartY.value - currentY; // Inverted: drag up = next color
+  const colorSteps = Math.floor(deltaY / 30); // 30px per color change
+  
+  if (colorSteps !== 0) {
+    let newColorIndex = currentColorIndex.value + colorSteps;
+    
+    // Wrap around
+    if (newColorIndex < 0) {
+      newColorIndex = RAINBOW_COLORS.length + (newColorIndex % RAINBOW_COLORS.length);
+    } else if (newColorIndex >= RAINBOW_COLORS.length) {
+      newColorIndex = newColorIndex % RAINBOW_COLORS.length;
+    }
+    
+    // Update color
+    slider.color = RAINBOW_COLORS[newColorIndex].color;
+    
+    // Reset drag start for next increment
+    colorDragStartY.value = currentY;
+    currentColorIndex.value = newColorIndex;
+    
+    savePreset();
+  }
+}
+
+function handleColorSwatchEnd() {
+  colorDragIndex.value = null;
+}
+
+// Mode switching
+function enterLiveMode() {
+  viewMode.value = 'live';
+}
+
+function exitLiveMode() {
+  viewMode.value = 'setup';
+}
+
+// Show explainer text with fade effect
+function showExplainerText(text: string) {
+  // Clear any existing timeout
+  if (explainerTimeout) {
+    clearTimeout(explainerTimeout);
+  }
+  
+  // Reset fade state
+  explainerFading.value = false;
+  explainerText.value = text;
+  
+  // Start fade out after 2 seconds
+  explainerTimeout = window.setTimeout(() => {
+    explainerFading.value = true;
+  }, 2000);
+}
+
+// Touch/swipe handling for exiting live mode
+function handleTouchStart(event: TouchEvent) {
+  if (viewMode.value === 'live' && event.touches.length === 1) {
+    touchStartY.value = event.touches[0].clientY;
+    touchStartTime.value = Date.now();
+  }
+}
+
+function handleTouchEnd(event: TouchEvent) {
+  if (viewMode.value === 'live' && event.changedTouches.length === 1) {
+    const touchEndY = event.changedTouches[0].clientY;
+    const deltaY = touchEndY - touchStartY.value;
+    const deltaTime = Date.now() - touchStartTime.value;
+    
+    // Swipe down from top: deltaY > 100px, within 500ms, starting near top
+    if (deltaY > 100 && deltaTime < 500 && touchStartY.value < 100) {
+      exitLiveMode();
+    }
+  }
+}
+
+// Toggle settings visibility (removed - no longer needed in setup mode)
+// function toggleSettings() {
+//   settingsVisible.value = !settingsVisible.value;
+//   savePreset();
+// }
 
 // Save preset to localStorage
 function savePreset() {
   const preset: Preset = {
     sliders: sliders.value,
+    links: links.value,
   };
-  localStorage.setItem(PRESET_KEY, JSON.stringify(preset));
-  
-  // Also save settings visibility separately
-  localStorage.setItem(PRESET_KEY + '.settingsVisible', JSON.stringify(settingsVisible.value));
+  SliderPresetStore.saveCurrentState(preset);
 }
 
-// Load preset (placeholder for future implementation)
-function loadPreset() {
-  initializeSliders();
+// Get current preset state
+function getCurrentPreset(): SliderPreset {
+  return {
+    sliders: sliders.value,
+    links: links.value,
+  };
+}
+
+// Load preset from external source
+function loadPreset(preset: SliderPreset) {
+  sliders.value = JSON.parse(JSON.stringify(preset.sliders)); // Deep clone
+  links.value = [...preset.links];
+  savePreset();
+  showExplainerText('Preset Loaded');
 }
 
 // Calculate slider percentage for visual display
@@ -244,105 +624,155 @@ function getSliderPercent(slider: SliderConfig): number {
 </script>
 
 <template>
-  <div class="performance-sliders">
-    <!-- Header -->
-    <div class="header">
-      <div class="header-left">
-        <h2>Performance FX Control</h2>
+  <div 
+    class="performance-sliders"
+    :class="{ 'live-mode': viewMode === 'live' }"
+    @touchstart="handleTouchStart"
+    @touchend="handleTouchEnd"
+  >
+    <!-- SETUP MODE -->
+    <div v-if="viewMode === 'setup'" class="setup-mode" @click="closeColorPicker">
+      <!-- Header -->
+      <div class="setup-header">
+        <button class="btn-live" @click="enterLiveMode">ENTER LIVE MODE</button>
+        <div class="explainer-text" :class="{ fading: explainerFading }">
+          {{ explainerText }}
+        </div>
       </div>
-      <div class="header-right">
-        <button class="btn-settings" @click="toggleSettings">
-          ⚙️ SETTINGS {{ settingsVisible ? '▲' : '▼' }}
-        </button>
-        <button class="btn-action" @click="savePreset">SAVE</button>
-        <button class="btn-action" @click="loadPreset">LOAD</button>
+      
+      <!-- Sliders list -->
+      <div class="sliders-list">
+        <template v-for="(slider, index) in sliders" :key="slider.cc">
+          <div class="slider-row">
+            <!-- Color swatch (clickable) -->
+            <div class="color-section">
+              <div 
+                class="color-swatch-wrapper"
+              >
+                <div 
+                  class="color-swatch"
+                  :style="{ backgroundColor: slider.color }"
+                  @click="handleColorSwatchClick(index, $event)"
+                ></div>
+                
+                <!-- Color picker overlay -->
+                <Transition name="picker-fade">
+                  <div 
+                    v-if="showColorPicker === index"
+                    class="color-picker-overlay"
+                    :data-picker-index="index"
+                    @click.stop
+                  >
+                    <div class="color-picker-container">
+                      <div class="color-picker-center-indicator"></div>
+                      <div class="color-picker-scroll" @scroll="handlePickerScroll">
+                        <div class="color-picker-spacer"></div>
+                        <div
+                          v-for="color in RAINBOW_COLORS"
+                          :key="color.id"
+                          class="color-picker-item"
+                          :class="{ selected: slider.color === color.color }"
+                          :style="{ backgroundColor: color.color }"
+                          :data-color-id="color.id"
+                          @click="selectColorFromPicker(index, color.id)"
+                        ></div>
+                        <div class="color-picker-spacer"></div>
+                      </div>
+                    </div>
+                  </div>
+                </Transition>
+              </div>
+            </div>
+            
+            <!-- CC Number -->
+            <div class="cc-section">
+              <span class="cc-label-text">MIDI CC </span><span class="cc-label">{{ slider.cc }}</span>
+            </div>
+            
+            <!-- Inline toggles -->
+            <div class="slider-toggle-inline">
+              <!-- Polarity toggle -->
+              <img 
+                :src="`/KB1-config/uni_bi_toggle/${slider.bipolar ? 'r' : 'l'}_active.svg`"
+                alt="Polarity Toggle"
+                class="slider-toggle-image"
+                @click="toggleBipolar(index)"
+              />
+              
+              <!-- Mom/Lat toggle -->
+              <img 
+                :src="`/KB1-config/mom_lat_toggle/${slider.momentary ? 'l' : 'r'}_activ.svg`"
+                alt="Mode Toggle"
+                class="slider-toggle-image"
+                @click="toggleMomentary(index)"
+              />
+            </div>
+          </div>
+          
+          <!-- Link icon between sliders (not after last slider) -->
+          <div v-if="index < sliders.length - 1" class="link-icon-container">
+            <img 
+              :src="`/KB1-config/${links[index] ? 'link' : 'unlink'}.svg`"
+              :alt="links[index] ? 'Linked' : 'Unlinked'"
+              class="link-icon"
+              :class="{ linked: links[index] }"
+              @click="toggleLink(index)"
+            />
+          </div>
+        </template>
       </div>
     </div>
     
-    <!-- Main sliders container -->
-    <div class="sliders-container">
-      <div 
-        v-for="zoneNum in [1, 2, 3, 4]" 
-        :key="zoneNum"
-        class="zone-group"
-      >
-        <!-- Color bar -->
+    <!-- LIVE MODE -->
+    <div v-if="viewMode === 'live'" class="live-mode">
+      <!-- Exit hint -->
+      <div class="exit-hint">Swipe down to exit</div>
+      
+      <!-- Sliders container -->
+      <div class="live-sliders-container">
         <div 
-          class="color-bar"
-          :style="{ backgroundColor: ZONE_COLORS.find(z => z.zone === zoneNum)?.color || '#9400D3' }"
-        ></div>
-        
-        <!-- Sliders in this zone -->
-        <div class="sliders-row">
+          v-for="(slider, index) in sliders"
+          :key="slider.cc"
+          class="live-slider-wrapper"
+        >
+          <!-- Slider track -->
           <div 
-            v-for="slider in slidersByZone[zoneNum]"
-            :key="slider.cc"
-            class="slider-wrapper"
+            class="live-slider-track"
+            @dblclick="handleDoubleClick(index)"
           >
+            <!-- Center marker for bipolar mode -->
             <div 
-              class="slider-track"
-              @dblclick="handleDoubleClick(sliders.indexOf(slider))"
-            >
-              <!-- Center marker for bipolar mode -->
-              <div 
-                v-if="slider.bipolar"
-                class="center-marker"
-              ></div>
-              
-              <!-- Slider fill -->
-              <div 
-                class="slider-fill"
-                :style="{
-                  height: `${getSliderPercent(slider)}%`,
-                  backgroundColor: slider.color,
-                }"
-              ></div>
-              
-              <!-- Slider input -->
-              <input
-                type="range"
-                class="slider-input"
-                :min="slider.bipolar ? -100 : 0"
-                :max="100"
-                :value="slider.value"
-                @input="handleSliderChange(sliders.indexOf(slider), Number(($event.target as HTMLInputElement).value))"
-                @mousedown="handleMouseDown(sliders.indexOf(slider))"
-                @mouseup="handleMouseUp(sliders.indexOf(slider))"
-                @touchstart="handleMouseDown(sliders.indexOf(slider))"
-                @touchend="handleMouseUp(sliders.indexOf(slider))"
-              />
-            </div>
+              v-if="slider.bipolar"
+              class="center-marker"
+            ></div>
             
-            <!-- CC label (only visible in settings mode) -->
-            <div v-if="settingsVisible" class="cc-label">CC {{ slider.cc }}</div>
-          </div>
-        </div>
-        
-        <!-- Settings bar (accordion) -->
-        <transition name="settings-slide">
-          <div v-if="settingsVisible" class="settings-bar">
+            <!-- Slider fill -->
             <div 
-              v-for="slider in slidersByZone[zoneNum]"
-              :key="slider.cc"
-              class="settings-cell"
-            >
-              <button 
-                class="setting-label"
-                :class="{ active: slider.bipolar }"
-                @click="toggleBipolar(sliders.indexOf(slider))"
-              >
-                {{ slider.bipolar ? 'BI' : 'UNI' }}
-              </button>
-              <button 
-                class="setting-label"
-                :class="{ active: slider.momentary }"
-                @click="toggleMomentary(sliders.indexOf(slider))"
-              >
-                {{ slider.momentary ? 'MOM' : 'LAT' }}
-              </button>
-            </div>
+              class="live-slider-fill"
+              :style="{
+                height: `${getSliderPercent(slider)}%`,
+                backgroundColor: slider.color,
+              }"
+            ></div>
+            
+            <!-- Slider input -->
+            <input
+              type="range"
+              class="live-slider-input"
+              :min="slider.bipolar ? -100 : 0"
+              :max="100"
+              :value="slider.value"
+              @input="handleSliderChange(index, Number(($event.target as HTMLInputElement).value))"
+              @mousedown="handleMouseDown(index)"
+              @mouseup="handleMouseUp(index)"
+              @touchstart="handleMouseDown(index)"
+              @touchend="handleMouseUp(index)"
+            />
           </div>
-        </transition>
+          
+          <!-- CC label -->
+          <div class="live-cc-label">{{ slider.cc }}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -354,98 +784,348 @@ function getSliderPercent(slider: SliderConfig): number {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--color-background, #1a1a1a);
-  color: var(--color-text, #ffffff);
-  padding: 1rem;
+  background: var(--color-background, #0F0F0F);
+  color: var(--color-text, #EAEAEA);
+  overflow: hidden;
 }
 
-.header {
+/* === SETUP MODE === */
+.setup-mode {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1rem;
+  overflow: auto;
+}
+
+.setup-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--color-border, #3a3a3a);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.header-left h2 {
+.setup-header h2 {
   margin: 0;
-  font-size: 0.8125rem; /* 13px */
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'Roboto Mono';
+  text-transform: uppercase;
+}
+
+.btn-live {
+  flex: 0 0 auto;
+  padding: 0.25rem 1.25rem;
+  background: rgba(106, 104, 83, 0.2);
+  border: none;
+  color: #EAEAEA;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Roboto Mono';
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.btn-live:hover {
+  background: rgba(106, 104, 83, 0.3);
+  font-weight: 700;
+}
+
+.btn-live:active {
+  background: rgba(106, 104, 83, 0.45);
+}
+
+.explainer-text {
+  color: #F9AC20;
+  font-size: 0.8125rem;
+  font-family: 'Roboto Mono';
+  font-weight: 500;
+  opacity: 1;
+  transition: opacity 2s ease-out;
+  min-height: 1rem;
+  flex: 1;
+}
+
+.explainer-text.fading {
+  opacity: 0;
+}
+
+.sliders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.01rem;
+  padding: 0.25rem 1rem;
+  background: rgba(106, 104, 83, 0.2);
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.slider-row:hover {
+  background: rgba(106, 104, 83, 0.3);
+}
+
+.color-section {
+  display: flex;
+  align-items: center;
+  min-width: 60px;
+}
+
+.color-swatch-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.color-swatch {
+  width: 20px;
+  height: 30px;
+  border-radius: 6px;
+  border: 2px solid rgba(234, 234, 234, 0.3);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.color-swatch:hover {
+  border-color: rgba(234, 234, 234, 0.5);
+  transform: scale(1.05);
+}
+
+.color-swatch:active {
+  transform: scale(0.95);
+}
+
+/* Color Picker Overlay */
+.color-picker-overlay {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  padding: 0.5rem;
+  background: rgba(15, 15, 15, 0.95);
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.color-picker-container {
+  position: relative;
+  width: 20px;
+  height: 220px;
+}
+
+.color-picker-center-indicator {
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  top: 50%;
+  height: 30px;
+  transform: translateY(-50%);
+  border-top: 2px solid rgba(116, 196, 255, 0.5);
+  border-bottom: 2px solid rgba(116, 196, 255, 0.5);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.color-picker-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.color-picker-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.color-picker-spacer {
+  height: 95px;
+  flex-shrink: 0;
+}
+
+.color-picker-item {
+  height: 30px;
+  width: 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  scroll-snap-align: center;
+  transition: opacity 0.1s, filter 0.1s;
+  border: none;
+  margin: 2px 0;
+}
+
+.color-picker-item:hover {
+  opacity: 1 !important;
+  filter: blur(0px) !important;
+}
+
+.color-picker-item.selected {
+  box-shadow: 0 0 10px rgba(116, 196, 255, 0.5);
+}
+
+/* Picker fade transition */
+.picker-fade-enter-active,
+.picker-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.picker-fade-enter-from,
+.picker-fade-leave-to {
+  opacity: 0;
+}
+
+.cc-section {
+  min-width: 80px;
+}
+
+.cc-label-text {
+  font-size: 0.8125rem;
+  font-family: 'Roboto Mono';
+  color: #848484;
+  font-weight: 400;
+}
+
+.cc-label {
+  font-size: 0.8125rem;
+  font-family: 'Roboto Mono';
+  color: #F9AC20;
   font-weight: 600;
 }
 
-.header-right {
+.slider-toggle-inline {
   display: flex;
-  gap: 0.75rem;
+  flex-direction: row;
+  gap: 0.5rem;
+  margin-left: 1rem;
 }
 
-.btn-settings,
-.btn-action {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--color-border, #3a3a3a);
-  border-radius: 6px;
-  background: var(--color-background-soft, #242424);
-  color: var(--color-text, #ffffff);
-  font-size: 0.8125rem; /* 13px */
-  font-weight: 500;
+.slider-toggle-image {
+  width: auto;
+  height: auto;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  user-select: none;
+  display: block;
+}
+
+.slider-toggle-image:hover {
+  opacity: 0.8;
+}
+
+.slider-toggle-image:active {
+  opacity: 0.6;
+}
+
+.link-icon-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0;
+  margin-left: 2.25rem;
+  margin-top: -0.5rem;
+  margin-bottom: -0.5rem;
+  height: 16px;
+}
+
+.link-icon {
+  width: 28px;
+  height: 28px;
+  opacity: 0.4;
   cursor: pointer;
   transition: all 0.2s;
+  user-select: none;
 }
 
-.btn-settings:hover,
-.btn-action:hover {
-  background: var(--color-background-mute, #2a2a2a);
-  border-color: var(--color-border-hover, #4a4a4a);
+.link-icon:hover {
+  opacity: 0.6;
+  transform: scale(1.1);
 }
 
-.sliders-container {
-  display: flex;
-  gap: 2rem;
-  flex: 1;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 1rem 0;
+.link-icon:active {
+  transform: scale(0.95);
 }
 
-.zone-group {
+.link-icon.linked {
+  opacity: 1;
+}
+
+/* === LIVE MODE === */
+.live-mode {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  height: 100%;
+  width: 100%;
+  background: #0F0F0F;
+  position: relative;
 }
 
-.color-bar {
-  height: 3px;
-  border-radius: 2px;
-  box-shadow: 0 0 8px currentColor;
-  opacity: 0.9;
+.exit-hint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem;
+  text-align: center;
+  background: rgba(116, 196, 255, 0.1);
+  color: #74C4FF;
+  font-size: 0.75rem;
+  font-family: 'Roboto Mono';
+  z-index: 10;
+  opacity: 0.7;
+  transition: opacity 0.3s;
 }
 
-.sliders-row {
+.exit-hint:hover {
+  opacity: 1;
+}
+
+.live-sliders-container {
   display: flex;
+  flex: 1;
   gap: 1rem;
+  padding: 3rem 1rem 1rem;
+  justify-content: center;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
-.slider-wrapper {
+.live-slider-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  min-width: 60px;
 }
 
-.slider-track {
+.live-slider-track {
   position: relative;
-  width: 80px;
-  height: 350px;
-  background: var(--color-background-mute, #2a2a2a);
-  border: 2px solid var(--color-border, #3a3a3a);
+  width: 60px;
+  flex: 1;
+  min-height: 200px;
+  background: rgba(234, 234, 234, 0.05);
+  border: 2px solid rgba(234, 234, 234, 0.2);
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   transition: border-color 0.2s;
 }
 
-.slider-track:hover {
-  border-color: var(--color-border-hover, #4a4a4a);
+.live-slider-track:hover {
+  border-color: rgba(234, 234, 234, 0.4);
 }
 
 .center-marker {
@@ -460,24 +1140,23 @@ function getSliderPercent(slider: SliderConfig): number {
   pointer-events: none;
 }
 
-.slider-fill {
+.live-slider-fill {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  transition: height 0.15s ease-out;
+  transition: height 0.1s ease-out;
   pointer-events: none;
-  opacity: 0.8;
-  box-shadow: 0 0 10px currentColor;
+  opacity: 0.9;
 }
 
-.slider-input {
+.live-slider-input {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 50%;
-  width: 350px;
-  height: 80px;
-  transform: translateX(-50%) rotate(-90deg);
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
+  transform: translate(-50%, -50%) rotate(-90deg);
   transform-origin: center;
   -webkit-appearance: none;
   appearance: none;
@@ -486,94 +1165,51 @@ function getSliderPercent(slider: SliderConfig): number {
   z-index: 2;
 }
 
-.slider-input::-webkit-slider-thumb {
+.live-slider-input::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 60px;
-  background: rgba(255, 255, 255, 0.9);
+  width: 16px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.95);
   cursor: pointer;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-.slider-input::-moz-range-thumb {
-  width: 20px;
-  height: 60px;
-  background: rgba(255, 255, 255, 0.9);
+.live-slider-input::-moz-range-thumb {
+  width: 16px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.95);
   cursor: pointer;
   border-radius: 4px;
   border: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-.slider-input::-webkit-slider-runnable-track {
+.live-slider-input::-webkit-slider-runnable-track {
   background: transparent;
 }
 
-.slider-input::-moz-range-track {
+.live-slider-input::-moz-range-track {
   background: transparent;
 }
 
-.cc-label {
-  font-size: 0.8125rem; /* 13px */
-  color: var(--color-text-muted, #a0a0a0);
+.live-cc-label {
+  font-size: 0.8125rem;
+  font-family: 'Roboto Mono';
+  color: rgba(234, 234, 234, 0.6);
+  font-weight: 600;
 }
 
-.settings-bar {
-  display: flex;
-  gap: 1rem;
-  padding: 0.5rem;
-  background: var(--color-background-soft, #242424);
-  border: 1px solid var(--color-border, #3a3a3a);
-  border-radius: 6px;
-}
-
-.settings-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  width: 80px;
-}
-
-.setting-label {
-  padding: 0.25rem 0.5rem;
-  border: 1px solid var(--color-border, #3a3a3a);
-  border-radius: 4px;
-  background: var(--color-background-mute, #2a2a2a);
-  color: var(--color-text-muted, #a0a0a0);
-  font-size: 0.8125rem; /* 13px */
-  font-weight: 400;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: center;
-}
-
-.setting-label.active {
-  font-weight: 700;
-  color: var(--color-text, #ffffff);
-  background: var(--color-background-soft, #242424);
-  border-color: var(--color-border-hover, #4a4a4a);
-}
-
-.setting-label:hover {
-  background: var(--color-background-soft, #242424);
-  border-color: var(--color-border-hover, #4a4a4a);
-}
-
-/* Settings slide animation */
-.settings-slide-enter-active,
-.settings-slide-leave-active {
-  transition: all 0.2s ease-out;
-  max-height: 100px;
-  opacity: 1;
-}
-
-.settings-slide-enter-from,
-.settings-slide-leave-to {
-  max-height: 0;
-  opacity: 0;
-  padding-top: 0;
-  padding-bottom: 0;
+/* Landscape optimization for live mode */
+@media (orientation: landscape) and (max-height: 600px) {
+  .live-sliders-container {
+    padding: 2rem 1rem 0.5rem;
+  }
+  
+  .live-slider-track {
+    min-height: 150px;
+  }
 }
 </style>
+

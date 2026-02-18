@@ -429,4 +429,27 @@ function isRootNote(midiNote: number): boolean {
   flex-shrink: 0;
   min-width: 120px;
 }
+
+.picker-trigger {
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #EAEAEA;
+  font-size: 0.8125rem; /* 13px */
+  font-family: 'Roboto Mono';
+  font-weight: 400;
+  flex: 1;
+  text-align: right;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.picker-trigger:hover {
+  background: rgba(234, 234, 234, 0.05);
+}
+
+.picker-trigger.picker-open {
+  color: transparent;
+}
 </style>

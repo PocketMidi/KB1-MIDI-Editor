@@ -55,6 +55,11 @@ const DEFAULT_COLORS = [
 type ViewMode = 'setup' | 'live';
 const viewMode = ref<ViewMode>('setup');
 
+// Mobile detection and fullscreen state
+const isMobile = ref(false);
+const showExitButton = ref(false);
+const exitButtonExpanded = ref(false);
+
 // Initialize sliders
 const sliders = ref<SliderConfig[]>([]);
 const dragging = ref<number | null>(null);
@@ -137,6 +142,9 @@ onMounted(() => {
   document.addEventListener('mouseup', handleColorSwatchEnd);
   document.addEventListener('touchmove', handleColorSwatchMove);
   document.addEventListener('touchend', handleColorSwatchEnd);
+  
+  // Listen for fullscreen changes (handle ESC key, etc.)
+  document.addEventListener('fullscreenchange', handleFullscreenChange);
 });
 
 onUnmounted(() => {
@@ -145,7 +153,16 @@ onUnmounted(() => {
   document.removeEventListener('mouseup', handleColorSwatchEnd);
   document.removeEventListener('touchmove', handleColorSwatchMove);
   document.removeEventListener('touchend', handleColorSwatchEnd);
+  document.removeEventListener('fullscreenchange', handleFullscreenChange);
 });
+
+// Handle fullscreen exit via ESC or other means
+function handleFullscreenChange() {
+  if (!document.fullscreenElement && viewMode.value === 'live' && isMobile.value) {
+    // User exited fullscreen, so exit live mode
+    exitLiveMode();
+  }
+}
 
 // Map slider value to CC value (0-127)
 function valueToCC(slider: SliderConfig): number {
@@ -521,12 +538,77 @@ function handleColorSwatchEnd() {
 }
 
 // Mode switching
-function enterLiveMode() {
-  viewMode.value = 'live';
+// Detect if device is mobile (touch + small screen)
+function detectMobile() {
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const isSmallScreen = window.innerWidth < 768;
+  isMobile.value = hasTouch && isSmallScreen;
 }
 
-function exitLiveMode() {
+async function enterLiveMode() {
+  detectMobile();
+  viewMode.value = 'live';
+  
+  // On mobile: enter fullscreen and lock orientation to landscape
+  if (isMobile.value) {
+    try {
+      // Request fullscreen
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        await elem.requestFullscreen();
+      }
+      
+      // Lock orientation to landscape
+      if (screen.orientation && 'lock' in screen.orientation) {
+        try {
+          await (screen.orientation as any).lock('landscape');
+        } catch (e) {
+          console.log('Orientation lock not supported:', e);
+        }
+      }
+      
+      // Show exit button after entering fullscreen
+      showExitButton.value = true;
+    } catch (e) {
+      console.error('Fullscreen error:', e);
+      // Still show exit button even if fullscreen fails
+      showExitButton.value = true;
+    }
+  }
+}
+
+async function exitLiveMode() {
   viewMode.value = 'setup';
+  exitButtonExpanded.value = false;
+  showExitButton.value = false;
+  
+  // On mobile: exit fullscreen and unlock orientation
+  if (isMobile.value) {
+    try {
+      // Exit fullscreen
+      if (document.fullscreenElement && document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
+      
+      // Unlock orientation
+      if (screen.orientation && 'unlock' in screen.orientation) {
+        (screen.orientation as any).unlock();
+      }
+    } catch (e) {
+      console.error('Exit fullscreen error:', e);
+    }
+  }
+}
+
+// Handle exit button interaction
+function handleExitButtonClick() {
+  if (!exitButtonExpanded.value) {
+    // First tap: expand
+    exitButtonExpanded.value = true;
+  } else {
+    // Second tap: exit
+    exitLiveMode();
+  }
 }
 
 // Show explainer text with fade effect
@@ -716,9 +798,20 @@ function getSliderPercent(slider: SliderConfig): number {
     </div>
     
     <!-- LIVE MODE -->
-    <div v-if="viewMode === 'live'" class="live-mode">
-      <!-- Exit hint -->
-      <div class="exit-hint">Swipe down to exit</div>
+    <div v-if="viewMode === 'live'" class="live-mode" :class="{ 'mobile-landscape': isMobile }">
+      <!-- Exit button (mobile only, lower-left corner) -->
+      <div 
+        v-if="showExitButton" 
+        class="exit-button"
+        :class="{ expanded: exitButtonExpanded }"
+        @click="handleExitButtonClick"
+      >
+        <div class="exit-triangle" v-if="!exitButtonExpanded"></div>
+        <div class="exit-text" v-if="exitButtonExpanded">Tap to Exit</div>
+      </div>
+      
+      <!-- Exit hint (desktop only) -->
+      <div v-if="!isMobile" class="exit-hint">Swipe down to exit</div>
       
       <!-- Sliders container -->
       <div class="live-sliders-container">
@@ -1082,6 +1175,80 @@ function getSliderPercent(slider: SliderConfig): number {
 
 .exit-hint:hover {
   opacity: 1;
+}
+
+/* Exit Button (Mobile) */
+.exit-button {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.exit-button:not(.expanded) {
+  width: 60px;
+  height: 60px;
+}
+
+.exit-button.expanded {
+  width: 150px;
+  height: 60px;
+  background: rgba(116, 196, 255, 0.2);
+  border: 2px solid #74C4FF;
+  border-bottom: none;
+  border-left: none;
+  border-top-right-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exit-triangle {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 50px 50px;
+  border-color: transparent transparent rgba(116, 196, 255, 0.3) transparent;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.exit-text {
+  color: #74C4FF;
+  font-family: 'Roboto Mono';
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Mobile Landscape Optimizations */
+.live-mode.mobile-landscape {
+  padding: 0;
+}
+
+.live-mode.mobile-landscape .live-sliders-container {
+  padding: 0.5rem;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.live-mode.mobile-landscape .live-slider-wrapper {
+  flex: 1;
+  min-width: 0;
+  gap: 0.25rem;
+}
+
+.live-mode.mobile-landscape .live-slider-track {
+  width: 100%;
+  min-height: 0;
+  border-width: 1px;
+}
+
+.live-mode.mobile-landscape .live-cc-label {
+  font-size: 0.625rem;
 }
 
 .live-sliders-container {

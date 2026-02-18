@@ -51,7 +51,7 @@
         />
       </div>
       
-      <div class="dots-visualization" :class="{ 'wide-spacing': isStandard }">
+      <div class="dots-visualization" :class="{ 'wide-spacing': isNatural }">
         <div v-for="i in 12" :key="i" class="dot"></div>
       </div>
     </div>
@@ -114,11 +114,11 @@ const animationTimeoutId = ref<number | null>(null)
 const transitionDirection = ref<'left-to-right' | 'right-to-left' | null>(null)
 
 // Computed properties for toggle state
-const isStandard = computed(() => model.value.keyMapping === 0)
+const isNatural = computed(() => model.value.keyMapping === 0)
 const isChromatic = computed(() => model.value.scaleType === 0)
 
 const toggleImage = computed(() => {
-  const mode = isStandard.value ? 'l' : 'r'
+  const mode = isNatural.value ? 'l' : 'r'
   
   if (isAnimating.value && transitionDirection.value) {
     // During animation, show transition frames
@@ -139,19 +139,19 @@ const toggleTooltip = computed(() => {
     return 'Mapping mode disabled in Chromatic scale'
   }
   // Show the mode you're about to switch TO
-  return isStandard.value ? 'Switch to Condensed' : 'Switch to Standard'
+  return isNatural.value ? 'Switch to Compact' : 'Switch to Natural'
 })
 
 const handleToggleClick = () => {
   if (isAnimating.value || isChromatic.value) return
   
-  const isCurrentlyStandard = isStandard.value
-  transitionDirection.value = isCurrentlyStandard ? 'left-to-right' : 'right-to-left'
+  const isCurrentlyNatural = isNatural.value
+  transitionDirection.value = isCurrentlyNatural ? 'left-to-right' : 'right-to-left'
   
   isAnimating.value = true
   
   animationTimeoutId.value = window.setTimeout(() => {
-    model.value.keyMapping = isCurrentlyStandard ? 1 : 0
+    model.value.keyMapping = isCurrentlyNatural ? 1 : 0
     isAnimating.value = false
     transitionDirection.value = null
     animationTimeoutId.value = null
@@ -354,13 +354,13 @@ function isRootNote(midiNote: number): boolean {
 .dots-visualization {
   display: flex;
   align-items: center;
-  gap: 2px; /* Close spacing for condensed mode */
+  gap: 2px; /* Close spacing for compact mode */
   transition: gap 0.3s ease;
   flex-shrink: 0;
 }
 
 .dots-visualization.wide-spacing {
-  gap: 8px; /* Wide spacing for standard mode */
+  gap: 8px; /* Wide spacing for natural mode */
 }
 
 .dot {

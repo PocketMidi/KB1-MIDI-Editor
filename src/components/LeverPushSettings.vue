@@ -73,10 +73,14 @@
     <div class="inputs">
       <div class="group">
         <label>CATEGORY</label>
-        <CustomDropdown 
-          v-model="selectedCategory" 
-          :options="categoryOptions"
-        />
+        <button 
+          ref="categoryTriggerRef"
+          class="picker-trigger"
+          :class="{ 'picker-open': categoryPickerOpen }"
+          @click="categoryPickerOpen = true"
+        >
+          {{ selectedCategory }}
+        </button>
       </div>
       <div class="input-divider"></div>
 
@@ -194,6 +198,14 @@
         </div>
       </template>
     </div>
+
+    <!-- Category Wheel Picker Modal -->
+    <OptionWheelPicker
+      v-model="selectedCategory"
+      v-model:isOpen="categoryPickerOpen"
+      :options="categoryOptions"
+      :trigger-el="categoryTriggerRef"
+    />
   </div>
 </template>
 
@@ -203,6 +215,7 @@ import { type CCEntry } from '../data/ccMap'
 import ValueControl from './ValueControl.vue'
 import LevelMeter from './LevelMeter.vue'
 import CustomDropdown from './CustomDropdown.vue'
+import OptionWheelPicker from './OptionWheelPicker.vue'
 
 const BASE_PATH = import.meta.env.BASE_URL || '/'
 
@@ -252,6 +265,8 @@ const initialCategory = computed(() => {
   return cat || props.categories[0] || 'Global'
 })
 const selectedCategory = ref<string>(initialCategory.value)
+const categoryPickerOpen = ref(false)
+const categoryTriggerRef = ref<HTMLElement | null>(null)
 
 // Convert categories to dropdown options, adding Reset at the end
 const categoryOptions = computed(() => {
@@ -920,6 +935,29 @@ onBeforeUnmount(() => {
   text-align: right;
   appearance: none;
   cursor: pointer;
+}
+
+.picker-trigger {
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #EAEAEA;
+  font-size: 0.8125rem; /* 13px */
+  font-family: 'Roboto Mono';
+  font-weight: 400;
+  flex: 1;
+  text-align: right;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.picker-trigger:hover {
+  background: rgba(234, 234, 234, 0.05);
+}
+
+.picker-trigger.picker-open {
+  color: transparent;
 }
 
 .group select {

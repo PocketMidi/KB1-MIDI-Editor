@@ -65,7 +65,7 @@ export interface TouchSettings {
 export interface ScaleSettings {
   scaleType: number;
   rootNote: number;
-  keyMapping: number; // 0 = Standard, 1 = Condensed
+  keyMapping: number; // 0 = Natural, 1 = Compact
 }
 
 /**
@@ -395,7 +395,7 @@ export class KB1Protocol {
       scale: {
         scaleType: ScaleType.CHROMATIC,
         rootNote: 60,
-        keyMapping: 0, // Standard
+        keyMapping: 0, // Natural
       },
       system: {
         lightSleepTimeout: 90, // 90 seconds (firmware: LIGHT_SLEEP_MAX_MS)

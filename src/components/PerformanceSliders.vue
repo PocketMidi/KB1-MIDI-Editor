@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 import { midiBle } from '../services/midiBle';
 import { SliderPresetStore, type SliderPreset } from '../state/sliderPresets';
 
@@ -56,7 +56,6 @@ type ViewMode = 'setup' | 'live';
 const viewMode = ref<ViewMode>('setup');
 
 // Initialize sliders
-const PRESET_KEY = 'kb1.performanceSliders.preset';
 const sliders = ref<SliderConfig[]>([]);
 const dragging = ref<number | null>(null);
 const isDragging = ref(false);
@@ -72,7 +71,6 @@ const currentColorIndex = ref<number>(0);
 
 // Color picker state
 const showColorPicker = ref<number | null>(null); // Index of slider showing picker
-const colorPickerRef = ref<HTMLElement | null>(null);
 
 // Explainer text for toggle changes
 const explainerText = ref('');
@@ -85,9 +83,9 @@ const links = ref<boolean[]>(new Array(11).fill(false));
 // Initialize sliders
 function initializeSliders() {
   const savedPreset = SliderPresetStore.loadCurrentState();
-  if (savedPreset) {
+  if (savedPreset && savedPreset.sliders && savedPreset.links) {
     sliders.value = savedPreset.sliders;
-    links.value = savedPreset.links || new Array(11).fill(false);
+    links.value = savedPreset.links;
     return;
   }
   
@@ -96,7 +94,7 @@ function initializeSliders() {
   for (let i = 0; i < 12; i++) {
     sliders.value.push({
       cc: 51 + i,
-      color: DEFAULT_COLORS[i],
+      color: DEFAULT_COLORS[i] || '#FF0000',
       bipolar: false,
       momentary: false,
       gangId: i, // Each starts in its own gang
@@ -112,7 +110,7 @@ function resetToDefaults() {
   for (let i = 0; i < 12; i++) {
     sliders.value.push({
       cc: 51 + i,
-      color: DEFAULT_COLORS[i],
+      color: DEFAULT_COLORS[i] || '#FF0000',
       bipolar: false,
       momentary: false,
       gangId: i,
@@ -359,8 +357,7 @@ function unlinkSliders(linkIndex: number) {
   // Clear the link
   links.value[linkIndex] = false;
   
-  // Check if lower slider is still connected to upper's gang through other links
-  const lowerGangId = upper.gangId;
+  // Find all sliders connected through links starting from upper
   const connectedIndices = new Set<number>();
   
   // Find all sliders connected through links starting from upper
@@ -411,25 +408,6 @@ function changeSliderColor(index: number, colorId: number) {
 }
 
 // Color swatch drag handlers
-function handleColorSwatchStart(index: number, event: MouseEvent | TouchEvent) {
-  // Prevent default to avoid text selection
-  event.preventDefault();
-  
-  colorDragIndex.value = index;
-  const slider = sliders.value[index];
-  if (!slider) return;
-  
-  // Find current color index
-  currentColorIndex.value = RAINBOW_COLORS.findIndex(c => c.color === slider.color);
-  
-  // Get Y position
-  if (event instanceof MouseEvent) {
-    colorDragStartY.value = event.clientY;
-  } else if (event.touches.length > 0) {
-    colorDragStartY.value = event.touches[0].clientY;
-  }
-}
-
 function handleColorSwatchClick(index: number, event: MouseEvent | TouchEvent) {
   event.stopPropagation();
   const wasOpen = showColorPicker.value === index;
@@ -451,7 +429,9 @@ function handleColorSwatchClick(index: number, event: MouseEvent | TouchEvent) {
         scrollContainer.scrollTop = colorIndex * 34;
         
         // Trigger initial opacity/blur calculation
-        handlePickerScroll({ target: scrollContainer } as Event);
+        const scrollEvent = new Event('scroll');
+        Object.defineProperty(scrollEvent, 'target', { value: scrollContainer, writable: false });
+        handlePickerScroll(scrollEvent);
       }
     });
   }
@@ -467,7 +447,8 @@ function closeColorPicker() {
 }
 
 function handlePickerScroll(event: Event) {
-  const scrollContainer = event.target as HTMLElement;
+  const scrollContainer = event.target as HTMLElement | null;
+  if (!scrollContainer) return;
   const items = scrollContainer.querySelectorAll('.color-picker-item');
   const containerCenter = scrollContainer.offsetHeight / 2;
   
@@ -501,7 +482,10 @@ function handleColorSwatchMove(event: MouseEvent | TouchEvent) {
   if (event instanceof MouseEvent) {
     currentY = event.clientY;
   } else if (event.touches.length > 0) {
-    currentY = event.touches[0].clientY;
+    const touch = event.touches[0];
+    if (touch) {
+      currentY = touch.clientY;
+    }
   }
   
   // Calculate delta and determine color index change
@@ -519,7 +503,10 @@ function handleColorSwatchMove(event: MouseEvent | TouchEvent) {
     }
     
     // Update color
-    slider.color = RAINBOW_COLORS[newColorIndex].color;
+    const newColor = RAINBOW_COLORS[newColorIndex];
+    if (newColor) {
+      slider.color = newColor.color;
+    }
     
     // Reset drag start for next increment
     colorDragStartY.value = currentY;
@@ -562,14 +549,19 @@ function showExplainerText(text: string) {
 // Touch/swipe handling for exiting live mode
 function handleTouchStart(event: TouchEvent) {
   if (viewMode.value === 'live' && event.touches.length === 1) {
-    touchStartY.value = event.touches[0].clientY;
-    touchStartTime.value = Date.now();
+    const touch = event.touches[0];
+    if (touch) {
+      touchStartY.value = touch.clientY;
+      touchStartTime.value = Date.now();
+    }
   }
 }
 
 function handleTouchEnd(event: TouchEvent) {
   if (viewMode.value === 'live' && event.changedTouches.length === 1) {
-    const touchEndY = event.changedTouches[0].clientY;
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    const touchEndY = touch.clientY;
     const deltaY = touchEndY - touchStartY.value;
     const deltaTime = Date.now() - touchStartTime.value;
     

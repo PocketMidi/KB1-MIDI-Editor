@@ -11,22 +11,71 @@
     
     <!-- Always show content, but apply disconnected styling -->
     <div class="scales-content" :class="{ 'disconnected-state': !isConnected }">
-      <ScaleSettings
-        v-model="localSettings.scale"
-        :scales="scales"
-        :rootNotes="rootNotes"
-        @update:modelValue="markChanged"
-      />
+      <AccordionSection
+        title="Scales"
+        :title-suffix="scalesSuffix"
+        :title-suffix-fading="scalesSuffixFading"
+        :subtitle="scalesSubtitle"
+        :id="'scales'"
+        :default-open="false"
+      >
+        <template #header-right>
+          <div class="root-note-display">
+            Root Note <span class="root-note-value">{{ currentRootNoteLabel }}</span>
+          </div>
+        </template>
+        <ScaleSettings
+          v-model="localSettings.scale"
+          :scales="scales"
+          :rootNotes="rootNotes"
+          @update:modelValue="markChanged"
+          @mappingChanged="handleMappingChange"
+        />
+      </AccordionSection>
+      
+      <div class="accordion-divider"></div>
+      
+      <AccordionSection
+        title="PRESETS"
+        :subtitle="presetsSubtitle"
+        :id="'presets'"
+        :default-open="false"
+      >
+        <PresetManager
+          :current-settings="localSettings"
+          :has-unsaved-changes="hasChanges"
+          @load="handlePresetLoad"
+          @preset-activated="handlePresetActivated"
+        />
+      </AccordionSection>
+      
+      <div class="accordion-divider"></div>
+      
+      <AccordionSection
+        title="SYSTEM"
+        subtitle="Power & Timeout Settings"
+        :id="'system-settings'"
+        :default-open="false"
+      >
+        <SystemSettings
+          v-model="localSettings.system"
+          @update:modelValue="markChanged"
+        />
+      </AccordionSection>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useDeviceState } from '../composables/useDeviceState';
 import type { DeviceSettings } from '../ble/kb1Protocol';
 import StickyActionBar from '../components/StickyActionBar.vue';
 import ScaleSettings from '../components/ScaleSettings.vue';
+import AccordionSection from '../components/AccordionSection.vue';
+import SystemSettings from '../components/SystemSettings.vue';
+import PresetManager from '../components/PresetManager.vue';
+import { PresetStore } from '../state/presets';
 
 const {
   isConnected,
@@ -40,6 +89,16 @@ const {
 
 const localSettings = ref<DeviceSettings>({ ...deviceSettings.value });
 const hasChanges = ref(false);
+
+// Active preset tracking
+const activePresetId = ref<string | null>(PresetStore.getActivePresetId());
+const activePresetName = ref<string>('');
+
+// State for temporary accordion title suffix (fade-in/out effect)
+const scalesSuffix = ref<string>('');
+const scalesSuffixFading = ref<boolean>(false);
+let scalesFadeTimeoutId: number | null = null;
+let scalesClearTimeoutId: number | null = null;
 
 // Scales
 const scales = [
@@ -72,6 +131,32 @@ const rootNotes = [
   { value: 71, label: 'B' },
 ];
 
+// Computed properties for accordion header display
+const currentScaleLabel = computed(() => {
+  const scale = scales.find(s => s.value === localSettings.value.scale.scaleType);
+  return scale ? scale.label : 'Unknown';
+});
+
+const currentRootNoteLabel = computed(() => {
+  const rootNote = rootNotes.find(n => n.value === localSettings.value.scale.rootNote);
+  return rootNote ? rootNote.label : 'C';
+});
+
+const scalesSubtitle = computed(() => {
+  return currentScaleLabel.value;
+});
+
+const presetsSubtitle = computed(() => {
+  const presets = PresetStore.getAllPresets();
+  const count = presets.length;
+  
+  if (activePresetName.value) {
+    return `Active: ${activePresetName.value}`;
+  }
+  
+  return count === 0 ? 'No presets saved' : `${count} saved`;
+});
+
 // Watch for device settings changes
 watch(deviceSettings, (newSettings) => {
   if (!hasChanges.value) {
@@ -81,6 +166,37 @@ watch(deviceSettings, (newSettings) => {
 
 function markChanged() {
   hasChanges.value = true;
+}
+
+function handleMappingChange(mappingName: string) {
+  if (scalesFadeTimeoutId) clearTimeout(scalesFadeTimeoutId);
+  if (scalesClearTimeoutId) clearTimeout(scalesClearTimeoutId);
+  scalesSuffix.value = ` ${mappingName}`;
+  scalesSuffixFading.value = false;
+  scalesFadeTimeoutId = window.setTimeout(() => {
+    scalesSuffixFading.value = true;
+    scalesFadeTimeoutId = null;
+  }, 500);
+  scalesClearTimeoutId = window.setTimeout(() => {
+    scalesSuffix.value = '';
+    scalesSuffixFading.value = false;
+    scalesClearTimeoutId = null;
+  }, 2500);
+}
+
+function handlePresetLoad(settings: DeviceSettings) {
+  localSettings.value = { ...settings };
+  hasChanges.value = true; // Mark as changed so user can save to device
+}
+
+function handlePresetActivated(presetId: string | null) {
+  activePresetId.value = presetId;
+  if (presetId) {
+    const preset = PresetStore.getPreset(presetId);
+    activePresetName.value = preset?.name || '';
+  } else {
+    activePresetName.value = '';
+  }
 }
 
 async function handleLoadClick() {
@@ -144,6 +260,26 @@ async function handleSaveToDevice() {
   overflow-y: auto;
   /* Ensure content doesn't hide behind sticky bars */
   padding-top: 1rem;
+}
+
+.root-note-display {
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 400;
+  color: #848484;
+  font-family: 'Roboto Mono';
+  margin-right: 1rem;
+}
+
+.root-note-value {
+  color: #F9AC20;
+  font-weight: 600;
+}
+
+.accordion-divider {
+  height: 2px;
+  background: rgba(234, 234, 234, 0.3);
+  margin: 0 0 1rem 0;
+  width: 100%;
 }
 
 @media (max-width: 768px) {

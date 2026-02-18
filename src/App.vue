@@ -17,12 +17,12 @@ const {
 } = useDeviceState();
 
 // Single unified tab state
-type Tab = 'controls' | 'scales' | 'sliders';
+type Tab = 'settings' | 'controls' | 'sliders';
 const activeTab = ref<Tab>('controls');
 
 const tabs = [
+  { id: 'settings' as Tab, label: 'SETTINGS' },
   { id: 'controls' as Tab, label: 'CONTROLS' },
-  { id: 'scales' as Tab, label: 'SCALES' },
   { id: 'sliders' as Tab, label: 'SLIDERS' }
 ];
 
@@ -192,17 +192,9 @@ function handleMainClick(event: MouseEvent) {
     
     <main class="app-main" @click="handleMainClick">
       <MobileControls v-if="activeTab === 'controls'" />
-      <MobileScales v-if="activeTab === 'scales'" />
+      <MobileScales v-if="activeTab === 'settings'" />
       <MobileSliders v-if="activeTab === 'sliders'" />
     </main>
-    
-    <footer class="app-footer">
-      <p>KB1 config - Web Bluetooth Configuration Tool</p>
-      <p class="footer-note">
-        <strong>Note:</strong> This app requires HTTPS and a Bluetooth-enabled device. 
-        Ensure your browser supports Web Bluetooth API.
-      </p>
-    </footer>
   </div>
 </template>
 
@@ -548,25 +540,6 @@ body {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-}
-
-.app-footer {
-  background: var(--color-background-soft);
-  border-top: none;
-  padding: 2rem;
-  text-align: center;
-  margin-top: auto;
-  margin-bottom: 80px; /* Account for fixed action bar at bottom */
-}
-
-.app-footer p {
-  margin: 0.5rem 0;
-  font-size: 0.8125rem; /* 13px */
-  color: var(--color-text-muted);
-}
-
-.footer-note {
-  font-size: 0.8125rem; /* 13px */
 }
 
 /* Responsive adjustments using CSS media queries only */

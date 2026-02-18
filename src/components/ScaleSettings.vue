@@ -58,7 +58,7 @@
 
     <div class="inputs">
       <div class="group">
-        <label>SCALE</label>
+        <label>SCALE TYPE</label>
         <button 
           ref="scaleTriggerRef"
           class="picker-trigger"
@@ -108,6 +108,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', v: ScaleModel): void
+  (e: 'mappingChanged', mappingName: string): void
 }>()
 
 const model = computed({
@@ -171,6 +172,10 @@ const handleToggleClick = () => {
   transitionDirection.value = isCurrentlyNatural ? 'left-to-right' : 'right-to-left'
   
   isAnimating.value = true
+  
+  // Emit the mapping change immediately for UI feedback
+  const newMappingName = isCurrentlyNatural ? 'Dense (all keys used)' : 'Spaced (keys repeat)'
+  emit('mappingChanged', newMappingName)
   
   animationTimeoutId.value = window.setTimeout(() => {
     model.value.keyMapping = isCurrentlyNatural ? 1 : 0

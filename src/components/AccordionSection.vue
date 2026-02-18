@@ -13,9 +13,11 @@
         </h3>
         <div v-if="subtitle" class="accordion-subtitle">{{ subtitle }}</div>
       </div>
-      <div v-if="midiCc !== undefined" class="midi-cc-display">
-        MIDI CC <span class="midi-cc-number">{{ midiCc }}</span>
-      </div>
+      <slot name="header-right">
+        <div v-if="midiCc !== undefined" class="midi-cc-display">
+          MIDI CC <span class="midi-cc-number">{{ midiCc }}</span>
+        </div>
+      </slot>
       <span class="accordion-icon">{{ isOpen ? '−' : '+' }}</span>
     </button>
     <div 
@@ -68,7 +70,7 @@ function toggle() {
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1.25rem 0.5rem; /* 12px top, 20px left/right, 8px bottom */
-  background: rgba(29, 29, 29, 0.2); /* #1D1D1D at 20% */
+  background: rgba(106, 104, 83, 0.2); /* #6A6853 at 20% */
   border: none;
   color: var(--color-text);
   cursor: pointer;
@@ -79,15 +81,15 @@ function toggle() {
 }
 
 .accordion-section.is-open .accordion-header {
-  background: #1D1D1D; /* Brighter when selected */
+  background: rgba(106, 104, 83, 0.35); /* Brighter when selected */
 }
 
 .accordion-header:hover {
-  background: rgba(29, 29, 29, 0.6);
+  background: rgba(106, 104, 83, 0.3);
 }
 
 .accordion-header:active {
-  background: rgba(29, 29, 29, 0.8);
+  background: rgba(106, 104, 83, 0.45);
 }
 
 .accordion-title {

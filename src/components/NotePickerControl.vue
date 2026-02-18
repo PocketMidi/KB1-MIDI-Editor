@@ -6,7 +6,7 @@
       @click="decreaseNote"
       title="Previous note"
     >
-      ◀
+      −
     </button>
     <div 
       class="note-display"
@@ -24,7 +24,7 @@
       @click="increaseNote"
       title="Next note"
     >
-      ▶
+      +
     </button>
   </div>
 </template>
@@ -204,17 +204,17 @@ onBeforeUnmount(() => {
 }
 
 .note-display {
-  flex: 1;
-  text-align: right;
+  width: 70px;
+  text-align: center;
   font-family: 'Roboto Mono';
   font-size: 0.8125rem;
   color: #EAEAEA;
   font-weight: 400;
-  padding: 1px 0.5rem 1px 0.25rem;
-  min-width: 40px;
+  padding: 1px 0.5rem;
   cursor: ew-resize;
   user-select: none;
   transition: background 0.2s ease;
+  flex-shrink: 0;
 }
 
 .note-display:hover {

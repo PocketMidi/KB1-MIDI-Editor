@@ -199,7 +199,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onBeforeUnmount } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { type CCEntry } from '../data/ccMap'
 import ValueControl from './ValueControl.vue'
 import LevelMeter from './LevelMeter.vue'
@@ -273,12 +273,18 @@ const selectedParameterLabel = computed(() => {
   return option?.label || 'None'
 })
 
+// Flag to prevent infinite watch loops
+const isUpdatingInternally = ref(false)
+
 // Watch for ccMapByNumber changes to initialize category when map loads
 watch(() => props.ccMapByNumber.size, () => {
+  if (isUpdatingInternally.value) return
+  isUpdatingInternally.value = true
   const cat = props.ccMapByNumber.get(model.value.ccNumber)?.category
   if (cat && cat !== selectedCategory.value) {
     selectedCategory.value = cat
   }
+  isUpdatingInternally.value = false
 }, { immediate: true })
 
 // Filter options by selected category
@@ -295,19 +301,26 @@ const filteredOptions = computed(() => {
 
 // Watch ccNumber to keep Category in sync
 watch(() => model.value.ccNumber, (cc) => {
+  if (isUpdatingInternally.value) return
   // Don't override if we're in Reset mode
   if (model.value.functionMode === FUNCTION_MODE_RESET) return
   
+  isUpdatingInternally.value = true
   const cat = props.ccMapByNumber.get(cc)?.category
   if (cat && cat !== 'Reset') selectedCategory.value = cat
+  isUpdatingInternally.value = false
 })
 
 // Watch selectedCategory to handle Reset mode and parameter selection
 watch(selectedCategory, (cat) => {
+  if (isUpdatingInternally.value) return
+  isUpdatingInternally.value = true
+  
   // Special case: Reset category sets functionMode to Reset
   if (cat === 'Reset') {
     model.value.functionMode = FUNCTION_MODE_RESET
     // Keep current parameter selection
+    isUpdatingInternally.value = false
     return
   }
   
@@ -317,17 +330,24 @@ watch(selectedCategory, (cat) => {
   }
   
   // If "None" is selected, keep it
-  if (model.value.ccNumber === -1) return
+  if (model.value.ccNumber === -1) {
+    isUpdatingInternally.value = false
+    return
+  }
   
   const ok = props.ccMapByNumber.get(model.value.ccNumber)?.category === cat
   if (!ok) {
     const first = filteredOptions.value.find(o => o.value >= 0)
     if (first) model.value.ccNumber = first.value
   }
+  isUpdatingInternally.value = false
 })
 
 // Watch functionMode to sync category when Reset mode is set externally
 watch(() => model.value.functionMode, (mode) => {
+  if (isUpdatingInternally.value) return
+  isUpdatingInternally.value = true
+  
   if (mode === FUNCTION_MODE_RESET && selectedCategory.value !== 'Reset') {
     selectedCategory.value = 'Reset'
   } else if (mode !== FUNCTION_MODE_RESET && selectedCategory.value === 'Reset') {
@@ -336,6 +356,7 @@ watch(() => model.value.functionMode, (mode) => {
     if (cat) selectedCategory.value = cat
     else selectedCategory.value = props.categories[0] || 'Global'
   }
+  isUpdatingInternally.value = false
 })
 
 // Momentary/Latch Toggle (using offset time: 0 = momentary, >0 = latched)

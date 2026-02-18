@@ -199,18 +199,11 @@ async function parsePolyendCSV(csvText: string): Promise<void> {
           state.loaded = true;
           state.error = null;
           
-          // Debug logging: Show all categories and their CCs
-          console.log('Polyend CC map loaded:', {
-            entries: newCCMap.size,
-            groups: newGroups.length,
-          });
-          
-          // Log each category with its CCs for verification
-          console.log('Categories and CCs:');
-          for (const group of newGroups) {
-            const ccList = group.entries.map(e => e.ccNumber).join(', ');
-            console.log(`  ${group.category}: [${ccList}]`);
-          }
+          // Debug logging (commented out to prevent console overflow)
+          // console.log('Polyend CC map loaded:', {
+          //   entries: newCCMap.size,
+          //   groups: newGroups.length,
+          // });
           
           resolve();
         } catch (error) {

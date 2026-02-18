@@ -177,12 +177,18 @@ const selectedModeLabel = computed(() => {
   return mode?.label || 'Unknown'
 })
 
+// Flag to prevent infinite watch loops
+const isUpdatingInternally = ref(false)
+
 // Watch for ccMapByNumber changes to initialize category when map loads
 watch(() => props.ccMapByNumber.size, () => {
+  if (isUpdatingInternally.value) return
+  isUpdatingInternally.value = true
   const cat = props.ccMapByNumber.get(model.value.ccNumber)?.category
   if (cat && cat !== selectedCategory.value) {
     selectedCategory.value = cat
   }
+  isUpdatingInternally.value = false
 }, { immediate: true })
 
 // Filter options by selected category
@@ -194,20 +200,30 @@ const filteredOptions = computed(() => {
 
 // Watch ccNumber to keep Category in sync
 watch(() => model.value.ccNumber, (cc) => {
+  if (isUpdatingInternally.value) return
+  isUpdatingInternally.value = true
   const cat = props.ccMapByNumber.get(cc)?.category
   if (cat) selectedCategory.value = cat
+  isUpdatingInternally.value = false
 })
 
 // Watch selectedCategory to ensure a valid parameter is selected
 watch(selectedCategory, (cat) => {
+  if (isUpdatingInternally.value) return
+  isUpdatingInternally.value = true
+  
   // If "None" is selected, keep it
-  if (model.value.ccNumber === -1) return
+  if (model.value.ccNumber === -1) {
+    isUpdatingInternally.value = false
+    return
+  }
   
   const ok = props.ccMapByNumber.get(model.value.ccNumber)?.category === cat
   if (!ok) {
     const first = filteredOptions.value.find(o => o.value >= 0)
     if (first) model.value.ccNumber = first.value
   }
+  isUpdatingInternally.value = false
 })
 
 // Conversion functions

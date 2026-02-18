@@ -12,6 +12,7 @@
     <!-- Always show content, but apply disconnected styling -->
     <div v-if="isCCMapLoaded()" class="controls-accordion" :class="{ 'disconnected-state': !isConnected }">
       <AccordionSection
+        ref="lever1Accordion"
         :title="`Lever 1`"
         :title-suffix="lever1Suffix"
         :title-suffix-fading="lever1SuffixFading"
@@ -38,6 +39,7 @@
       <div class="accordion-divider"></div>
       
       <AccordionSection
+        ref="leverPush1Accordion"
         :title="`Press 1`"
         :title-suffix="leverPush1Suffix"
         :title-suffix-fading="leverPush1SuffixFading"
@@ -64,6 +66,7 @@
       <div class="accordion-divider"></div>
       
       <AccordionSection
+        ref="lever2Accordion"
         :title="`Lever 2`"
         :title-suffix="lever2Suffix"
         :title-suffix-fading="lever2SuffixFading"
@@ -90,6 +93,7 @@
       <div class="accordion-divider"></div>
       
       <AccordionSection
+        ref="leverPush2Accordion"
         :title="`Press 2`"
         :title-suffix="leverPush2Suffix"
         :title-suffix-fading="leverPush2SuffixFading"
@@ -116,6 +120,7 @@
       <div class="accordion-divider"></div>
       
       <AccordionSection
+        ref="touchAccordion"
         title="TOUCH"
         :subtitle="getTouchSubtitle(localSettings.touch)"
         :midi-cc="localSettings.touch.ccNumber"
@@ -354,8 +359,9 @@ function getLeverPushSubtitle(leverPush: LeverPushSettingsType): string {
   const ccMap = ccMapByNumber.value;
   const ccInfo = ccMap.get(leverPush.ccNumber);
   const paramName = ccInfo?.parameter || `CC ${leverPush.ccNumber}`;
-  // Press is always unipolar (0-100)
-  const range = '0 to 100';
+  // Check if in Reset mode (functionMode = 3)
+  const FUNCTION_MODE_RESET = 3;
+  const range = leverPush.functionMode === FUNCTION_MODE_RESET ? 'Reset' : '0 to 100';
   return `${paramName} | ${range}`;
 }
 
@@ -422,6 +428,25 @@ async function handleSaveToDevice() {
     alert('Failed to apply settings to device');
   }
 }
+
+// Accordion refs
+const lever1Accordion = ref<InstanceType<typeof AccordionSection> | null>(null);
+const leverPush1Accordion = ref<InstanceType<typeof AccordionSection> | null>(null);
+const lever2Accordion = ref<InstanceType<typeof AccordionSection> | null>(null);
+const leverPush2Accordion = ref<InstanceType<typeof AccordionSection> | null>(null);
+const touchAccordion = ref<InstanceType<typeof AccordionSection> | null>(null);
+
+function closeAllAccordions() {
+  lever1Accordion.value?.close();
+  leverPush1Accordion.value?.close();
+  lever2Accordion.value?.close();
+  leverPush2Accordion.value?.close();
+  touchAccordion.value?.close();
+}
+
+defineExpose({
+  closeAllAccordions
+});
 </script>
 
 <style scoped>

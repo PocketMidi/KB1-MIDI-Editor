@@ -120,6 +120,24 @@ function handleMainClick(event: MouseEvent) {
   }
 }
 
+// Refs for page components
+const mobileControlsRef = ref<InstanceType<typeof MobileControls> | null>(null);
+const mobileScalesRef = ref<InstanceType<typeof MobileScales> | null>(null);
+
+function handleTabClick(tabId: Tab) {
+  // If clicking on already active tab, close all accordions
+  if (activeTab.value === tabId) {
+    if (tabId === 'controls') {
+      mobileControlsRef.value?.closeAllAccordions();
+    } else if (tabId === 'settings') {
+      mobileScalesRef.value?.closeAllAccordions();
+    }
+  } else {
+    // Switch to the new tab
+    activeTab.value = tabId;
+  }
+}
+
 </script>
 
 <template>
@@ -161,7 +179,7 @@ function handleMainClick(event: MouseEvent) {
             :key="tab.id"
             class="nav-tab"
             :class="{ active: activeTab === tab.id }"
-            @click="activeTab = tab.id"
+            @click="handleTabClick(tab.id)"
           >
             {{ tab.label }}
           </button>
@@ -191,8 +209,8 @@ function handleMainClick(event: MouseEvent) {
     </div>
     
     <main class="app-main" @click="handleMainClick">
-      <MobileControls v-if="activeTab === 'controls'" />
-      <MobileScales v-if="activeTab === 'settings'" />
+      <MobileControls v-if="activeTab === 'controls'" ref="mobileControlsRef" />
+      <MobileScales v-if="activeTab === 'settings'" ref="mobileScalesRef" />
       <MobileSliders v-if="activeTab === 'sliders'" />
     </main>
   </div>
@@ -470,7 +488,9 @@ body {
 }
 
 .bluetooth-status.connected .status-text {
+  color: #74C4FF;
   opacity: 1;
+  font-weight: 700;
   animation: breathe 3s ease-in-out infinite;
 }
 
@@ -495,7 +515,7 @@ body {
 }
 
 .bluetooth-status.connected .bluetooth-icon {
-  filter: none;
+  filter: brightness(0) saturate(100%) invert(65%) sepia(45%) saturate(1154%) hue-rotate(174deg) brightness(101%) contrast(101%);
   animation: breatheScale 3s ease-in-out infinite;
 }
 

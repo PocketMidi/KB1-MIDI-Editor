@@ -12,6 +12,7 @@
     <!-- Always show content, but apply disconnected styling -->
     <div class="scales-content" :class="{ 'disconnected-state': !isConnected }">
       <AccordionSection
+        ref="scalesAccordion"
         title="Scales"
         :title-suffix="scalesSuffix"
         :title-suffix-fading="scalesSuffixFading"
@@ -36,6 +37,7 @@
       <div class="accordion-divider"></div>
       
       <AccordionSection
+        ref="presetsAccordion"
         title="PRESETS"
         :subtitle="presetsSubtitle"
         :id="'presets'"
@@ -52,6 +54,7 @@
       <div class="accordion-divider"></div>
       
       <AccordionSection
+        ref="systemAccordion"
         title="SYSTEM"
         subtitle="Power & Timeout Settings"
         :id="'system-settings'"
@@ -240,6 +243,21 @@ async function handleSaveToDevice() {
     alert('Failed to apply settings to device');
   }
 }
+
+// Accordion refs
+const scalesAccordion = ref<InstanceType<typeof AccordionSection> | null>(null);
+const presetsAccordion = ref<InstanceType<typeof AccordionSection> | null>(null);
+const systemAccordion = ref<InstanceType<typeof AccordionSection> | null>(null);
+
+function closeAllAccordions() {
+  scalesAccordion.value?.close();
+  presetsAccordion.value?.close();
+  systemAccordion.value?.close();
+}
+
+defineExpose({
+  closeAllAccordions
+});
 </script>
 
 <style scoped>

@@ -215,19 +215,27 @@ const isHovering = ref(false);
 /* Breathing animation for connected state */
 @keyframes breathe {
   0%, 100% {
-    opacity: 0.7;
+    opacity: 0.5;
+    color: #47708E;
+    font-weight: 400;
+    text-shadow: none;
   }
   50% {
     opacity: 1;
+    color: #74C4FF;
+    font-weight: 700;
+    text-shadow: 0 0 20px rgba(116, 196, 255, 1), 0 0 40px rgba(116, 196, 255, 0.8), 0 0 60px rgba(116, 196, 255, 0.5);
   }
 }
 
 @keyframes breatheScale {
   0%, 100% {
     transform: scale(1);
+    filter: none;
   }
   50% {
     transform: scale(1.15);
+    filter: brightness(0) saturate(100%) invert(65%) sepia(45%) saturate(1154%) hue-rotate(174deg) brightness(120%) contrast(110%) drop-shadow(0 0 16px rgba(116, 196, 255, 1)) drop-shadow(0 0 32px rgba(116, 196, 255, 0.8));
   }
 }
 

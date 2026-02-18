@@ -74,7 +74,6 @@ const statusClass = computed(() => ({
 
 .status-dot.connected {
   background: #10b981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
 }
 
 .status-text {

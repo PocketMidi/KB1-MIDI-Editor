@@ -248,7 +248,11 @@ const FUNCTION_MODE_PEAK_DECAY = 1
 const FUNCTION_MODE_RESET = 3
 
 // Initialize selectedCategory from current ccNumber's category (fallback to first available category)
+// Special case: If functionMode is RESET, start with 'Reset' category
 const initialCategory = computed(() => {
+  if (model.value.functionMode === FUNCTION_MODE_RESET) {
+    return 'Reset'
+  }
   const cat = props.ccMapByNumber.get(model.value.ccNumber)?.category
   return cat || props.categories[0] || 'Global'
 })
@@ -280,10 +284,17 @@ const isUpdatingInternally = ref(false)
 watch(() => props.ccMapByNumber.size, () => {
   if (isUpdatingInternally.value) return
   isUpdatingInternally.value = true
-  const cat = props.ccMapByNumber.get(model.value.ccNumber)?.category
-  if (cat && cat !== selectedCategory.value) {
-    selectedCategory.value = cat
+  
+  // If in Reset mode, ensure category is 'Reset'
+  if (model.value.functionMode === FUNCTION_MODE_RESET) {
+    selectedCategory.value = 'Reset'
+  } else {
+    const cat = props.ccMapByNumber.get(model.value.ccNumber)?.category
+    if (cat && cat !== selectedCategory.value) {
+      selectedCategory.value = cat
+    }
   }
+  
   isUpdatingInternally.value = false
 }, { immediate: true })
 

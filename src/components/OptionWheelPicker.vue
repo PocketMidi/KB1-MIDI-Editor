@@ -45,7 +45,7 @@ const props = defineProps<{
   modelValue: string | number;
   options: WheelOption[];
   isOpen: boolean;
-  triggerEl?: HTMLElement;
+  triggerEl?: HTMLElement | null;
 }>();
 
 const emit = defineEmits<{

@@ -773,7 +773,7 @@ function getSliderPercent(slider: SliderConfig): number {
 <style scoped>
 .performance-sliders {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--color-background, #0F0F0F);
@@ -1001,7 +1001,7 @@ function getSliderPercent(slider: SliderConfig): number {
   display: flex;
   flex-direction: row;
   gap: 0.5rem;
-  margin-left: 0.5rem;
+  margin-left: -0.5rem;
 }
 
 .slider-toggle-image {

@@ -206,7 +206,7 @@ function formatDate(timestamp: number): string {
 
 .sliders-wrapper {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 /* Modal Overlay */

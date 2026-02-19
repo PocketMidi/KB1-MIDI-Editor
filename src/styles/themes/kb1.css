@@ -15,6 +15,16 @@
 
 /* ===== DARK MODE (Default) ===== */
 .theme-kb1-dark {
+  /* ===== Generic Color Variables (used throughout app) ===== */
+  --color-background: #0F0F0F;
+  --color-background-soft: #0F0F0F;
+  --color-background-mute: #0F0F0F;
+  --color-border: transparent;
+  --color-border-hover: transparent;
+  --color-divider: rgba(234, 234, 234, 0.2);
+  --color-text: #EAEAEA;
+  --color-text-muted: rgba(234, 234, 234, 0.32);
+  
   /* ===== KB1 Brand Colors ===== */
   --kb1-background: #0F0F0F;
   --kb1-text-primary: #EAEAEA;
@@ -61,6 +71,12 @@
   --kb1-color-success: #10b981;
   --kb1-color-warning: #f59e0b;
   --kb1-color-error: #ef4444;
+  
+  /* ===== Bluetooth Status Colors ===== */
+  --bluetooth-status-inactive: #47708E;
+  --bluetooth-status-active: #74C4FF;
+  --bluetooth-icon-filter-active: brightness(0) saturate(100%) invert(65%) sepia(45%) saturate(1154%) hue-rotate(174deg) brightness(101%) contrast(101%);
+  --bluetooth-icon-filter-inactive: none;
   
   /* ===== Typography ===== */
   --kb1-font-family: 'Roboto Mono';
@@ -120,25 +136,137 @@
   --title-font-size: var(--kb1-font-size-xl);
   --title-font-weight: 600;
   --title-cc-color: var(--kb1-color-primary);
-  --title-cc-bg: rgba(59, 130, 246, 0.1);
+  --title-cc-bg: rgba(37, 99, 235, 0.1);
   --title-cc-padding: 0.5rem 1rem;
   --title-cc-radius: var(--kb1-radius-md);
 }
 
-/* ===== LIGHT MODE (To be defined) ===== */
+/* ===== LIGHT MODE ===== */
 .theme-kb1-light {
-  /* TODO: Define light mode color values here */
-  /* Example structure (placeholder values): */
-  /*
-  --kb1-background: #FFFFFF;
+  /* ===== Generic Color Variables (used throughout app) ===== */
+  --color-background: #F8F8F8;
+  --color-background-soft: #F8F8F8;
+  --color-background-mute: #F8F8F8;
+  --color-border: transparent;
+  --color-border-hover: transparent;
+  --color-divider: rgba(26, 26, 26, 0.15);
+  --color-text: #1A1A1A;
+  --color-text-muted: rgba(26, 26, 26, 0.5);
+  
+  /* ===== KB1 Brand Colors (Inverted) ===== */
+  --kb1-background: #F8F8F8;
   --kb1-text-primary: #1A1A1A;
   --kb1-text-secondary: rgba(26, 26, 26, 0.5);
   
+  /* ===== Panel Backgrounds ===== */
+  /* Light mode versions of panel backgrounds */
+  --lever-panel-bg: url('/src/assets/ui/lever-panel-light.svg');
+  --lever-push-panel-bg: url('/src/assets/ui/lever-push-panel-light.svg');
+  --touch-panel-bg: url('/src/assets/ui/touch-panel-light.svg');
+  --scale-panel-bg: url('/src/assets/ui/scale-panel-light.svg');
+  
+  /* ===== Fader Elements ===== */
+  /* Light mode fader assets */
+  --fader-track-bg: url('/src/assets/ui/fader-track-light.svg');
+  --fader-thumb-bg: url('/src/assets/ui/fader-thumb-light.svg');
+  --fader-track-height: 200px;
+  --fader-thumb-size: 24px;
+  
+  /* ===== Button States ===== */
+  /* Primary buttons - darker blues for better contrast on light bg */
   --btn-primary-bg: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   --btn-primary-bg-hover: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  --btn-primary-bg-disabled: #cbd5e1;
+  --btn-primary-color: #ffffff;
+  --btn-primary-color-disabled: #64748b;
   
-  ... (copy all variables from dark mode and adjust colors)
-  */
+  /* Secondary buttons */
+  --btn-secondary-bg: var(--kb1-background);
+  --btn-secondary-bg-hover: rgba(26, 26, 26, 0.05);
+  --btn-secondary-bg-disabled: var(--kb1-background);
+  --btn-secondary-color: var(--kb1-text-primary);
+  --btn-secondary-color-disabled: var(--kb1-text-secondary);
+  --btn-secondary-border: 1px solid transparent;
+  
+  /* ===== Color Tokens (adjusted for light mode contrast) ===== */
+  --kb1-color-primary: #2563eb;
+  --kb1-color-primary-hover: #1d4ed8;
+  --kb1-color-primary-active: #1e40af;
+  
+  --kb1-color-accent: #7c3aed;
+  --kb1-color-accent-hover: #6d28d9;
+  
+  --kb1-color-success: #059669;
+  --kb1-color-warning: #d97706;
+  --kb1-color-error: #dc2626;
+  
+  /* ===== Bluetooth Status Colors (inverted for light mode) ===== */
+  --bluetooth-status-inactive: #5a89af;
+  --bluetooth-status-active: #2563eb;
+  --bluetooth-icon-filter-active: brightness(0) saturate(100%) invert(35%) sepia(98%) saturate(2084%) hue-rotate(213deg) brightness(96%) contrast(92%);
+  --bluetooth-icon-filter-inactive: brightness(0) saturate(100%) invert(50%) sepia(15%) saturate(1000%) hue-rotate(174deg) brightness(90%) contrast(90%);
+  
+  /* ===== Typography ===== */
+  --kb1-font-family: 'Roboto Mono';
+  --kb1-font-family-mono: 'Roboto Mono';
+  --kb1-font-size-xs: 0.8125rem; /* 13px */
+  --kb1-font-size-sm: 0.8125rem; /* 13px */
+  --kb1-font-size-base: 0.8125rem; /* 13px */
+  --kb1-font-size-lg: 0.8125rem; /* 13px */
+  --kb1-font-size-xl: 0.8125rem; /* 13px */
+  --kb1-font-size-2xl: 0.8125rem; /* 13px */
+  
+  /* ===== Spacing ===== */
+  --kb1-spacing-xs: 0.25rem;
+  --kb1-spacing-sm: 0.5rem;
+  --kb1-spacing-md: 1rem;
+  --kb1-spacing-lg: 1.5rem;
+  --kb1-spacing-xl: 2rem;
+  --kb1-spacing-2xl: 3rem;
+  
+  /* ===== Border Radius ===== */
+  --kb1-radius-sm: 4px;
+  --kb1-radius-md: 6px;
+  --kb1-radius-lg: 8px;
+  --kb1-radius-xl: 12px;
+  --kb1-radius-full: 9999px;
+  
+  /* ===== Settings Panel Styling ===== */
+  --settings-panel-padding: 1.5rem;
+  --settings-panel-gap: 1rem;
+  --settings-panel-bg: var(--color-background-soft);
+  --settings-panel-border: 1px solid var(--color-border);
+  --settings-panel-radius: var(--kb1-radius-lg);
+  
+  /* ===== Input Styling ===== */
+  --input-bg: var(--color-background);
+  --input-border: 1px solid var(--color-border);
+  --input-border-focus: 1px solid var(--kb1-color-primary);
+  --input-radius: var(--kb1-radius-md);
+  --input-padding: 0.75rem;
+  --input-color: var(--color-text);
+  
+  /* ===== Select/Dropdown Styling ===== */
+  --select-bg: var(--color-background);
+  --select-border: 1px solid var(--color-border);
+  --select-border-focus: 1px solid var(--kb1-color-primary);
+  --select-radius: var(--kb1-radius-md);
+  --select-padding: 0.75rem;
+  --select-color: var(--color-text);
+  
+  /* ===== Label Styling ===== */
+  --label-color: var(--color-text);
+  --label-font-size: var(--kb1-font-size-sm);
+  --label-font-weight: 500;
+  
+  /* ===== Title Block Styling ===== */
+  --title-color: var(--color-text);
+  --title-font-size: var(--kb1-font-size-xl);
+  --title-font-weight: 600;
+  --title-cc-color: var(--kb1-color-primary);
+  --title-cc-bg: rgba(37, 99, 235, 0.1);
+  --title-cc-padding: 0.5rem 1rem;
+  --title-cc-radius: var(--kb1-radius-md);
 }
 
 /* ===== Smooth Theme Transitions ===== */

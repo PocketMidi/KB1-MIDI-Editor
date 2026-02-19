@@ -46,6 +46,7 @@ const themeIcon = computed(() => {
 function toggleTheme() {
   isDarkMode.value = !isDarkMode.value;
   localStorage.setItem(THEME_KEY, isDarkMode.value ? 'dark' : 'light');
+  console.log('Theme toggled to:', isDarkMode.value ? 'dark' : 'light');
 }
 
 // Computed property for bluetooth status text
@@ -271,7 +272,11 @@ function handleTabClick(tabId: Tab) {
 /* Import Roboto Mono font */
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
 
+/* ===== NOTE: Theme-specific color variables are defined in /src/styles/themes/kb1.css ===== */
+/* The .theme-kb1-dark and .theme-kb1-light classes contain all color definitions */
+
 :root {
+  /* Default to dark mode colors for fallback */
   --color-background: #0F0F0F;
   --color-background-soft: #0F0F0F;
   --color-background-mute: #0F0F0F;
@@ -378,7 +383,7 @@ body {
 
 /* Header - Unified for all screen sizes */
 .app-header {
-  background-color: #0F0F0F;
+  background-color: var(--color-background);
   border-bottom: none;
   position: relative;
   z-index: 100; /* Lower than sticky tabs */
@@ -404,6 +409,12 @@ body {
   height: 40px;
 }
 
+/* Invert logo for light mode for better visibility */
+.theme-kb1-light .header-logo {
+  filter: invert(1) hue-rotate(180deg);
+  opacity: 0.85;
+}
+
 .warning-banner {
   padding: 1rem 2rem;
   background: rgba(239, 68, 68, 0.1);
@@ -418,12 +429,12 @@ body {
   position: sticky;
   top: 0;
   z-index: 200; /* High z-index to stay above header */
-  background-color: #0F0F0F;
+  background-color: var(--color-background);
 }
 
 /* Tab Navigation - Unified responsive layout */
 .app-nav {
-  background-color: #0F0F0F;
+  background-color: var(--color-background);
   border-bottom: none;
   display: flex;
   justify-content: space-between;
@@ -434,6 +445,15 @@ body {
   padding: 0 2rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  
+  /* Hide scrollbar while keeping scroll functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.app-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .nav-tabs {
@@ -447,7 +467,7 @@ body {
   background: transparent;
   border: none;
   border-radius: 0;
-  color: #EAEAEA;
+  color: var(--color-text);
   font-family: var(--kb1-font-family-mono);
   font-weight: 400;
   text-transform: uppercase;
@@ -465,7 +485,7 @@ body {
 }
 
 .nav-tab.active {
-  color: #EAEAEA;
+  color: var(--color-text);
   opacity: 1;
   font-weight: 700;
 }
@@ -478,7 +498,7 @@ body {
   left: 0;
   right: 0;
   height: 2px;
-  background: #EAEAEA;
+  background: var(--color-text);
   border-radius: 1px;
 }
 
@@ -490,7 +510,7 @@ body {
   left: 0;
   right: 0;
   height: 2px;
-  background: #EAEAEA;
+  background: var(--color-text);
   opacity: 0.32;
   border-radius: 1px;
 }
@@ -517,13 +537,25 @@ body {
   height: 28px;
   width: 28px;
   display: block;
+  /* Ensure icon is always visible regardless of theme */
+  filter: opacity(0.8);
+}
+
+.theme-kb1-light .theme-icon {
+  /* In light mode, ensure dark icon is visible */
+  filter: opacity(1);
+}
+
+.theme-kb1-dark .theme-icon {
+  /* In dark mode, ensure light icon is visible */
+  filter: opacity(1);
 }
 
 /* Vertical separator (divider) after tabs */
 .separator {
   width: 2px;
   height: 50%;
-  background: rgba(234, 234, 234, 0.3);
+  background: var(--color-divider);
   align-self: center;
   flex-shrink: 0;
   margin: 0 0.5rem;
@@ -546,7 +578,7 @@ body {
   font-family: var(--kb1-font-family-mono);
   font-weight: 400;
   font-size: 0.8125rem; /* 13px */
-  color: #47708E;
+  color: var(--bluetooth-status-inactive);
   opacity: 0.5;
   transition: color 0.5s ease-in-out, 
               opacity 0.5s ease-in-out, 
@@ -556,14 +588,14 @@ body {
 
 .bluetooth-status.hoverable:hover .status-text,
 .bluetooth-status.hoverable:active .status-text {
-  color: #74C4FF;
+  color: var(--bluetooth-status-active);
   opacity: 1;
   font-weight: 700;
   /* NO transform scale */
 }
 
 .bluetooth-status.connected .status-text {
-  color: #74C4FF;
+  color: var(--bluetooth-status-active);
   opacity: 1;
   font-weight: 700;
   animation: breathe 3s ease-in-out infinite;
@@ -580,22 +612,23 @@ body {
   transition: filter 0.5s ease-in-out, 
               transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   transform-origin: center;
+  filter: var(--bluetooth-icon-filter-inactive);
 }
 
 /* Bluetooth icon hover effect - with bounce animation */
 .bluetooth-status.hoverable:hover .bluetooth-icon,
 .bluetooth-status.hoverable:active .bluetooth-icon {
-  filter: brightness(0) saturate(100%) invert(65%) sepia(45%) saturate(1154%) hue-rotate(174deg) brightness(101%) contrast(101%);
+  filter: var(--bluetooth-icon-filter-active);
   transform: scale(1.15);
 }
 
 .bluetooth-status.connected .bluetooth-icon {
-  filter: brightness(0) saturate(100%) invert(65%) sepia(45%) saturate(1154%) hue-rotate(174deg) brightness(101%) contrast(101%);
+  filter: var(--bluetooth-icon-filter-active);
   animation: breatheScale 3s ease-in-out infinite;
 }
 
 .bluetooth-status.connected.hoverable:hover .bluetooth-icon {
-  filter: brightness(0) saturate(100%) invert(65%) sepia(45%) saturate(1154%) hue-rotate(174deg) brightness(101%) contrast(101%);
+  filter: var(--bluetooth-icon-filter-active);
   transform: scale(1.15);
   animation: none; /* Disable breathing animation on hover */
 }
@@ -622,7 +655,7 @@ body {
 /* Horizontal divider under navigation */
 .nav-divider {
   height: 2px;
-  background: rgba(234, 234, 234, 0.3);
+  background: var(--color-divider);
   max-width: 1400px;
   margin: -2px auto 0;
   width: 100%;

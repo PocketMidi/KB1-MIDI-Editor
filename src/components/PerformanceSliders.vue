@@ -942,7 +942,7 @@ defineExpose({
       <div v-if="isMobile && isIOS && isPortrait" class="portrait-prompt">
         <div class="prompt-content">
           <img src="/rotate.gif" alt="Rotate device" class="rotate-icon-img" />
-          <div class="prompt-text">Please rotate your device</div>
+          <div class="prompt-text">Please rotate your device [18:45]</div>
           <div class="prompt-subtext">Landscape orientation required</div>
         </div>
       </div>
@@ -951,7 +951,7 @@ defineExpose({
       <div v-if="showRotateBackPrompt" class="portrait-prompt">
         <div class="prompt-content">
           <img src="/rotate.gif" alt="Rotate device" class="rotate-icon-img" />
-          <div class="prompt-text">Rotate back to portrait</div>
+          <div class="prompt-text">Rotate back to portrait [18:45]</div>
           <div class="prompt-subtext">or wait 3 seconds</div>
         </div>
       </div>

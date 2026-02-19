@@ -897,13 +897,6 @@ function stopToPortAnimation() {
   }
 }
 
-function getFramePath(folder: string, frame: number): string {
-  const frameStr = frame.toString().padStart(5, '0');
-  const path = `/${folder}/${folder}_${frameStr}.png`;
-  console.log('Generated path:', path, 'for frame:', frame);
-  return path;
-}
-
 // Computed properties for reactive image paths
 const toLandImageSrc = computed(() => {
   const frameStr = toLandFrame.value.toString().padStart(5, '0');

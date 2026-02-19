@@ -58,7 +58,7 @@
 
     <!-- Profile Visualization -->
     <div class="profile-visualization">
-      <img :src="profileImage" alt="Profile Graph" />
+      <img :src="profileImage" alt="Profile Graph" class="profile-graph" />
     </div>
 
     <!-- Level Meter -->
@@ -729,7 +729,7 @@ const duration = computed({
 .meter-divider {
   width: 2px;
   height: 17px;
-  background: #FFA500;
+  background: var(--accent-highlight);
   flex-shrink: 0;
 }
 
@@ -740,7 +740,7 @@ const duration = computed({
 .latch-indicator {
   width: 2px;
   height: 17px;
-  background: #F9AC20;
+  background: var(--accent-highlight);
   flex-shrink: 0;
   margin-left: 4px;
 }
@@ -750,7 +750,7 @@ const duration = computed({
   top: -4px;
   width: 5px;
   height: 17px;
-  background: #F9AC20;
+  background: var(--accent-highlight);
   z-index: 2;
 }
 

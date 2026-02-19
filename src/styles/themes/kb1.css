@@ -78,6 +78,13 @@
   --bluetooth-icon-filter-active: brightness(0) saturate(100%) invert(65%) sepia(45%) saturate(1154%) hue-rotate(174deg) brightness(101%) contrast(101%);
   --bluetooth-icon-filter-inactive: none;
   
+  /* ===== UI Accent Colors (dark mode defaults) ===== */
+  --accent-highlight: #F9AC20; /* Original orange/yellow */
+  --label-gray: #848484; /* Original gray */
+  
+  /* ===== SVG Icon Filters (dark mode) ===== */
+  --svg-icon-filter: none;
+  
   /* ===== Typography ===== */
   --kb1-font-family: 'Roboto Mono';
   --kb1-font-family-mono: 'Roboto Mono';
@@ -149,14 +156,14 @@
   --color-background-mute: #F8F8F8;
   --color-border: transparent;
   --color-border-hover: transparent;
-  --color-divider: rgba(26, 26, 26, 0.15);
-  --color-text: #1A1A1A;
-  --color-text-muted: rgba(26, 26, 26, 0.5);
+  --color-divider: rgba(0, 0, 0, 0.2);
+  --color-text: #0D0D0D;
+  --color-text-muted: rgba(0, 0, 0, 0.6);
   
   /* ===== KB1 Brand Colors (Inverted) ===== */
   --kb1-background: #F8F8F8;
-  --kb1-text-primary: #1A1A1A;
-  --kb1-text-secondary: rgba(26, 26, 26, 0.5);
+  --kb1-text-primary: #0D0D0D;
+  --kb1-text-secondary: rgba(0, 0, 0, 0.6);
   
   /* ===== Panel Backgrounds ===== */
   /* Light mode versions of panel backgrounds */
@@ -205,6 +212,14 @@
   --bluetooth-status-active: #2563eb;
   --bluetooth-icon-filter-active: brightness(0) saturate(100%) invert(35%) sepia(98%) saturate(2084%) hue-rotate(213deg) brightness(96%) contrast(92%);
   --bluetooth-icon-filter-inactive: brightness(0) saturate(100%) invert(50%) sepia(15%) saturate(1000%) hue-rotate(174deg) brightness(90%) contrast(90%);
+  
+  /* ===== UI Accent Colors (light mode overrides) ===== */
+  --accent-highlight: #5B21B6; /* Dark violet - replaces orange */
+  --label-gray: #404040; /* Darker charcoal - replaces #848484 */
+  
+  /* ===== SVG Icon Filters (light mode) ===== */
+  /* Simple inversion for toggle and profile graphics */
+  --svg-icon-filter: invert(1);
   
   /* ===== Typography ===== */
   --kb1-font-family: 'Roboto Mono';
@@ -323,4 +338,45 @@
   /* background-image: var(--scale-panel-bg); */
   background-size: cover;
   background-position: center;
+}
+
+/* ===== SVG Icon Inversions (light mode only) ===== */
+/* Apply filter to toggle switches and profile graphs */
+.toggle-image,
+.profile-graph,
+.slider-toggle-image {
+  filter: var(--svg-icon-filter);
+  transition: filter 0.3s ease;
+}
+
+/* ===== Light Mode Text and Selector Inversions ===== */
+/* Invert dark background selectors and inputs for maximum contrast in light mode */
+.theme-kb1-light .picker-trigger,
+.theme-kb1-light .dropdown-trigger,
+.theme-kb1-light .dropdown-menu,
+.theme-kb1-light .dropdown-item,
+.theme-kb1-light .value-input,
+.theme-kb1-light .tap-indicator,
+.theme-kb1-light .note-display,
+.theme-kb1-light .stepper-btn,
+.theme-kb1-light .profile-btn,
+.theme-kb1-light .modal-dialog,
+.theme-kb1-light .input-text,
+.theme-kb1-light .link-icon,
+.theme-kb1-light .btn-live {
+  filter: invert(1);
+}
+
+/* Invert piano keys for light mode */
+.theme-kb1-light .key,
+.theme-kb1-light .key.active,
+.theme-kb1-light .key.root-note {
+  filter: invert(1);
+}
+
+/* Also invert hover states for these elements */
+.theme-kb1-light .dropdown-item:hover,
+.theme-kb1-light .picker-trigger:hover,
+.theme-kb1-light .input-text:focus {
+  filter: invert(1);
 }

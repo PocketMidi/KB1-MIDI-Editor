@@ -471,7 +471,7 @@ function formatDate(timestamp: number): string {
 .btn-create-preset {
   width: 100%;
   padding: 0.25rem 1rem;
-  background: rgba(106, 104, 83, 0.2);
+  background: rgba(149, 151, 172, 0.2);
   border: none;
   color: #EAEAEA;
   font-size: 0.875rem;
@@ -484,7 +484,7 @@ function formatDate(timestamp: number): string {
 }
 
 .btn-create-preset:hover {
-  background: rgba(106, 104, 83, 0.3);
+  background: rgba(149, 151, 172, 0.3);
 }
 
 .presets-list {
@@ -508,7 +508,7 @@ function formatDate(timestamp: number): string {
 }
 
 .preset-item.active {
-  background: rgba(106, 104, 83, 0.25);
+  background: rgba(149, 151, 172, 0.25);
 }
 
 .preset-item:hover {
@@ -530,7 +530,7 @@ function formatDate(timestamp: number): string {
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #F9AC20;
+  accent-color: var(--accent-highlight);
 }
 
 .preset-info {
@@ -555,7 +555,7 @@ function formatDate(timestamp: number): string {
 
 .preset-meta {
   font-size: 0.75rem;
-  color: #848484;
+  color: var(--label-gray);
 }
 
 .preset-actions {

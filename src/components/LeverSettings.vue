@@ -62,7 +62,7 @@
 
     <!-- Profile Visualization -->
     <div class="profile-visualization">
-      <img :src="profileImage" alt="Profile Graph" />
+      <img :src="profileImage" alt="Profile Graph" class="profile-graph" />
     </div>
 
     <!-- Level Meter -->
@@ -940,7 +940,7 @@ function increaseSteps() {
 .meter-divider {
   width: 2px;
   height: 17px;
-  background: #FFA500;
+  background: var(--accent-highlight);
   flex-shrink: 0;
 }
 

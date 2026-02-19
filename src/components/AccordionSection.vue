@@ -82,7 +82,7 @@ defineExpose({
   align-items: center;
   justify-content: space-between;
   padding: 0.25rem 1rem; /* 4px top/bottom, 16px left/right */
-  background: rgba(106, 104, 83, 0.2); /* #6A6853 at 20% */
+  background: rgba(149, 151, 172, 0.2); /* Inverted blue-gray tone */
   border: none;
   color: var(--color-text);
   cursor: pointer;
@@ -93,15 +93,15 @@ defineExpose({
 }
 
 .accordion-section.is-open .accordion-header {
-  background: rgba(106, 104, 83, 0.35); /* Brighter when selected */
+  background: rgba(149, 151, 172, 0.35); /* Brighter when selected */
 }
 
 .accordion-header:hover {
-  background: rgba(106, 104, 83, 0.3);
+  background: rgba(149, 151, 172, 0.3);
 }
 
 .accordion-header:active {
-  background: rgba(106, 104, 83, 0.45);
+  background: rgba(149, 151, 172, 0.45);
 }
 
 .accordion-title {
@@ -118,7 +118,7 @@ defineExpose({
 }
 
 .title-suffix {
-  color: #F9AC20;
+  color: var(--accent-highlight);
   margin-left: 0.5rem;
   font-weight: 500;
   text-transform: none;
@@ -153,7 +153,7 @@ defineExpose({
 }
 
 .midi-cc-number {
-  color: #F9AC20;
+  color: var(--accent-highlight);
   font-weight: 600;
 }
 

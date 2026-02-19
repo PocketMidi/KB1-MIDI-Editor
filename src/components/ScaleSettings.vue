@@ -314,9 +314,9 @@ function isRootNote(midiNote: number): boolean {
 
 /* Root note outline */
 .key.root-note {
-  box-shadow: 
+  box-shadow:
     inset 0 0 0 2px #0F0F0F,  /* Inner dark outline - 2px */
-    0 0 0 1px #F9AC20;         /* Outer orange outline - 1px */
+    0 0 0 1px var(--accent-highlight);         /* Outer accent outline */
 }
 
 /* Add gap after certain keys to mimic piano layout */
@@ -394,7 +394,7 @@ function isRootNote(midiNote: number): boolean {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background-color: #F9AC20;
+  background-color: var(--accent-highlight);
   flex-shrink: 0;
 }
 
@@ -427,7 +427,7 @@ function isRootNote(midiNote: number): boolean {
 .group label {
   font-weight: 400;
   font-size: 0.8125rem; /* 13px */
-  color: #848484;
+  color: var(--label-gray);
   font-family: 'Roboto Mono';
   text-transform: uppercase;
   letter-spacing: 0.05em;

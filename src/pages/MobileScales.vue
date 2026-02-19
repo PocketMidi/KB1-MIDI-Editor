@@ -285,7 +285,7 @@ defineExpose({
 }
 
 .root-note-value {
-  color: #F9AC20;
+  color: var(--accent-highlight);
   font-weight: 600;
 }
 

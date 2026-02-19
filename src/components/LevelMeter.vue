@@ -142,7 +142,7 @@ const labels = computed<Label[]>(() => {
   position: absolute;
   width: 5px;
   height: 5px;
-  background: #F9AC20;
+  background: var(--accent-highlight);
   border-radius: 50%;
   transform: translateX(-50%) translateY(4px);
   transition: opacity 0.2s ease;
@@ -156,12 +156,11 @@ const labels = computed<Label[]>(() => {
   border-right: 3.5px solid transparent;
   border-bottom: 9px solid #4A4A4A;
   transform: translateX(-50%);
-  transition: border-bottom-color 0.2s ease;
   opacity: 0.3;
 }
 
 .triangle.highlighted {
-  border-bottom-color: #F9AC20;
+  border-bottom-color: var(--accent-highlight);
   opacity: 1;
 }
 

@@ -347,6 +347,9 @@ function resetValuesToZero() {
 onMounted(() => {
   initializeSliders();
   
+  // Preload rotation animation frames
+  preloadRotationFrames();
+  
   // Add global listeners for color swatch dragging
   document.addEventListener('mousemove', handleColorSwatchMove);
   document.addEventListener('mouseup', handleColorSwatchEnd);
@@ -904,17 +907,37 @@ function getFramePath(folder: string, frame: number): string {
 // Computed properties for reactive image paths
 const toLandImageSrc = computed(() => {
   const frameStr = toLandFrame.value.toString().padStart(5, '0');
-  const path = `/to_land/to_land_${frameStr}.png`;
+  const path = `${import.meta.env.BASE_URL}to_land/to_land_${frameStr}.png`;
   console.log('toLandImageSrc computed:', path);
   return path;
 });
 
 const toPortImageSrc = computed(() => {
   const frameStr = toPortFrame.value.toString().padStart(5, '0');
-  const path = `/to_port/to_port_${frameStr}.png`;
+  const path = `${import.meta.env.BASE_URL}to_port/to_port_${frameStr}.png`;
   console.log('toPortImageSrc computed:', path);
   return path;
 });
+
+// Preload animation frames for smooth playback
+function preloadRotationFrames() {
+  const baseUrl = import.meta.env.BASE_URL;
+  console.log('Preloading rotation frames from:', baseUrl);
+  
+  // Preload to_land frames
+  for (let i = 0; i < TOTAL_FRAMES; i++) {
+    const img = new Image();
+    const frameNum = i.toString().padStart(5, '0');
+    img.src = `${baseUrl}to_land/to_land_${frameNum}.png`;
+  }
+  
+  // Preload to_port frames
+  for (let i = 0; i < TOTAL_FRAMES; i++) {
+    const img = new Image();
+    const frameNum = i.toString().padStart(5, '0');
+    img.src = `${baseUrl}to_port/to_port_${frameNum}.png`;
+  }
+}
 
 async function enterLiveMode() {
   detectMobile();

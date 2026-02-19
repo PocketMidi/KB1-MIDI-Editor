@@ -1305,6 +1305,7 @@ defineExpose({
   -webkit-user-select: none;
   user-select: none;
   overflow: hidden;
+  overscroll-behavior: none; /* Prevent pull-to-refresh */
 }
 
 .live-mode.mobile-landscape .live-sliders-container {
@@ -1314,7 +1315,7 @@ defineExpose({
   min-height: 0;
   height: 100dvh;
   height: 100vh;
-  touch-action: manipulation; /* Allow touch but prevent zoom/scroll */
+  touch-action: pan-y; /* Allow vertical panning */
 }
 
 .live-mode.mobile-landscape .live-slider-wrapper {
@@ -1325,7 +1326,7 @@ defineExpose({
   height: 100%;
   display: flex;
   flex-direction: column;
-  touch-action: pan-y; /* Allow vertical panning for sliders */
+  touch-action: auto; /* Allow default touch behavior for slider */
 }
 
 .live-mode.mobile-landscape .live-slider-track {
@@ -1334,7 +1335,7 @@ defineExpose({
   min-height: 0;
   flex: 1;
   border-radius: 8px;
-  touch-action: pan-y; /* Allow vertical dragging on slider */
+  touch-action: auto; /* Allow default touch for range input */
   -webkit-touch-callout: none;
 }
 
@@ -1417,7 +1418,7 @@ defineExpose({
 }
 
 .live-slider-input {
-  touch-action: pan-y !important; /* Allow vertical pan for slider control */
+  touch-action: auto !important; /* Allow default range input behavior */
   -webkit-touch-callout: none;
   position: absolute;
   top: 0;

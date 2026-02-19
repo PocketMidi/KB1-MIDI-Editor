@@ -189,7 +189,7 @@ function getSliderFillBottom(slider: SliderConfig): number {
 // === END UTILITY FUNCTIONS ===
 
 // Handle touch drag on slider track (for mobile)
-function handleTrackTouchStart(event: TouchEvent, index: number) {
+function handleTrackTouchStart(event: TouchEvent, _bindingIndex: number) {
   if (!isMobile.value || viewMode.value !== 'live') return;
   event.preventDefault();
   
@@ -200,23 +200,41 @@ function handleTrackTouchStart(event: TouchEvent, index: number) {
   swipeStartX.value = touch.clientX;
   swipeStartY.value = touch.clientY;
   
-  // Get the track that was touched directly
-  const track = event.currentTarget as HTMLElement;
+  // Calculate which slider based on actual touch position
+  const container = document.querySelector('.live-sliders-container') as HTMLElement;
+  if (!container) return;
+  
+  const containerRect = container.getBoundingClientRect();
+  const touchX = touch.clientX - containerRect.left;
+  
+  // Calculate which slider based on X position
+  const sliderWidth = 36;
+  const gap = parseFloat(getComputedStyle(container).gap) || 0;
+  const sliderPlusGap = sliderWidth + gap;
+  const calculatedIndex = Math.floor(touchX / sliderPlusGap);
+  const actualIndex = Math.max(0, Math.min(calculatedIndex, sliders.value.length - 1));
+  
+  console.log('Touch:', { touchX, gap, sliderPlusGap, calculatedIndex, actualIndex });
+  
+  // Get the track element for the calculated slider
+  const sliderWrappers = container.querySelectorAll('.live-slider-wrapper');
+  const sliderWrapper = sliderWrappers[actualIndex] as HTMLElement;
+  if (!sliderWrapper) return;
+  
+  const track = sliderWrapper.querySelector('.live-slider-track') as HTMLElement;
   if (!track) return;
   
-  // Lock to this slider and track
-  activeTouchSlider.value = index;
+  // Lock to the calculated slider and track
+  activeTouchSlider.value = actualIndex;
   activeTouchTrack.value = track;
   
   // Process the initial touch position
-  handleTrackTouchMove(event, index);
+  handleTrackTouchMove(event, actualIndex);
 }
 
-function handleTrackTouchMove(event: TouchEvent, index: number) {
+function handleTrackTouchMove(event: TouchEvent, _bindingIndex: number) {
   if (!isMobile.value || viewMode.value !== 'live') return;
-  
-  // Only process if this is the active slider
-  if (activeTouchSlider.value !== index || !activeTouchTrack.value) return;
+  if (activeTouchSlider.value === null || !activeTouchTrack.value) return;
   
   event.preventDefault();
   event.stopPropagation();
@@ -224,7 +242,8 @@ function handleTrackTouchMove(event: TouchEvent, index: number) {
   const touch = event.touches[0];
   if (!touch) return;
   
-  // Use the stored track element for accurate bounds
+  // Use the locked slider index and track element
+  const index = activeTouchSlider.value;
   const track = activeTouchTrack.value;
   const trackRect = track.getBoundingClientRect();
   
@@ -944,7 +963,7 @@ defineExpose({
       <div v-if="isMobile && isIOS && isPortrait" class="portrait-prompt">
         <div class="prompt-content">
           <img src="/rotate.gif" alt="Rotate device" class="rotate-icon-img" />
-          <div class="prompt-text">Please rotate your device [22:54]</div>
+          <div class="prompt-text">Please rotate your device [23:01]</div>
           <div class="prompt-subtext">Landscape orientation required</div>
           <div class="prompt-subtext" style="margin-top: 0.5rem; font-size: 0.7rem; opacity: 0.6;">Swipe left or right to exit</div>
         </div>
@@ -954,7 +973,7 @@ defineExpose({
       <div v-if="showRotateBackPrompt" class="portrait-prompt">
         <div class="prompt-content">
           <img src="/rotate.gif" alt="Rotate device" class="rotate-icon-img" />
-          <div class="prompt-text">Rotate back to portrait [22:54]</div>
+          <div class="prompt-text">Rotate back to portrait [23:01]</div>
           <div class="prompt-subtext">or wait 3 seconds</div>
         </div>
       </div>

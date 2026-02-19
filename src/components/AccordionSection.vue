@@ -176,6 +176,7 @@ defineExpose({
 .accordion-content.is-open {
   max-height: 5000px;
   transition: max-height 0.3s ease-in;
+  overflow: visible;
 }
 
 .accordion-body {

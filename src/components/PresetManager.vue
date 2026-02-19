@@ -11,9 +11,18 @@
         v-for="preset in presets"
         :key="preset.id"
         class="preset-item"
-        :class="{ active: preset.id === activePresetId }"
+        :class="{ active: preset.id === activePresetId, selected: selectedPresets.has(preset.id) }"
       >
-        <div class="preset-info">
+        <!-- Checkbox for selection -->
+        <div v-if="showCheckboxes" class="preset-checkbox" @click.stop="togglePresetSelection(preset.id)">
+          <input 
+            type="checkbox" 
+            :checked="selectedPresets.has(preset.id)"
+            @change="togglePresetSelection(preset.id)"
+          />
+        </div>
+        
+        <div class="preset-info" @click="showCheckboxes ? togglePresetSelection(preset.id) : null" :style="{ cursor: showCheckboxes ? 'pointer' : 'default' }">
           <div class="preset-name">
             <span class="active-indicator" v-if="preset.id === activePresetId">●</span>
             {{ preset.name }}
@@ -56,8 +65,19 @@
       <button class="btn-secondary" @click="importPresetDialog">
         Import Preset
       </button>
-      <button class="btn-secondary" @click="exportAllPresets" :disabled="presets.length === 0">
-        Export All
+      <button 
+        v-if="showCheckboxes" 
+        class="btn-secondary" 
+        @click="clearSelection"
+      >
+        Clear Selection
+      </button>
+      <button 
+        class="btn-secondary" 
+        @click="selectedPresets.size > 0 ? exportSelectedPresets() : exportAllPresets()" 
+        :disabled="presets.length === 0"
+      >
+        {{ selectedPresets.size > 0 ? `Export (${selectedPresets.size})` : 'Export All' }}
       </button>
     </div>
 
@@ -142,6 +162,10 @@ const emit = defineEmits<{
 const presets = ref<Preset[]>([]);
 const activePresetId = ref<string | null>(null);
 const openMenuId = ref<string | null>(null);
+
+// Selection state for export
+const selectedPresets = ref<Set<string>>(new Set());
+const showCheckboxes = ref(false);
 
 // Create dialog
 const showCreateDialog = ref(false);
@@ -303,6 +327,54 @@ function exportAllPresets() {
   downloadJSON(json, filename);
 }
 
+function togglePresetSelection(id: string) {
+  // Show checkboxes on first selection
+  if (!showCheckboxes.value) {
+    showCheckboxes.value = true;
+  }
+  
+  // Toggle selection
+  if (selectedPresets.value.has(id)) {
+    selectedPresets.value.delete(id);
+  } else {
+    selectedPresets.value.add(id);
+  }
+  
+  // Force reactivity
+  selectedPresets.value = new Set(selectedPresets.value);
+  
+  // Hide checkboxes if all deselected
+  if (selectedPresets.value.size === 0) {
+    showCheckboxes.value = false;
+  }
+}
+
+function clearSelection() {
+  selectedPresets.value.clear();
+  showCheckboxes.value = false;
+}
+
+function exportSelectedPresets() {
+  if (selectedPresets.value.size === 0) return;
+  
+  // If only one preset selected, export with its name
+  if (selectedPresets.value.size === 1) {
+    const id = Array.from(selectedPresets.value)[0];
+    if (id) {
+      exportPreset(id);
+    }
+    return;
+  }
+  
+  // Export multiple presets
+  const selectedIds = Array.from(selectedPresets.value);
+  const selectedPresetsData = selectedIds.map(id => PresetStore.getPreset(id)).filter(p => p !== null);
+  const json = JSON.stringify(selectedPresetsData, null, 2);
+  const filename = `KB1_${selectedPresets.value.size}_Presets_${Date.now()}.json`;
+  downloadJSON(json, filename);
+  clearSelection();
+}
+
 function downloadJSON(json: string, filename: string) {
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -420,6 +492,7 @@ function formatDate(timestamp: number): string {
   justify-content: space-between;
   align-items: center;
   transition: all 0.2s;
+  position: relative;
 }
 
 .preset-item.active {
@@ -428,6 +501,24 @@ function formatDate(timestamp: number): string {
 
 .preset-item:hover {
   background: rgba(234, 234, 234, 0.1);
+}
+
+.preset-item.selected {
+  background: rgba(249, 172, 32, 0.2);
+}
+
+.preset-checkbox {
+  display: flex;
+  align-items: center;
+  margin-right: 0.75rem;
+  cursor: pointer;
+}
+
+.preset-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #F9AC20;
 }
 
 .preset-info {
@@ -499,7 +590,7 @@ function formatDate(timestamp: number): string {
   border: 1px solid rgba(234, 234, 234, 0.2);
   border-radius: 4px;
   padding: 0.25rem;
-  z-index: 100;
+  z-index: 1000;
   min-width: 120px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }

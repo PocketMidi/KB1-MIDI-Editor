@@ -25,4 +25,8 @@ dist-ssr
 
 # Test files
 public/test-settings.html
+
+# Ignore PNG files except animation frames
 *.png
+!public/to_land/*.png
+!public/to_port/*.png

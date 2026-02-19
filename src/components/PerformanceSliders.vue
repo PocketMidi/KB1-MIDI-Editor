@@ -250,6 +250,9 @@ function handleTrackTouchMove(event: TouchEvent, index: number) {
 }
 
 function handleTrackTouchEnd(event: TouchEvent) {
+  // Store the active slider before checking swipe
+  const wasActiveSlider = activeTouchSlider.value;
+  
   // Check for horizontal swipe to exit
   if (swipeStartX.value !== null && swipeStartY.value !== null) {
     const touch = event.changedTouches[0];
@@ -262,6 +265,37 @@ function handleTrackTouchEnd(event: TouchEvent) {
         exitLiveMode();
         return;
       }
+    }
+  }
+  
+  // Handle momentary bounce-back before resetting
+  if (wasActiveSlider !== null) {
+    const slider = sliders.value[wasActiveSlider];
+    if (slider && slider.momentary) {
+      // Spring back to default with smooth animation
+      const defaultValue = getDefaultValue(slider);
+      
+      // Animate the spring-back over 300ms
+      const startValue = slider.value;
+      const startTime = performance.now();
+      const duration = 300; // ms
+      
+      const animate = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Smooth easing function (ease-out cubic)
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        
+        const currentValue = startValue + (defaultValue - startValue) * easeProgress;
+        handleSliderChange(wasActiveSlider, Math.round(currentValue), false);
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+      
+      requestAnimationFrame(animate);
     }
   }
   
@@ -944,7 +978,7 @@ defineExpose({
       <div v-if="isMobile && isIOS && isPortrait" class="portrait-prompt">
         <div class="prompt-content">
           <img src="/rotate.gif" alt="Rotate device" class="rotate-icon-img" />
-          <div class="prompt-text">Please rotate your device [23:06]</div>
+          <div class="prompt-text">Please rotate your device [23:12]</div>
           <div class="prompt-subtext">Landscape orientation required</div>
           <div class="prompt-subtext" style="margin-top: 0.5rem; font-size: 0.7rem; opacity: 0.6;">Swipe left or right to exit</div>
         </div>
@@ -954,7 +988,7 @@ defineExpose({
       <div v-if="showRotateBackPrompt" class="portrait-prompt">
         <div class="prompt-content">
           <img src="/rotate.gif" alt="Rotate device" class="rotate-icon-img" />
-          <div class="prompt-text">Rotate back to portrait [23:06]</div>
+          <div class="prompt-text">Rotate back to portrait [23:12]</div>
           <div class="prompt-subtext">or wait 3 seconds</div>
         </div>
       </div>

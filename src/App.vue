@@ -41,6 +41,11 @@ const bluetoothStatusText = computed(() => {
   return isHoveringStatus.value ? 'CONNECT' : 'DISCONNECTED';
 });
 
+// Computed property to check if in live mode
+const isInLiveMode = computed(() => {
+  return activeTab.value === 'sliders' && mobileSlidersRef.value?.isInLiveMode();
+});
+
 // Check if first-time overlay should be shown
 onMounted(() => {
   const hasSeenIntro = localStorage.getItem(FIRST_TIME_BLE_INTRO_KEY);
@@ -166,7 +171,7 @@ function handleTabClick(tabId: Tab) {
     />
     
     <!-- Unified Responsive Layout -->
-    <header class="app-header">
+    <header v-if="!isInLiveMode" class="app-header">
       <div class="header-content">
         <!-- KB1 logo - centered, no buttons -->
         <div class="logo-section">
@@ -180,7 +185,7 @@ function handleTabClick(tabId: Tab) {
     </header>
     
     <!-- Unified Tab Navigation with Bluetooth Controls -->
-    <div class="tab-nav-wrapper">
+    <div v-if="!isInLiveMode" class="tab-nav-wrapper">
       <nav class="app-nav">
         <div class="nav-tabs">
           <button 
@@ -217,7 +222,7 @@ function handleTabClick(tabId: Tab) {
       <div class="nav-divider"></div>
     </div>
     
-    <main class="app-main" @click="handleMainClick">
+    <main class="app-main" :class="{ 'live-fullscreen': isInLiveMode }" @click="handleMainClick">
       <MobileControls v-if="activeTab === 'controls'" ref="mobileControlsRef" />
       <MobileScales v-if="activeTab === 'settings'" ref="mobileScalesRef" />
       <MobileSliders v-if="activeTab === 'sliders'" ref="mobileSlidersRef" />
@@ -569,6 +574,10 @@ body {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+}
+
+.app-main.live-fullscreen {
+  padding-bottom: 0;
 }
 
 /* Responsive adjustments using CSS media queries only */

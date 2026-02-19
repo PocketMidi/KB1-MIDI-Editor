@@ -1,6 +1,7 @@
 <template>
   <div class="mobile-sliders-tab">
     <StickyActionBar
+      v-if="!isLiveMode"
       :is-connected="isConnected"
       :is-loading="false"
       :has-changes="false"
@@ -80,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted } from 'vue';
+import { ref, nextTick, onMounted, computed } from 'vue';
 import { useDeviceState } from '../composables/useDeviceState';
 import PerformanceSliders from '../components/PerformanceSliders.vue';
 import StickyActionBar from '../components/StickyActionBar.vue';
@@ -88,6 +89,11 @@ import { SliderPresetStore, generateRandomSliderName, type NamedSliderPreset } f
 
 const { isConnected } = useDeviceState();
 const performanceSlidersRef = ref<InstanceType<typeof PerformanceSliders> | null>(null);
+
+// Check if in live mode
+const isLiveMode = computed(() => {
+  return performanceSlidersRef.value?.viewMode === 'live';
+});
 
 // Save dialog
 const showSaveDialog = ref(false);

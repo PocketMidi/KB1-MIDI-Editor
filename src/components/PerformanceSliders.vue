@@ -64,6 +64,7 @@ const showRotateBackPrompt = ref(false); // Show "rotate back" prompt on exit
 
 // Touch tracking for slider dragging
 const activeTouchSlider = ref<number | null>(null);
+const activeTouchTrack = ref<HTMLElement | null>(null);
 
 // Initialize sliders
 const sliders = ref<SliderConfig[]>([]);
@@ -190,46 +191,18 @@ function handleTrackTouchStart(event: TouchEvent, _index: number) {
   if (!isMobile.value || viewMode.value !== 'live') return;
   event.preventDefault();
   
-  // Calculate which slider was actually touched based on position
   const touch = event.touches[0];
   if (!touch) return;
   
-  // Get the container element
-  const container = (event.currentTarget as HTMLElement)?.closest('.live-sliders-container') as HTMLElement;
-  if (!container) return;
-  
-  const containerRect = container.getBoundingClientRect();
-  const touchX = touch.clientX - containerRect.left;
-  
-  // Calculate which slider based on position
-  // Each slider is 36px wide with 1.5rem (24px) gap
-  const sliderWidth = 36;
-  const gap = parseFloat(getComputedStyle(container).gap) || 0;
-  const sliderPlusGap = sliderWidth + gap;
-  const calculatedIndex = Math.floor(touchX / sliderPlusGap);
-  
-  // Use the calculated index instead of the passed index
-  const actualIndex = Math.max(0, Math.min(calculatedIndex, sliders.value.length - 1));
-  
-  activeTouchSlider.value = actualIndex;
-  handleTrackTouchMove(event, actualIndex);
-  showExitButton.value = true; // Show X when interacting
-}
-
-function handleTrackTouchMove(event: TouchEvent, index: number) {
-  if (!isMobile.value || viewMode.value !== 'live' || activeTouchSlider.value !== index) return;
-  event.preventDefault();
-  event.stopPropagation();
-  
-  const touch = event.touches[0];
-  if (!touch) return;
-  
-  // Get the container and calculate which slider
+  // Get container and calculate which slider was actually touched
   const container = document.querySelector('.live-sliders-container') as HTMLElement;
   if (!container) return;
   
   const containerRect = container.getBoundingClientRect();
-  const touchX = touch.clientX - containerRect.left;
+  
+  // Apply 50px offset to compensate for touch misalignment
+  const adjustedTouchX = touch.clientX - 50;
+  const touchX = adjustedTouchX - containerRect.left;
   
   // Calculate which slider based on X position
   const sliderWidth = 36;
@@ -238,7 +211,7 @@ function handleTrackTouchMove(event: TouchEvent, index: number) {
   const calculatedIndex = Math.floor(touchX / sliderPlusGap);
   const actualIndex = Math.max(0, Math.min(calculatedIndex, sliders.value.length - 1));
   
-  // Find the actual track element for this slider
+  // Get the track element for the calculated slider
   const sliderWrappers = container.querySelectorAll('.live-slider-wrapper');
   const sliderWrapper = sliderWrappers[actualIndex] as HTMLElement;
   if (!sliderWrapper) return;
@@ -246,6 +219,31 @@ function handleTrackTouchMove(event: TouchEvent, index: number) {
   const track = sliderWrapper.querySelector('.live-slider-track') as HTMLElement;
   if (!track) return;
   
+  // Lock to the calculated slider and its track
+  activeTouchSlider.value = actualIndex;
+  activeTouchTrack.value = track;
+  
+  // Process the initial touch position
+  handleTrackTouchMove(event, actualIndex);
+  
+  // Show exit button
+  showExitButton.value = true;
+}
+
+function handleTrackTouchMove(event: TouchEvent, index: number) {
+  if (!isMobile.value || viewMode.value !== 'live') return;
+  
+  // Only process if this is the active slider
+  if (activeTouchSlider.value !== index || !activeTouchTrack.value) return;
+  
+  event.preventDefault();
+  event.stopPropagation();
+  
+  const touch = event.touches[0];
+  if (!touch) return;
+  
+  // Use the stored track element for accurate bounds
+  const track = activeTouchTrack.value;
   const trackRect = track.getBoundingClientRect();
   
   // Calculate position from bottom (0 = bottom, 1 = top)
@@ -254,7 +252,7 @@ function handleTrackTouchMove(event: TouchEvent, index: number) {
   const positionFromTop = Math.max(0, Math.min(1, y / height));
   const positionFromBottom = 1 - positionFromTop;
   
-  const slider = sliders.value[actualIndex];
+  const slider = sliders.value[index];
   if (!slider) return;
   
   let newValue;
@@ -266,11 +264,12 @@ function handleTrackTouchMove(event: TouchEvent, index: number) {
     newValue = Math.round(positionFromBottom * 100);
   }
   
-  handleSliderChange(actualIndex, newValue, false);
+  handleSliderChange(index, newValue, false);
 }
 
 function handleTrackTouchEnd() {
   activeTouchSlider.value = null;
+  activeTouchTrack.value = null;
   // Hide X after 2 seconds of no interaction
   setTimeout(() => {
     if (activeTouchSlider.value === null) {

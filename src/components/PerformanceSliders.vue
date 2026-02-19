@@ -857,6 +857,11 @@ function checkOrientation() {
   } else if (!isPortrait.value && wasPortrait) {
     stopToLandAnimation();
   }
+  
+  // If waiting to exit and user rotated to portrait, complete the exit
+  if (showRotateBackPrompt.value && isPortrait.value) {
+    completeExit();
+  }
 }
 
 function startToLandAnimation() {
@@ -939,18 +944,7 @@ async function exitLiveMode() {
   if (isMobile.value && isIOS.value && !isPortrait.value) {
     showRotateBackPrompt.value = true;
     startToPortAnimation();
-    // Wait 3 seconds or until portrait orientation detected
-    const checkInterval = setInterval(() => {
-      if (window.innerHeight > window.innerWidth) {
-        clearInterval(checkInterval);
-        completeExit();
-      }
-    }, 100);
-    // Auto-complete after 3 seconds regardless
-    setTimeout(() => {
-      clearInterval(checkInterval);
-      completeExit();
-    }, 3000);
+    // Wait until portrait orientation detected (no timeout)
   } else {
     completeExit();
   }
@@ -1132,7 +1126,7 @@ defineExpose({
       <!-- iOS Portrait Prompt -->
       <div v-if="isMobile && isIOS && isPortrait" class="portrait-prompt">
         <div class="prompt-content">
-          <img :src="getFramePath('to_land', toLandFrame)" alt="Rotate to landscape" class="rotate-animation" />
+          <img :src="getFramePath('to_land', toLandFrame)" alt="Rotate to landscape" class="rotate-icon-img" />
           <div class="prompt-subtext" style="margin-top: 1rem; font-size: 0.7rem; opacity: 0.6;">Swipe left or right to exit</div>
         </div>
       </div>
@@ -1140,7 +1134,7 @@ defineExpose({
       <!-- Rotate Back Prompt (on exit) -->
       <div v-if="showRotateBackPrompt" class="portrait-prompt">
         <div class="prompt-content">
-          <img :src="getFramePath('to_port', toPortFrame)" alt="Rotate to portrait" class="rotate-animation" />
+          <img :src="getFramePath('to_port', toPortFrame)" alt="Rotate to portrait" class="rotate-icon-img" />
         </div>
       </div>
       

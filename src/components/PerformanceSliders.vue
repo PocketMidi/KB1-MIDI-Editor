@@ -186,11 +186,33 @@ function getSliderFillBottom(slider: SliderConfig): number {
 // === END UTILITY FUNCTIONS ===
 
 // Handle touch drag on slider track (for mobile)
-function handleTrackTouchStart(event: TouchEvent, index: number) {
+function handleTrackTouchStart(event: TouchEvent, _index: number) {
   if (!isMobile.value || viewMode.value !== 'live') return;
   event.preventDefault();
-  activeTouchSlider.value = index;
-  handleTrackTouchMove(event, index);
+  
+  // Calculate which slider was actually touched based on position
+  const touch = event.touches[0];
+  if (!touch) return;
+  
+  // Get the container element
+  const container = (event.currentTarget as HTMLElement)?.closest('.live-sliders-container') as HTMLElement;
+  if (!container) return;
+  
+  const containerRect = container.getBoundingClientRect();
+  const touchX = touch.clientX - containerRect.left;
+  
+  // Calculate which slider based on position
+  // Each slider is 36px wide with 1.5rem (24px) gap
+  const sliderWidth = 36;
+  const gap = parseFloat(getComputedStyle(container).gap) || 0;
+  const sliderPlusGap = sliderWidth + gap;
+  const calculatedIndex = Math.floor(touchX / sliderPlusGap);
+  
+  // Use the calculated index instead of the passed index
+  const actualIndex = Math.max(0, Math.min(calculatedIndex, sliders.value.length - 1));
+  
+  activeTouchSlider.value = actualIndex;
+  handleTrackTouchMove(event, actualIndex);
   showExitButton.value = true; // Show X when interacting
 }
 
@@ -202,19 +224,37 @@ function handleTrackTouchMove(event: TouchEvent, index: number) {
   const touch = event.touches[0];
   if (!touch) return;
   
-  // Get the track element directly - it's the currentTarget
-  const track = event.currentTarget as HTMLElement;
+  // Get the container and calculate which slider
+  const container = document.querySelector('.live-sliders-container') as HTMLElement;
+  if (!container) return;
+  
+  const containerRect = container.getBoundingClientRect();
+  const touchX = touch.clientX - containerRect.left;
+  
+  // Calculate which slider based on X position
+  const sliderWidth = 36;
+  const gap = parseFloat(getComputedStyle(container).gap) || 0;
+  const sliderPlusGap = sliderWidth + gap;
+  const calculatedIndex = Math.floor(touchX / sliderPlusGap);
+  const actualIndex = Math.max(0, Math.min(calculatedIndex, sliders.value.length - 1));
+  
+  // Find the actual track element for this slider
+  const sliderWrappers = container.querySelectorAll('.live-slider-wrapper');
+  const sliderWrapper = sliderWrappers[actualIndex] as HTMLElement;
+  if (!sliderWrapper) return;
+  
+  const track = sliderWrapper.querySelector('.live-slider-track') as HTMLElement;
   if (!track) return;
   
-  const rect = track.getBoundingClientRect();
+  const trackRect = track.getBoundingClientRect();
   
   // Calculate position from bottom (0 = bottom, 1 = top)
-  const y = touch.clientY - rect.top;
-  const height = rect.height;
+  const y = touch.clientY - trackRect.top;
+  const height = trackRect.height;
   const positionFromTop = Math.max(0, Math.min(1, y / height));
   const positionFromBottom = 1 - positionFromTop;
   
-  const slider = sliders.value[index];
+  const slider = sliders.value[actualIndex];
   if (!slider) return;
   
   let newValue;
@@ -226,7 +266,7 @@ function handleTrackTouchMove(event: TouchEvent, index: number) {
     newValue = Math.round(positionFromBottom * 100);
   }
   
-  handleSliderChange(index, newValue, false);
+  handleSliderChange(actualIndex, newValue, false);
 }
 
 function handleTrackTouchEnd() {

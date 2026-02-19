@@ -187,44 +187,23 @@ function getSliderFillBottom(slider: SliderConfig): number {
 // === END UTILITY FUNCTIONS ===
 
 // Handle touch drag on slider track (for mobile)
-function handleTrackTouchStart(event: TouchEvent, _index: number) {
+function handleTrackTouchStart(event: TouchEvent, index: number) {
   if (!isMobile.value || viewMode.value !== 'live') return;
   event.preventDefault();
   
   const touch = event.touches[0];
   if (!touch) return;
   
-  // Get container and calculate which slider was actually touched
-  const container = document.querySelector('.live-sliders-container') as HTMLElement;
-  if (!container) return;
-  
-  const containerRect = container.getBoundingClientRect();
-  
-  // Apply 60px offset to compensate for touch misalignment
-  const adjustedTouchX = touch.clientX - 60;
-  const touchX = adjustedTouchX - containerRect.left;
-  
-  // Calculate which slider based on X position
-  const sliderWidth = 36;
-  const gap = parseFloat(getComputedStyle(container).gap) || 0;
-  const sliderPlusGap = sliderWidth + gap;
-  const calculatedIndex = Math.floor(touchX / sliderPlusGap);
-  const actualIndex = Math.max(0, Math.min(calculatedIndex, sliders.value.length - 1));
-  
-  // Get the track element for the calculated slider
-  const sliderWrappers = container.querySelectorAll('.live-slider-wrapper');
-  const sliderWrapper = sliderWrappers[actualIndex] as HTMLElement;
-  if (!sliderWrapper) return;
-  
-  const track = sliderWrapper.querySelector('.live-slider-track') as HTMLElement;
+  // Get the track that was touched directly
+  const track = event.currentTarget as HTMLElement;
   if (!track) return;
   
-  // Lock to the calculated slider and its track
-  activeTouchSlider.value = actualIndex;
+  // Lock to this slider and track
+  activeTouchSlider.value = index;
   activeTouchTrack.value = track;
   
   // Process the initial touch position
-  handleTrackTouchMove(event, actualIndex);
+  handleTrackTouchMove(event, index);
   
   // Show exit button
   showExitButton.value = true;
@@ -1488,6 +1467,11 @@ defineExpose({
   touch-action: none; /* Prevent default, we handle touch manually */
   -webkit-touch-callout: none;
   cursor: pointer;
+}
+
+.live-mode.mobile-landscape .live-slider-input {
+  pointer-events: none; /* Disable input interaction, use custom touch handlers */
+  display: none; /* Hide completely in mobile mode */
 }
 
 .live-mode.mobile-landscape .center-marker-left,

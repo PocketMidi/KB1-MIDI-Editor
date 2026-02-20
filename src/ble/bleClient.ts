@@ -23,12 +23,6 @@ const SYSTEM_SETTINGS_UUID = '8f7e6d5c-4b3a-2c1d-0e9f-8a7b6c5d4e3f';
 const MIDI_UUID = 'eb58b31b-d963-4c7d-9a11-e8aabec2fe32';
 const KEEPALIVE_UUID = 'a8f3d5e2-9c4b-11ef-8e7a-325096b39f47';
 
-// Preset Management UUIDs
-const PRESET_SAVE_UUID = 'd3a7b321-0001-4000-8000-000000000009';
-const PRESET_LOAD_UUID = 'd3a7b321-0001-4000-8000-00000000000a';
-const PRESET_LIST_UUID = 'd3a7b321-0001-4000-8000-00000000000b';
-const PRESET_DELETE_UUID = 'd3a7b321-0001-4000-8000-00000000000c';
-
 export interface BLEConnectionStatus {
   connected: boolean;
   device: BluetoothDevice | null;
@@ -51,12 +45,6 @@ export class BLEClient {
   private scaleCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
   private systemCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
   private keepAliveCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
-  
-  // Preset management characteristics
-  private presetSaveCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
-  private presetLoadCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
-  private presetListCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
-  private presetDeleteCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
 
   // Keep-alive mechanism (firmware expects writes within 10 minute grace period)
   private keepAliveTimer: ReturnType<typeof setInterval> | null = null;
@@ -131,17 +119,6 @@ export class BLEClient {
         this.scaleCharacteristic = await service.getCharacteristic(SCALE_SETTINGS_UUID);
         this.systemCharacteristic = await service.getCharacteristic(SYSTEM_SETTINGS_UUID);
         this.keepAliveCharacteristic = await service.getCharacteristic(KEEPALIVE_UUID);
-        
-        // Try to get preset characteristics (may not be available on older firmware)
-        try {
-          this.presetSaveCharacteristic = await service.getCharacteristic(PRESET_SAVE_UUID);
-          this.presetLoadCharacteristic = await service.getCharacteristic(PRESET_LOAD_UUID);
-          this.presetListCharacteristic = await service.getCharacteristic(PRESET_LIST_UUID);
-          this.presetDeleteCharacteristic = await service.getCharacteristic(PRESET_DELETE_UUID);
-          console.log('✅ Preset characteristics found');
-        } catch (presetError) {
-          console.warn('⚠️ Preset characteristics not available (requires updated firmware):', presetError);
-        }
       } catch (e) {
         console.warn('Some settings characteristics not available:', e);
       }

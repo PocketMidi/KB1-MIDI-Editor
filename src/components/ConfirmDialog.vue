@@ -33,19 +33,9 @@ const emit = defineEmits<{
 
 const visible = ref(true);
 
+// Always center the dialog - position prop is ignored
 const dialogStyle = computed(() => {
-  if (!props.position) return {};
-  
-  // Position near click but ensure it stays on screen
-  const x = Math.min(Math.max(props.position.x - 150, 20), window.innerWidth - 320);
-  const y = Math.min(Math.max(props.position.y - 80, 20), window.innerHeight - 180);
-  
-  return {
-    position: 'fixed',
-    left: `${x}px`,
-    top: `${y}px`,
-    margin: 0,
-  };
+  return {}; // Use default centered positioning from CSS
 });
 
 function handleConfirm() {

@@ -1130,20 +1130,20 @@ input:checked + .toggle-slider:before {
 /* Toast Notifications Container */
 .toast-container {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 9999;
   display: flex;
   flex-direction: column;
   gap: 12px;
   pointer-events: none;
+  align-items: center;
 }
 
 @media (max-width: 640px) {
   .toast-container {
-    top: 10px;
-    right: 10px;
-    left: 10px;
+    width: 90vw;
   }
 }
 </style>

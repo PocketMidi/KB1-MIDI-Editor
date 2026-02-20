@@ -105,11 +105,11 @@ onMounted(() => {
 
 .toast-enter-from {
   opacity: 0;
-  transform: translateY(-20px);
+  transform: scale(0.9);
 }
 
 .toast-leave-to {
   opacity: 0;
-  transform: translateY(-20px);
+  transform: scale(0.9);
 }
 </style>

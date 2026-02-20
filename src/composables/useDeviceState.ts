@@ -505,6 +505,8 @@ export function useDeviceState() {
     
     if (devMode.value) {
       console.log(`🔧 DEV MODE: Saving to device slot ${slot}: "${name}"`);
+      console.log('📊 Device presets BEFORE save:', JSON.parse(JSON.stringify(devicePresets.value)));
+      
       // Update mock data
       devicePresets.value[slot] = {
         slot,
@@ -512,6 +514,9 @@ export function useDeviceState() {
         timestamp: Date.now() / 1000,
         isValid: true,
       };
+      
+      console.log('📊 Device presets AFTER save:', JSON.parse(JSON.stringify(devicePresets.value)));
+      console.log(`✅ Slot ${slot} updated:`, devicePresets.value[slot]);
       return;
     }
     
@@ -547,6 +552,8 @@ export function useDeviceState() {
     
     if (devMode.value) {
       console.log(`🔧 DEV MODE: Deleting device slot ${slot}`);
+      console.log('📊 Device presets BEFORE delete:', JSON.parse(JSON.stringify(devicePresets.value)));
+      
       // Update mock data
       devicePresets.value[slot] = {
         slot,
@@ -554,6 +561,9 @@ export function useDeviceState() {
         timestamp: 0,
         isValid: false,
       };
+      
+      console.log('📊 Device presets AFTER delete:', JSON.parse(JSON.stringify(devicePresets.value)));
+      console.log(`✅ Slot ${slot} cleared`);
       return;
     }
     

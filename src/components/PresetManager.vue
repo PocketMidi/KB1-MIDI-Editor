@@ -18,7 +18,7 @@
               class="slot-box"
               :class="{
                 filled: getDevicePreset(slot - 1).isValid,
-                active: activeDeviceSlot === (slot - 1),
+                active: activeDeviceSlot === (slot - 1) || selectedDeviceSlots.has(slot - 1),
                 empty: !getDevicePreset(slot - 1).isValid
               }"
               :title="getDevicePreset(slot - 1).isValid ? getDevicePreset(slot - 1).name : `Slot ${slot} (Empty)`"
@@ -56,11 +56,11 @@
           <div class="preset-info" @click="isConnected && toggleDeviceSlotSelection(slot - 1)" :style="{ cursor: isConnected ? 'pointer' : 'not-allowed' }">
             <div class="preset-name">
               <span class="active-indicator" v-if="activeDeviceSlot === (slot - 1)">●</span>
-              <span v-if="getDevicePreset(slot - 1).isValid">{{ getDevicePreset(slot - 1).name }}</span>
-              <span v-else class="empty-slot-label">Slot {{ slot }} (Empty)</span>
+              <span>Slot {{ slot }}</span>
             </div>
-            <div class="preset-meta" v-if="getDevicePreset(slot - 1).isValid">
-              Slot {{ slot }}
+            <div class="preset-meta">
+              <span v-if="getDevicePreset(slot - 1).isValid">{{ getDevicePreset(slot - 1).name }}</span>
+              <span v-else>(Empty)</span>
             </div>
           </div>
           
@@ -321,26 +321,46 @@ const activeDeviceSlot = ref<number | null>(null);
 
 // Load presets on mount
 onMounted(() => {
+  console.log('🎬 PresetManager mounted');
+  console.log('📊 Initial device presets:', JSON.parse(JSON.stringify(devicePresets.value)));
   refreshPresets();
   activePresetId.value = PresetStore.getActivePresetId();
 });
 
 // Helper to get device preset by slot
 function getDevicePreset(slot: number) {
-  return devicePresets.value[slot] || { 
+  const preset = devicePresets.value[slot] || { 
     slot, 
     name: '[Empty]', 
     timestamp: 0, 
     isValid: false 
   };
+  // Uncomment for debugging:
+  // console.log(`🔍 getDevicePreset(${slot}):`, preset);
+  return preset;
 }
 
 // Device preset operations
 async function saveToDevice(slot: number) {
   const preset = getDevicePreset(slot);
+  console.log(`💾 Save to device slot ${slot}:`, { isValid: preset.isValid, name: preset.name });
   
-  // Pre-fill with existing name or generate default
+  // Warn if slot is filled
   if (preset.isValid) {
+    const overwrite = confirm(`Slot ${slot + 1} contains "${preset.name}".\n\nDo you want to overwrite it?\n\nClick Cancel to choose a different slot.`);
+    if (!overwrite) {
+      // Find next empty slot
+      const emptySlot = devicePresets.value.findIndex(p => !p.isValid);
+      if (emptySlot >= 0) {
+        const useEmpty = confirm(`Use empty slot ${emptySlot + 1} instead?`);
+        if (useEmpty) {
+          saveToDevice(emptySlot);
+          return;
+        }
+      }
+      return; // User cancelled
+    }
+    // User chose to overwrite - pre-fill with existing name
     newPresetName.value = preset.name;
   } else {
     newPresetName.value = generateRandomName();
@@ -352,6 +372,8 @@ async function saveToDevice(slot: number) {
 
 async function loadFromDevice(slot: number) {
   const preset = getDevicePreset(slot);
+  console.log(`📥 Load from device slot ${slot}:`, { isValid: preset.isValid, name: preset.name });
+  
   if (!preset.isValid) {
     alert('Slot is empty');
     return;
@@ -363,9 +385,10 @@ async function loadFromDevice(slot: number) {
     // Clear browser preset active state
     activePresetId.value = null;
     emit('presetActivated', null);
+    console.log(`✅ Successfully loaded from slot ${slot + 1}:`, preset.name);
     alert(`Loaded from device slot ${slot + 1}: "${preset.name}"`);
   } catch (error) {
-    console.error('Failed to load device preset:', error);
+    console.error('❌ Failed to load device preset:', error);
     alert('Failed to load from device');
   }
 }
@@ -387,6 +410,11 @@ async function deleteFromDevice(slot: number) {
 }
 
 // Load presets on mount
+
+// Debug: Watch devicePresets for changes
+watch(devicePresets, (newPresets) => {
+  console.log('🔄 Device presets changed:', JSON.parse(JSON.stringify(newPresets)));
+}, { deep: true });
 
 // Auto-focus inputs when dialogs open
 watch(showCreateDialog, async (show) => {
@@ -432,9 +460,14 @@ function getDialogHeading(): string {
 }
 
 function createNewFlashPreset() {
+  console.log('➕ Create new flash preset');
+  
+  // Find first empty slot
+  const emptySlot = devicePresets.value.findIndex(p => !p.isValid);
+  
   // Use -1 to indicate device preset creation with slot selection
   savingDeviceSlot.value = -1;
-  selectedSlotNumber.value = 0; // Default to first slot
+  selectedSlotNumber.value = emptySlot >= 0 ? emptySlot : 0; // Default to first empty slot or slot 0
   newPresetName.value = generateRandomName();
   showCreateDialog.value = true;
 }
@@ -469,24 +502,40 @@ async function confirmCreate() {
   if (savingDeviceSlot.value === -1) {
     // Creating device preset with slot selection
     const slot = selectedSlotNumber.value;
+    const preset = getDevicePreset(slot);
+    
+    // Warn if overwriting
+    if (preset.isValid) {
+      const confirm = window.confirm(`Slot ${slot + 1} contains "${preset.name}".\n\nOverwrite with "${name}"?`);
+      if (!confirm) {
+        return; // Stay in dialog
+      }
+    }
+    
+    console.log(`💾 Saving to slot ${slot}:`, name);
     try {
       await saveDevicePreset(slot, name.slice(0, 32));
       activeDeviceSlot.value = slot;
+      console.log(`✅ Successfully saved to device slot ${slot + 1}`);
+      console.log('📊 Device presets after save:', devicePresets.value);
       alert(`Saved to device slot ${slot + 1}`);
     } catch (error) {
-      console.error('Failed to save device preset:', error);
+      console.error('❌ Failed to save device preset:', error);
       alert('Failed to save to device');
     }
     savingDeviceSlot.value = null;
   } else if (savingDeviceSlot.value !== null) {
     // Saving to device slot
     const slot = savingDeviceSlot.value;
+    console.log(`💾 Saving to slot ${slot}:`, name);
     try {
       await saveDevicePreset(slot, name.slice(0, 32));
       activeDeviceSlot.value = slot;
+      console.log(`✅ Successfully saved to device slot ${slot + 1}`);
+      console.log('📊 Device presets after save:', devicePresets.value);
       alert(`Saved to device slot ${slot + 1}`);
     } catch (error) {
-      console.error('Failed to save device preset:', error);
+      console.error('❌ Failed to save device preset:', error);
       alert('Failed to save to device');
     }
     savingDeviceSlot.value = null;

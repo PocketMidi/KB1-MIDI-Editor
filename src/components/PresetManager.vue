@@ -272,6 +272,7 @@ const {
   saveDevicePreset,
   loadDevicePreset,
   deleteDevicePreset,
+  refreshDevicePresets,
 } = useDeviceState();
 
 const props = defineProps<{

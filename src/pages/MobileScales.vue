@@ -516,6 +516,10 @@ function handleLeverPush2ProfileChange(profileName: string) {
   }, 2500);
 }
 
+function handleLeverPush2BehaviourChange(behaviourName: string) {
+  handleLeverPush2ProfileChange(behaviourName);
+}
+
 function handleSlotNameDisplay(name: string) {
   if (presetsFadeTimeoutId) clearTimeout(presetsFadeTimeoutId);
   if (presetsClearTimeoutId) clearTimeout(presetsClearTimeoutId);

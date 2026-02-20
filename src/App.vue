@@ -385,6 +385,8 @@ body {
   background: var(--color-background);
   color: var(--color-text);
   line-height: 1.6;
+  touch-action: manipulation; /* Disable double-tap zoom */
+  -webkit-text-size-adjust: 100%; /* Prevent font scaling */
 }
 
 #app {
@@ -465,6 +467,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  touch-action: manipulation; /* Disable double-tap zoom */
 }
 
 /* Header - Unified for all screen sizes */

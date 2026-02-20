@@ -128,6 +128,9 @@ function handleBackdropClick() {
   justify-content: center;
   z-index: 900;
   padding: 1rem;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .contextual-modal {
@@ -139,6 +142,9 @@ function handleBackdropClick() {
   width: 100%;
   position: relative;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .close-button {

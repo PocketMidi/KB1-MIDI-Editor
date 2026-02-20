@@ -158,6 +158,9 @@ onUnmounted(() => {
   background: #1A1A1A;
   overflow: visible;
   z-index: 1000;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .dropdown-spacer {

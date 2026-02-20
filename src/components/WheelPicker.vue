@@ -228,6 +228,9 @@ function snapToNearest() {
   align-items: flex-end;
   z-index: 10000;
   animation: fadeIn 0.2s ease;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 @keyframes fadeIn {
@@ -241,6 +244,9 @@ function snapToNearest() {
   border-radius: 16px 16px 0 0;
   max-height: 50vh;
   animation: slideUp 0.3s ease;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 @keyframes slideUp {

@@ -202,6 +202,9 @@ onBeforeUnmount(() => {
   background: rgba(0, 0, 0, 0.5);
   z-index: 9999;
   backdrop-filter: blur(4px);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .picker-overlay {
@@ -209,6 +212,9 @@ onBeforeUnmount(() => {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .wheel-picker-container {

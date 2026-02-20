@@ -126,6 +126,9 @@ function handleBackdropClick() {
   justify-content: center;
   z-index: 1000;
   padding: 1rem;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .modal-card {
@@ -137,6 +140,9 @@ function handleBackdropClick() {
   width: 100%;
   position: relative;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .close-button {

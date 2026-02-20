@@ -1124,6 +1124,9 @@ function formatDate(timestamp: number): string {
   justify-content: center;
   z-index: 1000;
   padding: 1rem;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .modal-dialog {
@@ -1134,6 +1137,9 @@ function formatDate(timestamp: number): string {
   max-width: 400px;
   width: 100%;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .modal-dialog h3 {

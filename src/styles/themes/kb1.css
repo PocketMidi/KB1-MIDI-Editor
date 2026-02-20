@@ -363,8 +363,63 @@
 .theme-kb1-light .modal-dialog,
 .theme-kb1-light .input-text,
 .theme-kb1-light .link-icon,
-.theme-kb1-light .btn-live {
+.theme-kb1-light .btn-live,
+.theme-kb1-light .action-icon,
+.theme-kb1-light .btn-create-preset,
+.theme-kb1-light .preset-item,
+.theme-kb1-light .preset-checkbox input[type="checkbox"],
+.theme-kb1-light .btn-secondary,
+.theme-kb1-light .time-display {
   filter: invert(1);
+}
+
+/* Override backgrounds for light mode to use blue-gray tone */
+.theme-kb1-light .accordion-header {
+  background: rgba(149, 151, 172, 0.2) !important;
+}
+
+.theme-kb1-light .accordion-section.is-open .accordion-header {
+  background: rgba(149, 151, 172, 0.35) !important;
+}
+
+.theme-kb1-light .accordion-header:hover {
+  background: rgba(149, 151, 172, 0.3) !important;
+}
+
+.theme-kb1-light .accordion-header:active {
+  background: rgba(149, 151, 172, 0.45) !important;
+}
+
+.theme-kb1-light .slider-row {
+  background: rgba(149, 151, 172, 0.2) !important;
+}
+
+.theme-kb1-light .slider-row:hover {
+  background: rgba(149, 151, 172, 0.3) !important;
+}
+
+.theme-kb1-light .btn-live {
+  background: rgba(149, 151, 172, 0.2) !important;
+}
+
+.theme-kb1-light .btn-live:hover {
+  background: rgba(149, 151, 172, 0.3) !important;
+}
+
+.theme-kb1-light .btn-live:active {
+  background: rgba(149, 151, 172, 0.45) !important;
+}
+
+.theme-kb1-light .btn-create-preset {
+  background: rgba(149, 151, 172, 0.2) !important;
+}
+
+.theme-kb1-light .btn-create-preset:hover {
+  background: rgba(149, 151, 172, 0.3) !important;
+}
+
+.theme-kb1-light .preset-item.active {
+  background: rgba(149, 151, 172, 0.25) !important;
 }
 
 /* Invert piano keys for light mode */
@@ -377,6 +432,40 @@
 /* Also invert hover states for these elements */
 .theme-kb1-light .dropdown-item:hover,
 .theme-kb1-light .picker-trigger:hover,
-.theme-kb1-light .input-text:focus {
+.theme-kb1-light .input-text:focus,
+.theme-kb1-light .picker-item.selected,
+.theme-kb1-light .preset-item.selected,
+.theme-kb1-light .color-picker-item.selected,
+.theme-kb1-light .profile-btn.active,
+.theme-kb1-light .profile-btn.active::after,
+.theme-kb1-light .accordion-section.is-open .accordion-title h3,
+.theme-kb1-light .tab-button.active,
+.theme-kb1-light .tab-button.active::after,
+.theme-kb1-light .tab-button:not(.active)::after {
   filter: invert(1);
+}
+
+/* Counter-invert title suffix to preserve violet accent color */
+.theme-kb1-light .accordion-section.is-open .accordion-title h3 .title-suffix {
+  filter: invert(1);
+}
+/* Add dark outline to color swatches for visibility in light mode */
+.theme-kb1-light .color-swatch {
+  border: 1px solid rgba(0, 0, 0, 0.4) !important;
+}
+
+.theme-kb1-light .color-swatch:hover {
+  border-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Adjust root note outlines for light mode visibility */
+.theme-kb1-light .key.root-note {
+  box-shadow:
+    inset 0 0 0 2px #0F0F0F,  /* Dark inner (inverts to light, blends with bg) */
+    0 0 0 1px #CCCCCC;         /* Light outer (inverts to dark for visibility) */
+}
+
+/* Make preset timestamp darker (will invert inside inverted preset-item) */
+.theme-kb1-light .preset-meta {
+  color: #CCCCCC !important; /* Light gray inverts to dark gray for visibility */
 }

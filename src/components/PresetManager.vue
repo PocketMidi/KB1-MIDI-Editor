@@ -471,10 +471,10 @@ function formatDate(timestamp: number): string {
 .btn-create-preset {
   width: 100%;
   padding: 0.25rem 1rem;
-  background: rgba(149, 151, 172, 0.2);
+  background: rgba(106, 104, 83, 0.2);
   border: none;
   color: #EAEAEA;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   border-radius: 4px;
   cursor: pointer;
@@ -484,7 +484,7 @@ function formatDate(timestamp: number): string {
 }
 
 .btn-create-preset:hover {
-  background: rgba(149, 151, 172, 0.3);
+  background: rgba(106, 104, 83, 0.3);
 }
 
 .presets-list {
@@ -508,7 +508,7 @@ function formatDate(timestamp: number): string {
 }
 
 .preset-item.active {
-  background: rgba(149, 151, 172, 0.25);
+  background: rgba(106, 104, 83, 0.25);
 }
 
 .preset-item:hover {
@@ -539,7 +539,7 @@ function formatDate(timestamp: number): string {
 }
 
 .preset-name {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: #EAEAEA;
   font-weight: 500;
   margin-bottom: 0.25rem;
@@ -647,7 +647,7 @@ function formatDate(timestamp: number): string {
 
 .empty-state p {
   margin: 0.5rem 0;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .empty-state .hint {
@@ -734,7 +734,7 @@ function formatDate(timestamp: number): string {
   border: none;
   border-radius: 4px;
   color: #EAEAEA;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-family: 'Roboto Mono', monospace;
   box-sizing: border-box;
 }
@@ -759,7 +759,7 @@ function formatDate(timestamp: number): string {
   background: #6A6853;
   border: none;
   color: #EAEAEA;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   border-radius: 4px;
   cursor: pointer;

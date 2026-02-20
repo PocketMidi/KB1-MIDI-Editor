@@ -291,7 +291,7 @@ defineExpose({
   display: block;
   margin-bottom: 0.5rem;
   color: #EAEAEA;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .input-text {
@@ -302,7 +302,7 @@ defineExpose({
   border-radius: 4px;
   color: #EAEAEA;
   font-family: 'Roboto Mono', monospace;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .input-text:focus {
@@ -327,7 +327,7 @@ defineExpose({
   padding: 0.625rem 1.25rem;
   border-radius: 4px;
   font-family: 'Roboto Mono', monospace;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid;
@@ -391,7 +391,7 @@ defineExpose({
 
 .preset-name {
   color: #EAEAEA;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   margin-bottom: 0.25rem;
 }
 
@@ -427,7 +427,7 @@ defineExpose({
 
 .empty-state p {
   margin: 0.5rem 0;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 @media (min-width: 769px) {

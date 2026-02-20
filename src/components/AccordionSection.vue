@@ -82,7 +82,7 @@ defineExpose({
   align-items: center;
   justify-content: space-between;
   padding: 0.25rem 1rem; /* 4px top/bottom, 16px left/right */
-  background: rgba(149, 151, 172, 0.2); /* Inverted blue-gray tone */
+  background: rgba(106, 104, 83, 0.2); /* Warm brownish tone for dark mode */
   border: none;
   color: var(--color-text);
   cursor: pointer;
@@ -93,15 +93,15 @@ defineExpose({
 }
 
 .accordion-section.is-open .accordion-header {
-  background: rgba(149, 151, 172, 0.35); /* Brighter when selected */
+  background: rgba(106, 104, 83, 0.35); /* Brighter when selected */
 }
 
 .accordion-header:hover {
-  background: rgba(149, 151, 172, 0.3);
+  background: rgba(106, 104, 83, 0.3);
 }
 
 .accordion-header:active {
-  background: rgba(149, 151, 172, 0.45);
+  background: rgba(106, 104, 83, 0.45);
 }
 
 .accordion-title {

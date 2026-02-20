@@ -180,6 +180,68 @@ function handleTabClick(tabId: Tab) {
   }
 }
 
+// Swipe gesture detection
+const touchStartX = ref(0);
+const touchStartY = ref(0);
+const touchEndX = ref(0);
+const touchEndY = ref(0);
+const isTransitioning = ref(false);
+
+const MIN_SWIPE_DISTANCE = 50; // Minimum distance to trigger swipe
+const MAX_VERTICAL_DISTANCE = 100; // Max vertical movement for horizontal swipe
+
+function handleTouchStart(event: TouchEvent) {
+  if (isTransitioning.value) return;
+  touchStartX.value = event.touches[0].clientX;
+  touchStartY.value = event.touches[0].clientY;
+}
+
+function handleTouchMove(event: TouchEvent) {
+  if (isTransitioning.value) return;
+  touchEndX.value = event.touches[0].clientX;
+  touchEndY.value = event.touches[0].clientY;
+}
+
+function handleTouchEnd() {
+  if (isTransitioning.value) return;
+  
+  const deltaX = touchEndX.value - touchStartX.value;
+  const deltaY = Math.abs(touchEndY.value - touchStartY.value);
+  
+  // Ignore if vertical movement is too large (likely scrolling)
+  if (deltaY > MAX_VERTICAL_DISTANCE) return;
+  
+  // Ignore if swipe distance is too small
+  if (Math.abs(deltaX) < MIN_SWIPE_DISTANCE) return;
+  
+  const currentIndex = tabs.findIndex(tab => tab.id === activeTab.value);
+  
+  // Swipe right = go to previous tab
+  if (deltaX > 0 && currentIndex > 0) {
+    isTransitioning.value = true;
+    activeTab.value = tabs[currentIndex - 1].id;
+    setTimeout(() => { isTransitioning.value = false; }, 300);
+  }
+  // Swipe left = go to next tab
+  else if (deltaX < 0 && currentIndex < tabs.length - 1) {
+    isTransitioning.value = true;
+    activeTab.value = tabs[currentIndex + 1].id;
+    setTimeout(() => { isTransitioning.value = false; }, 300);
+  }
+  
+  // Reset values
+  touchStartX.value = 0;
+  touchStartY.value = 0;
+  touchEndX.value = 0;
+  touchEndY.value = 0;
+}
+
+// Computed property for slide animation
+const slideTransform = computed(() => {
+  const currentIndex = tabs.findIndex(tab => tab.id === activeTab.value);
+  return `translateX(-${currentIndex * 100}%)`;
+});
+
 </script>
 
 <template>
@@ -260,10 +322,27 @@ function handleTabClick(tabId: Tab) {
       <div class="nav-divider"></div>
     </div>
     
-    <main class="app-main" :class="{ 'live-fullscreen': hideUI }" @click="handleMainClick">
-      <MobileControls v-if="activeTab === 'controls'" ref="mobileControlsRef" />
-      <MobileScales v-if="activeTab === 'settings'" ref="mobileScalesRef" />
-      <MobileSliders v-if="activeTab === 'sliders'" ref="mobileSlidersRef" />
+    <main 
+      class="app-main" 
+      :class="{ 'live-fullscreen': hideUI }" 
+      @click="handleMainClick"
+      @touchstart="handleTouchStart"
+      @touchmove="handleTouchMove"
+      @touchend="handleTouchEnd"
+    >
+      <div class="tab-slider-wrapper">
+        <div class="tab-slider" :style="{ transform: slideTransform }">
+          <div class="tab-page">
+            <MobileScales ref="mobileScalesRef" />
+          </div>
+          <div class="tab-page">
+            <MobileControls ref="mobileControlsRef" />
+          </div>
+          <div class="tab-page">
+            <MobileSliders ref="mobileSlidersRef" />
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 </template>
@@ -476,7 +555,7 @@ body {
   transition: opacity 0.2s, font-weight 0.2s;
   position: relative;
   white-space: nowrap;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .nav-tab:hover {
@@ -668,10 +747,34 @@ body {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  overflow: hidden; /* Hide content outside visible area for sliding */
 }
 
 .app-main.live-fullscreen {
   padding-bottom: 0;
+}
+
+/* Swipe gesture slide animation */
+.tab-slider-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.tab-slider {
+  display: flex;
+  height: 100%;
+  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  will-change: transform;
+}
+
+.tab-page {
+  min-width: 100%;
+  width: 100%;
+  flex-shrink: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Responsive adjustments using CSS media queries only */

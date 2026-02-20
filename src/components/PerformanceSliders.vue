@@ -1262,7 +1262,7 @@ defineExpose({
 .btn-live {
   flex: 0 0 auto;
   padding: 0.5rem 1.25rem;
-  background: rgba(149, 151, 172, 0.2);
+  background: rgba(106, 104, 83, 0.2);
   border: none;
   color: #EAEAEA;
   font-size: 0.8125rem;
@@ -1277,12 +1277,12 @@ defineExpose({
 }
 
 .btn-live:hover {
-  background: rgba(149, 151, 172, 0.3);
+  background: rgba(106, 104, 83, 0.3);
   font-weight: 700;
 }
 
 .btn-live:active {
-  background: rgba(149, 151, 172, 0.45);
+  background: rgba(106, 104, 83, 0.45);
 }
 
 .explainer-text {
@@ -1311,13 +1311,13 @@ defineExpose({
   align-items: center;
   gap: 0.01rem;
   padding: 0.25rem 1rem;
-  background: rgba(149, 151, 172, 0.2);
+  background: rgba(106, 104, 83, 0.2);
   border-radius: 6px;
   transition: background 0.2s;
 }
 
 .slider-row:hover {
-  background: rgba(149, 151, 172, 0.3);
+  background: rgba(106, 104, 83, 0.3);
 }
 
 .color-section {
@@ -1591,7 +1591,7 @@ defineExpose({
 
 .prompt-subtext {
   font-family: 'Roboto Mono';
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: rgba(234, 234, 234, 0.6);
 }
 

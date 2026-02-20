@@ -265,7 +265,7 @@ function snapToNearest() {
 
 .picker-btn {
   font-family: 'Roboto Mono';
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   background: transparent;
   border: none;
   color: var(--color-text);

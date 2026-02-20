@@ -1,15 +1,15 @@
 <template>
   <div class="preset-manager">
     <!-- Device Presets Section (if supported) -->
-    <div v-if="hasDevicePresetSupport && isConnected" class="preset-section">
+    <div v-if="hasDevicePresetSupport" class="preset-section">
       <!-- Create New Embedded Flash Preset Button -->
-      <button class="btn-create-preset" @click="createNewFlashPreset">
+      <button class="btn-create-preset" @click="createNewFlashPreset" :disabled="!isConnected">
         + Create New Embedded Flash Preset
       </button>
       
       <!-- Slot Indicator -->
       <div class="slot-indicator">
-        <button class="btn-refresh" @click="refreshSlots" title="Refresh device slots">
+        <button class="btn-refresh" @click="refreshSlots" title="Refresh device slots" :disabled="!isConnected">
           ↻
         </button>
         <div class="slot-boxes">
@@ -22,7 +22,8 @@
                 empty: !getDevicePreset(slot - 1).isValid
               }"
               :title="getDevicePreset(slot - 1).isValid ? getDevicePreset(slot - 1).name : `Slot ${slot} (Empty)`"
-              @click="handleSlotIndicatorClick(slot - 1)"
+              @click="isConnected && handleSlotIndicatorClick(slot - 1)"
+              :style="{ cursor: isConnected ? (getDevicePreset(slot - 1).isValid ? 'pointer' : 'default') : 'not-allowed' }"
             >
               <span class="slot-number">{{ slot }}</span>
             </div>
@@ -43,15 +44,16 @@
           }"
         >
           <!-- Checkbox for selection (shy - only shows when in selection mode) -->
-          <div v-if="showCheckboxes" class="preset-checkbox" @click.stop="toggleDeviceSlotSelection(slot - 1)">
+          <div v-if="showCheckboxes" class="preset-checkbox" @click.stop="isConnected && toggleDeviceSlotSelection(slot - 1)">
             <input 
               type="checkbox" 
               :checked="selectedDeviceSlots.has(slot - 1)"
+              :disabled="!isConnected"
               @change="toggleDeviceSlotSelection(slot - 1)"
             />
           </div>
           
-          <div class="preset-info" @click="toggleDeviceSlotSelection(slot - 1)" style="cursor: pointer;">
+          <div class="preset-info" @click="isConnected && toggleDeviceSlotSelection(slot - 1)" :style="{ cursor: isConnected ? 'pointer' : 'not-allowed' }">
             <div class="preset-name">
               <span class="active-indicator" v-if="activeDeviceSlot === (slot - 1)">●</span>
               <span v-if="getDevicePreset(slot - 1).isValid">{{ getDevicePreset(slot - 1).name }}</span>
@@ -66,19 +68,21 @@
             <button 
               class="btn-small" 
               @click="loadFromDevice(slot - 1)" 
-              :disabled="!getDevicePreset(slot - 1).isValid"
+              :disabled="!isConnected || !getDevicePreset(slot - 1).isValid"
               title="Load preset from device">
               Load
             </button>
             <button 
               class="btn-small" 
               @click="saveToDevice(slot - 1)" 
+              :disabled="!isConnected"
               :title="getDevicePreset(slot - 1).isValid ? 'Overwrite with current settings' : 'Save current settings to this slot'">
               Save
             </button>
             <button 
               class="btn-small btn-menu" 
               @click="toggleMenu(`device-${slot - 1}`)" 
+              :disabled="!isConnected"
               title="More options">
               ⋯
             </button>

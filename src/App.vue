@@ -13,6 +13,8 @@ const {
   isConnected, 
   connect,
   disconnect,
+  devMode,
+  setDevMode,
 } = useDeviceState();
 
 // Single unified tab state
@@ -34,6 +36,42 @@ const showContextualModal = ref(false);
 // Theme state
 const THEME_KEY = 'kb1-theme-preference';
 const isDarkMode = ref(localStorage.getItem(THEME_KEY) !== 'light');
+
+// Secret dev mode toggle (tap logo 5 times)
+const logoClickCount = ref(0);
+const logoClickTimer = ref<number | null>(null);
+const showDevModeModal = ref(false);
+
+// Show counter after 2nd tap
+const showTapCounter = computed(() => logoClickCount.value >= 2 && logoClickCount.value < 5);
+
+function handleLogoClick() {
+  logoClickCount.value++;
+  
+  // Reset timer
+  if (logoClickTimer.value) clearTimeout(logoClickTimer.value);
+  
+  // If 5 clicks reached, toggle dev mode and show modal
+  if (logoClickCount.value >= 5) {
+    showDevModeModal.value = true;
+    logoClickCount.value = 0;
+    return;
+  }
+  
+  // Reset count after 2 seconds of no clicks
+  logoClickTimer.value = setTimeout(() => {
+    logoClickCount.value = 0;
+    logoClickTimer.value = null;
+  }, 2000);
+}
+
+function toggleDevMode() {
+  setDevMode(!devMode.value);
+}
+
+function closeDevModeModal() {
+  showDevModeModal.value = false;
+}
 
 // Computed property for theme icon
 const themeIcon = computed(() => {
@@ -197,8 +235,10 @@ function handleTabClick(tabId: Tab) {
     <header v-if="!hideUI" class="app-header">
       <div class="header-content">
         <!-- KB1 logo - centered, no buttons -->
-        <div class="logo-section">
+        <div class="logo-section" @click="handleLogoClick" style="cursor: pointer; position: relative;">
           <img src="/kb1_title.svg" alt="KB1 CONFIGURATOR" class="header-logo" />
+          <!-- Tap counter (shows after 2nd tap) -->
+          <div v-if="showTapCounter" class="tap-counter">{{ logoClickCount }}</div>
         </div>
       </div>
       
@@ -262,6 +302,41 @@ function handleTabClick(tabId: Tab) {
       <MobileScales v-if="activeTab === 'settings'" ref="mobileScalesRef" />
       <MobileSliders v-if="activeTab === 'sliders'" ref="mobileSlidersRef" />
     </main>
+    
+    <!-- Pulsing Red Dot - Dev Mode Indicator -->
+    <div v-if="devMode" class="dev-mode-indicator" title="Developer Mode Active">
+      <div class="pulse-dot"></div>
+    </div>
+    
+    <!-- Secret Dev Mode Modal -->
+    <div v-if="showDevModeModal" class="dev-mode-modal-overlay" @click.self="closeDevModeModal">
+      <div class="dev-mode-modal">
+        <h2>🔧 Developer Mode</h2>
+        <div class="modal-content">
+          <div class="dev-mode-warning">
+            <p><strong>⚠️ Warning:</strong> Developer mode simulates device connection with mock data.</p>
+            <p>This is intended for development and testing purposes only.</p>
+            <p class="status-line"><strong>Current Status:</strong> <span :class="{ 'status-enabled': devMode, 'status-disabled': !devMode }">{{ devMode ? 'ENABLED' : 'DISABLED' }}</span></p>
+          </div>
+          
+          <div class="dev-mode-toggle">
+            <label class="toggle-switch">
+              <input type="checkbox" :checked="devMode" @change="toggleDevMode" />
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">{{ devMode ? 'Disable' : 'Enable' }} Developer Mode</span>
+          </div>
+          
+          <div class="modal-note">
+            <p>💡 Tip: Tap the logo 5 times to toggle this menu</p>
+          </div>
+        </div>
+        
+        <div class="dev-mode-actions">
+          <button class="btn-modal-close" @click="closeDevModeModal">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -737,5 +812,257 @@ body {
   .bluetooth-icon {
     height: 24px;
   }
+}
+
+/* ===== Dev Mode Components ===== */
+
+/* Tap Counter */
+.tap-counter {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #F9AC20;
+  color: #0F0F0F;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: 'Roboto Mono', monospace;
+  padding: 0.25rem 0.5rem;
+  border-radius: 50%;
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bounce-in 0.2s ease-out;
+  box-shadow: 0 2px 8px rgba(249, 172, 32, 0.4);
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Pulsing Red Dot Indicator */
+.dev-mode-indicator {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.pulse-dot {
+  width: 12px;
+  height: 12px;
+  background: #ef4444;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.3);
+  }
+}
+
+/* Dev Mode Modal */
+.dev-mode-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+
+.dev-mode-modal {
+  background: var(--color-background);
+  border: 2px solid #F9AC20;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  animation: modal-slide-in 0.3s ease-out;
+}
+
+@keyframes modal-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dev-mode-modal h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #F9AC20;
+  font-family: 'Roboto Mono', monospace;
+  text-align: center;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dev-mode-warning {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  padding: 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.dev-mode-warning p {
+  margin: 0 0 0.5rem 0;
+}
+
+.dev-mode-warning p:last-child {
+  margin-bottom: 0;
+}
+
+.status-line {
+  font-size: 0.875rem;
+  margin-top: 0.75rem !important;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.status-enabled {
+  color: #10b981;
+  font-weight: 700;
+}
+
+.status-disabled {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.dev-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(249, 172, 32, 0.1);
+  border: 1px solid rgba(249, 172, 32, 0.3);
+  border-radius: 6px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: 0.3s;
+  border-radius: 28px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: #F9AC20;
+  border-color: #F9AC20;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(22px);
+}
+
+.toggle-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.modal-note {
+  background: rgba(249, 172, 32, 0.05);
+  border: 1px solid rgba(249, 172, 32, 0.2);
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.modal-note p {
+  margin: 0;
+}
+
+.dev-mode-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.btn-modal-close {
+  padding: 0.5rem 2rem;
+  background: rgba(249, 172, 32, 0.2);
+  border: 1px solid rgba(249, 172, 32, 0.4);
+  color: var(--color-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.btn-modal-close:hover {
+  background: rgba(249, 172, 32, 0.3);
+  border-color: rgba(249, 172, 32, 0.6);
+  box-shadow: 0 0 8px rgba(249, 172, 32, 0.3);
+}
+
+.btn-modal-close:active {
+  transform: scale(0.98);
 }
 </style>

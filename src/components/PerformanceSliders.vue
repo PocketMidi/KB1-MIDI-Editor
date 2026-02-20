@@ -1038,7 +1038,7 @@ defineExpose({
     <div v-if="viewMode === 'setup'" class="setup-mode" @click="closeColorPicker">
       <!-- Header -->
       <div class="setup-header">
-        <button class="btn-live" @click="enterLiveMode">ENTER LIVE MODE</button>
+        <button class="btn-live" @click="enterLiveMode">+ Enter Live Mode</button>
         <div class="explainer-text" :class="{ fading: explainerFading }">
           {{ explainerText }}
         </div>
@@ -1245,10 +1245,9 @@ defineExpose({
 
 .setup-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .setup-header h2 {
@@ -1260,29 +1259,32 @@ defineExpose({
 }
 
 .btn-live {
-  flex: 0 0 auto;
-  padding: 0.5rem 1.25rem;
-  background: rgba(106, 104, 83, 0.2);
-  border: none;
+  width: 100%;
+  padding: 0.25rem 1rem;
+  background: rgba(249, 172, 32, 0.15);
+  border: 1px solid rgba(249, 172, 32, 0.3);
   color: #EAEAEA;
   font-size: 0.8125rem;
   font-weight: 500;
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s;
-  font-family: 'Roboto Mono';
-  text-transform: uppercase;
-  text-align: left;
-  white-space: nowrap;
+  transition: all 0.2s ease;
+  font-family: 'Roboto Mono', monospace;
+  box-shadow: 0 0 0 rgba(249, 172, 32, 0);
 }
 
 .btn-live:hover {
-  background: rgba(106, 104, 83, 0.3);
-  font-weight: 700;
+  background: rgba(249, 172, 32, 0.25);
+  border-color: rgba(249, 172, 32, 0.5);
+  box-shadow: 0 0 8px rgba(249, 172, 32, 0.3);
+  color: #F9AC20;
 }
 
 .btn-live:active {
-  background: rgba(106, 104, 83, 0.45);
+  background: rgba(249, 172, 32, 0.35);
+  border-color: #F9AC20;
+  box-shadow: 0 0 12px rgba(249, 172, 32, 0.4);
+  transform: scale(0.98);
 }
 
 .explainer-text {

@@ -422,6 +422,11 @@
   background: rgba(149, 151, 172, 0.25) !important;
 }
 
+/* Invert entire slot indicator for light mode */
+.theme-kb1-light .slot-indicator {
+  filter: invert(1);
+}
+
 /* Invert piano keys for light mode */
 .theme-kb1-light .key,
 .theme-kb1-light .key.active,

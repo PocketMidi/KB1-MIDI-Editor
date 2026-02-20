@@ -773,20 +773,31 @@ function formatDate(timestamp: number): string {
 .btn-create-preset {
   width: 100%;
   padding: 0.25rem 1rem;
-  background: rgba(106, 104, 83, 0.2);
-  border: none;
+  background: rgba(249, 172, 32, 0.15);
+  border: 1px solid rgba(249, 172, 32, 0.3);
   color: #EAEAEA;
   font-size: 0.8125rem;
   font-weight: 500;
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   font-family: 'Roboto Mono', monospace;
   margin-bottom: 1rem;
+  box-shadow: 0 0 0 rgba(249, 172, 32, 0);
 }
 
 .btn-create-preset:hover {
-  background: rgba(106, 104, 83, 0.3);
+  background: rgba(249, 172, 32, 0.25);
+  border-color: rgba(249, 172, 32, 0.5);
+  box-shadow: 0 0 8px rgba(249, 172, 32, 0.3);
+  color: #F9AC20;
+}
+
+.btn-create-preset:active {
+  background: rgba(249, 172, 32, 0.35);
+  border-color: #F9AC20;
+  box-shadow: 0 0 12px rgba(249, 172, 32, 0.4);
+  transform: scale(0.98);
 }
 
 /* Slot Indicator */
@@ -1305,11 +1316,24 @@ function formatDate(timestamp: number): string {
 }
 
 .btn-create {
-  background: rgba(106, 104, 83, 0.3) !important;
+  background: rgba(249, 172, 32, 0.2) !important;
+  border: 1px solid rgba(249, 172, 32, 0.3) !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 0 0 rgba(249, 172, 32, 0) !important;
 }
 
 .btn-create:hover {
-  background: rgba(106, 104, 83, 0.5) !important;
+  background: rgba(249, 172, 32, 0.3) !important;
+  border-color: rgba(249, 172, 32, 0.6) !important;
+  box-shadow: 0 0 10px rgba(249, 172, 32, 0.35) !important;
+  color: #F9AC20 !important;
+}
+
+.btn-create:active {
+  background: rgba(249, 172, 32, 0.4) !important;
+  border-color: #F9AC20 !important;
+  box-shadow: 0 0 14px rgba(249, 172, 32, 0.45) !important;
+  transform: scale(0.98) !important;
 }
 
 .section-divider {

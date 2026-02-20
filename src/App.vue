@@ -39,7 +39,7 @@ const isDarkMode = ref(localStorage.getItem(THEME_KEY) !== 'light');
 
 // Secret dev mode toggle (tap logo 5 times)
 const logoClickCount = ref(0);
-const logoClickTimer = ref<number | null>(null);
+const logoClickTimer = ref<ReturnType<typeof setTimeout> | null>(null);
 const showDevModeModal = ref(false);
 
 // Show counter after 2nd tap

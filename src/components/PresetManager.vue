@@ -1,5 +1,51 @@
 <template>
   <div class="preset-manager">
+    <!-- Device Presets Section (if supported) -->
+    <div v-if="hasDevicePresetSupport && isConnected" class="preset-section">
+      <h4 class="section-title">Device Presets (On KB1)</h4>
+      <p class="section-subtitle">Stored in KB1 flash memory • 8 slots</p>
+      
+      <div class="device-presets-grid">
+        <div
+          v-for="slot in 8"
+          :key="`device-${slot - 1}`"
+          class="device-preset-slot"
+          :class="{ 
+            empty: !getDevicePreset(slot - 1).isValid,
+            active: activeDeviceSlot === (slot - 1)
+          }"
+        >
+          <div class="slot-number">Slot {{ slot }}</div>
+          
+          <div v-if="getDevicePreset(slot - 1).isValid" class="slot-content">
+            <div class="slot-name">{{ getDevicePreset(slot - 1).name }}</div>
+            <div class="slot-actions">
+              <button class="btn-small" @click="loadFromDevice(slot - 1)" title="Load preset from device">
+                Load
+              </button>
+              <button class="btn-small" @click="saveToDevice(slot - 1)" title="Overwrite with current settings">
+                Save
+              </button>
+              <button class="btn-small btn-danger" @click="deleteFromDevice(slot - 1)" title="Delete from device">
+                Del
+              </button>
+            </div>
+          </div>
+          
+          <div v-else class="slot-empty">
+            <button class="btn-small btn-create" @click="saveToDevice(slot - 1)" title="Save current settings to this slot">
+              + Save Here
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Divider between device and browser presets -->
+    <div v-if="hasDevicePresetSupport && isConnected" class="section-divider">
+      <span>Browser Presets (Local Storage)</span>
+    </div>
+    
     <!-- Create New Preset Button -->
     <button class="btn-create-preset" @click="showCreateDialog = true">
       + Create New Preset
@@ -155,6 +201,16 @@
 import { ref, onMounted, nextTick, watch } from 'vue';
 import { PresetStore, generateRandomName, type Preset } from '../state/presets';
 import type { DeviceSettings } from '../ble/kb1Protocol';
+import { useDeviceState } from '../composables/useDeviceState';
+
+const {
+  isConnected,
+  hasDevicePresetSupport,
+  devicePresets,
+  saveDevicePreset,
+  loadDevicePreset,
+  deleteDevicePreset,
+} = useDeviceState();
 
 const props = defineProps<{
   currentSettings: DeviceSettings;
@@ -188,11 +244,77 @@ const renameInput = ref<HTMLInputElement | null>(null);
 // File input
 const fileInput = ref<HTMLInputElement | null>(null);
 
+// Device preset state
+const activeDeviceSlot = ref<number | null>(null);
+
 // Load presets on mount
 onMounted(() => {
   refreshPresets();
   activePresetId.value = PresetStore.getActivePresetId();
 });
+
+// Helper to get device preset by slot
+function getDevicePreset(slot: number) {
+  return devicePresets.value[slot] || { 
+    slot, 
+    name: '[Empty]', 
+    timestamp: 0, 
+    isValid: false 
+  };
+}
+
+// Device preset operations
+async function saveToDevice(slot: number) {
+  const name = prompt('Enter preset name (max 32 characters):', `Preset ${slot + 1}`);
+  if (!name) return;
+  
+  try {
+    await saveDevicePreset(slot, name.slice(0, 32));
+    activeDeviceSlot.value = slot;
+    alert(`Saved to device slot ${slot + 1}`);
+  } catch (error) {
+    console.error('Failed to save device preset:', error);
+    alert('Failed to save to device');
+  }
+}
+
+async function loadFromDevice(slot: number) {
+  const preset = getDevicePreset(slot);
+  if (!preset.isValid) {
+    alert('Slot is empty');
+    return;
+  }
+  
+  try {
+    await loadDevicePreset(slot);
+    activeDeviceSlot.value = slot;
+    // Clear browser preset active state
+    activePresetId.value = null;
+    emit('presetActivated', null);
+    alert(`Loaded from device slot ${slot + 1}: "${preset.name}"`);
+  } catch (error) {
+    console.error('Failed to load device preset:', error);
+    alert('Failed to load from device');
+  }
+}
+
+async function deleteFromDevice(slot: number) {
+  const preset = getDevicePreset(slot);
+  if (!confirm(`Delete "${preset.name}" from slot ${slot + 1}?`)) return;
+  
+  try {
+    await deleteDevicePreset(slot);
+    if (activeDeviceSlot.value === slot) {
+      activeDeviceSlot.value = null;
+    }
+    alert(`Deleted from device slot ${slot + 1}`);
+  } catch (error) {
+    console.error('Failed to delete device preset:', error);
+    alert('Failed to delete device preset');
+  }
+}
+
+// Load presets on mount
 
 // Auto-focus inputs when dialogs open
 watch(showCreateDialog, async (show) => {
@@ -786,4 +908,138 @@ function formatDate(timestamp: number): string {
     padding: 0.25rem 0.5rem;
   }
 }
+
+/* Device Presets Section */
+.preset-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text);
+  margin-bottom: 0.25rem;
+}
+
+.section-subtitle {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+
+.device-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.device-preset-slot {
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 0.75rem;
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s, background-color 0.2s;
+  background: rgba(234, 234, 234, 0.02);
+}
+
+.device-preset-slot.active {
+  border-color: var(--accent-highlight);
+  background: rgba(106, 104, 83, 0.1);
+}
+
+.device-preset-slot.empty {
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+.device-preset-slot:hover:not(.empty) {
+  border-color: rgba(234, 234, 234, 0.3);
+}
+
+.slot-number {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.slot-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.slot-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  word-break: break-word;
+  color: var(--color-text);
+  flex: 1;
+}
+
+.slot-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.slot-actions .btn-small {
+  flex: 1;
+  min-width: 45px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+}
+
+.slot-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-create {
+  background: rgba(106, 104, 83, 0.3) !important;
+}
+
+.btn-create:hover {
+  background: rgba(106, 104, 83, 0.5) !important;
+}
+
+.section-divider {
+  margin: 2rem 0;
+  text-align: center;
+  position: relative;
+}
+
+.section-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--color-divider);
+}
+
+.section-divider span {
+  position: relative;
+  background: var(--color-background);
+  padding: 0 1rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .device-presets-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 </style>
+

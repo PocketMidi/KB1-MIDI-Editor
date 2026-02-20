@@ -115,6 +115,25 @@ export interface KB1DeviceState {
 }
 
 /**
+ * Device preset metadata (from firmware)
+ */
+export interface DevicePresetMetadata {
+  slot: number;           // 0-7
+  name: string;           // Max 32 chars
+  timestamp: number;      // Unix timestamp
+  isValid: boolean;       // true if slot has data
+}
+
+/**
+ * Device preset system constants
+ */
+export const DEVICE_PRESET = {
+  MAX_SLOTS: 8,
+  NAME_MAX_LENGTH: 32,
+  EMPTY_SLOT_NAME: '[Empty]',
+} as const;
+
+/**
  * Message types for KB1 protocol
  */
 export enum KB1MessageType {

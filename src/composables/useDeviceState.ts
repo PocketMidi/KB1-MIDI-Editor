@@ -7,7 +7,7 @@
 
 import { ref, computed } from 'vue';
 import { bleClient, type BLEConnectionStatus } from '../ble/bleClient';
-import { kb1Protocol, type CCMapping, type DeviceSettings } from '../ble/kb1Protocol';
+import { kb1Protocol, type CCMapping, type DeviceSettings, type DevicePresetMetadata, DEVICE_PRESET } from '../ble/kb1Protocol';
 
 // ============================================
 // DEV MODE - Set to true to work without hardware
@@ -410,6 +410,102 @@ export function useDeviceState() {
     connectionStatus.value.device?.name || 'No device'
   );
 
+  // ============================================
+  // Device Preset Management (Stub for testing UI)
+  // ============================================
+  
+  const devicePresets = ref<DevicePresetMetadata[]>([]);
+  const hasDevicePresetSupport = ref(false);
+  
+  // Initialize with mock data for UI testing
+  if (DEV_MODE) {
+    hasDevicePresetSupport.value = true;
+    devicePresets.value = [
+      { slot: 0, name: 'Ambient Pad', timestamp: Date.now() / 1000, isValid: true },
+      { slot: 1, name: 'Bass Heavy', timestamp: Date.now() / 1000 - 86400, isValid: true },
+      { slot: 2, name: DEVICE_PRESET.EMPTY_SLOT_NAME, timestamp: 0, isValid: false },
+      { slot: 3, name: 'Performance', timestamp: Date.now() / 1000 - 172800, isValid: true },
+      { slot: 4, name: DEVICE_PRESET.EMPTY_SLOT_NAME, timestamp: 0, isValid: false },
+      { slot: 5, name: DEVICE_PRESET.EMPTY_SLOT_NAME, timestamp: 0, isValid: false },
+      { slot: 6, name: DEVICE_PRESET.EMPTY_SLOT_NAME, timestamp: 0, isValid: false },
+      { slot: 7, name: DEVICE_PRESET.EMPTY_SLOT_NAME, timestamp: 0, isValid: false },
+    ];
+  }
+  
+  const refreshDevicePresets = async () => {
+    if (DEV_MODE) {
+      console.log('🔧 DEV MODE: Refreshing device presets (mock)');
+      return;
+
+    }
+    
+    // TODO: Implement real BLE preset list
+    console.log('Device presets: Real implementation pending firmware update');
+  };
+  
+  const saveDevicePreset = async (slot: number, name: string) => {
+    if (slot < 0 || slot >= DEVICE_PRESET.MAX_SLOTS) {
+      throw new Error(`Invalid slot: ${slot}`);
+    }
+    
+    if (DEV_MODE) {
+      console.log(`🔧 DEV MODE: Saving to device slot ${slot}: "${name}"`);
+      // Update mock data
+      devicePresets.value[slot] = {
+        slot,
+        name: name.slice(0, DEVICE_PRESET.NAME_MAX_LENGTH),
+        timestamp: Date.now() / 1000,
+        isValid: true,
+      };
+      return;
+    }
+    
+    // TODO: Implement real BLE preset save
+    console.log(`Save to device slot ${slot}: ${name}`);
+  };
+  
+  const loadDevicePreset = async (slot: number) => {
+    if (slot < 0 || slot >= DEVICE_PRESET.MAX_SLOTS) {
+      throw new Error(`Invalid slot: ${slot}`);
+    }
+    
+    if (DEV_MODE) {
+      console.log(`🔧 DEV MODE: Loading from device slot ${slot}`);
+      const preset = devicePresets.value[slot];
+      if (preset.isValid) {
+        console.log(`Loaded preset: "${preset.name}"`);
+        // In real implementation, this would update deviceSettings
+      } else {
+        throw new Error('Slot is empty');
+      }
+      return;
+    }
+    
+    // TODO: Implement real BLE preset load
+    console.log(`Load from device slot ${slot}`);
+  };
+  
+  const deleteDevicePreset = async (slot: number) => {
+    if (slot < 0 || slot >= DEVICE_PRESET.MAX_SLOTS) {
+      throw new Error(`Invalid slot: ${slot}`);
+    }
+    
+    if (DEV_MODE) {
+      console.log(`🔧 DEV MODE: Deleting device slot ${slot}`);
+      // Update mock data
+      devicePresets.value[slot] = {
+        slot,
+        name: DEVICE_PRESET.EMPTY_SLOT_NAME,
+        timestamp: 0,
+        isValid: false,
+      };
+      return;
+    }
+    
+    // TODO: Implement real BLE preset delete
+    console.log(`Delete device slot ${slot}`);
+  };
+
   return {
     // State
     connectionStatus,
@@ -436,5 +532,13 @@ export function useDeviceState() {
     captureBaseline,
     recallBaseline,
     resetToDefaults,
+    
+    // Device Presets
+    devicePresets,
+    hasDevicePresetSupport,
+    refreshDevicePresets,
+    saveDevicePreset,
+    loadDevicePreset,
+    deleteDevicePreset,
   };
 }

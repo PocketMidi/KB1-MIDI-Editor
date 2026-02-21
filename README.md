@@ -2,6 +2,16 @@
 
 KB1 config is a browser-based configuration tool for the PocketMidi KB1 device. Configure lever behavior, touch sensitivity, scales, system settings, and control 12 customizable performance sliders wirelessly over Bluetooth directly from your browser.
 
+## Configuration Flexibility
+
+The KB1 system offers **~10²⁷ total unique configurations** (approximately 1 octillion possible combinations). When focusing on the most commonly adjusted parameters—CC numbers, min/max values, function modes, and interpolation curves—there are still **~10¹⁰ to 10¹² practical combinations** (10-100 billion distinct configurations).
+
+**Storage & Sharing:**
+- 8 preset slots on device for storing favorite configurations
+- Unlimited browser-based presets for sharing and experimenting
+
+The system is extraordinarily flexible for any performance or production workflow.
+
 ## Features
 
 ### ⚙️ SETTINGS Tab

@@ -162,6 +162,8 @@
       <AccordionSection
         ref="touchAccordion"
         title="TOUCH"
+        :title-suffix="touchSuffix"
+        :title-suffix-fading="touchSuffixFading"
         :subtitle="getTouchSubtitle(localSettings.touch)"
         :midi-cc="localSettings.touch.ccNumber"
         :id="'touch-sensor'"
@@ -175,6 +177,7 @@
           :categories="categories"
           :functionModes="touchFunctionModes"
           @update:modelValue="markChanged"
+          @modeChanged="handleTouchModeChange"
         />
       </AccordionSection>
       
@@ -265,6 +268,8 @@ const lever2Suffix = ref<string>('');
 const lever2SuffixFading = ref<boolean>(false);
 const leverPush2Suffix = ref<string>('');
 const leverPush2SuffixFading = ref<boolean>(false);
+const touchSuffix = ref<string>('');
+const touchSuffixFading = ref<boolean>(false);
 
 // Timeout IDs for clearing suffixes
 let lever1FadeTimeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -275,6 +280,8 @@ let lever2FadeTimeoutId: ReturnType<typeof setTimeout> | null = null;
 let lever2ClearTimeoutId: ReturnType<typeof setTimeout> | null = null;
 let leverPush2FadeTimeoutId: ReturnType<typeof setTimeout> | null = null;
 let leverPush2ClearTimeoutId: ReturnType<typeof setTimeout> | null = null;
+let touchFadeTimeoutId: ReturnType<typeof setTimeout> | null = null;
+let touchClearTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
 // Load CC map on mount
 onMounted(async () => {
@@ -299,6 +306,8 @@ onBeforeUnmount(() => {
   if (lever2ClearTimeoutId) clearTimeout(lever2ClearTimeoutId);
   if (leverPush2FadeTimeoutId) clearTimeout(leverPush2FadeTimeoutId);
   if (leverPush2ClearTimeoutId) clearTimeout(leverPush2ClearTimeoutId);
+  if (touchFadeTimeoutId) clearTimeout(touchFadeTimeoutId);
+  if (touchClearTimeoutId) clearTimeout(touchClearTimeoutId);
 });
 
 // CC Options
@@ -331,7 +340,7 @@ const leverPushFunctionModes = [
 ];
 
 const touchFunctionModes = [
-  { value: 0, label: 'Hold' },
+  { value: 0, label: 'Gate' },
   { value: 1, label: 'Toggle' },
   { value: 2, label: 'Continuous' },
 ];
@@ -523,6 +532,22 @@ function handleLeverPush2ProfileChange(profileName: string) {
 
 function handleLeverPush2BehaviourChange(behaviourName: string) {
   handleLeverPush2ProfileChange(behaviourName);
+}
+
+function handleTouchModeChange(modeName: string) {
+  if (touchFadeTimeoutId) clearTimeout(touchFadeTimeoutId);
+  if (touchClearTimeoutId) clearTimeout(touchClearTimeoutId);
+  touchSuffix.value = ` ${modeName}`;
+  touchSuffixFading.value = false;
+  touchFadeTimeoutId = setTimeout(() => {
+    touchSuffixFading.value = true;
+    touchFadeTimeoutId = null;
+  }, 500);
+  touchClearTimeoutId = setTimeout(() => {
+    touchSuffix.value = '';
+    touchSuffixFading.value = false;
+    touchClearTimeoutId = null;
+  }, 2500);
 }
 
 function handleSlotNameDisplay(name: string) {

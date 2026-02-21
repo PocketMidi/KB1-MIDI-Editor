@@ -325,7 +325,7 @@ const leverPushFunctionModes = [
 ];
 
 const touchFunctionModes = [
-  { value: 0, label: 'Hold' },
+  { value: 0, label: 'Gate' },
   { value: 1, label: 'Toggle' },
   { value: 2, label: 'Continuous' },
 ];

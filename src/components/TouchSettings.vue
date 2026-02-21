@@ -1,5 +1,40 @@
 <template>
   <div class="settings-touch">
+    <!-- Mode Selection -->
+    <div class="controls-row">
+      <div class="mode-selector">
+        <button 
+          class="mode-btn"
+          :class="{ active: model.functionMode === 2 }"
+          @click="selectMode(2)"
+          title="Continuous"
+        >
+          Cont
+        </button>
+        <button 
+          class="mode-btn"
+          :class="{ active: model.functionMode === 1 }"
+          @click="selectMode(1)"
+          title="Toggle"
+        >
+          Togg
+        </button>
+        <button 
+          class="mode-btn"
+          :class="{ active: model.functionMode === 0 }"
+          @click="selectMode(0)"
+          title="Gate"
+        >
+          Gate
+        </button>
+      </div>
+    </div>
+
+    <!-- Mode Visualization -->
+    <div class="mode-visualization">
+      <img :src="modeImage" alt="Touch Mode" class="mode-graph" />
+    </div>
+
     <!-- Level Meter -->
     <LevelMeter 
       :min="userMin" 
@@ -31,19 +66,6 @@
           @click="parameterPickerOpen = true"
         >
           {{ selectedParameterLabel }}
-        </button>
-      </div>
-      <div class="input-divider"></div>
-
-      <div class="group">
-        <label>MODE</label>
-        <button 
-          ref="modeTriggerRef"
-          class="picker-trigger"
-          :class="{ 'picker-open': modePickerOpen }"
-          @click="modePickerOpen = true"
-        >
-          {{ selectedModeLabel }}
         </button>
       </div>
       <div class="input-divider"></div>
@@ -103,14 +125,6 @@
       :options="filteredOptions"
       :trigger-el="parameterTriggerRef"
     />
-
-    <!-- Mode Wheel Picker Modal -->
-    <OptionWheelPicker
-      v-model="model.functionMode"
-      v-model:isOpen="modePickerOpen"
-      :options="functionModes"
-      :trigger-el="modeTriggerRef"
-    />
   </div>
 </template>
 
@@ -140,11 +154,39 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', v: TouchModel): void
+  (e: 'modeChanged', modeName: string): void
 }>()
 
 const model = computed({
   get: () => props.modelValue,
   set: v => emit('update:modelValue', v)
+})
+
+const BASE_PATH = import.meta.env.BASE_URL || '/'
+
+// Mode names for events
+const MODE_NAMES = {
+  0: 'Open Gate',
+  1: 'Toggle',
+  2: 'Continuous'
+} as const
+
+// Function to select mode and emit change
+function selectMode(mode: number) {
+  model.value.functionMode = mode
+  emit('modeChanged', MODE_NAMES[mode as keyof typeof MODE_NAMES])
+}
+
+// Mode visualization
+const modeImage = computed(() => {
+  // Function mode 0 = Hold, 1 = Toggle, 2 = Continuous
+  if (model.value.functionMode === 1) {
+    return `${BASE_PATH}touch/togg.svg`
+  } else if (model.value.functionMode === 2) {
+    return `${BASE_PATH}touch/cont.svg`
+  }
+  // Default to Hold (mode 0)
+  return `${BASE_PATH}touch/hold.svg`
 })
 
 // Initialize selectedCategory from current ccNumber's category (fallback to first available category)
@@ -163,18 +205,11 @@ const categoryPickerOpen = ref(false)
 const categoryTriggerRef = ref<HTMLElement | null>(null)
 const parameterPickerOpen = ref(false)
 const parameterTriggerRef = ref<HTMLElement | null>(null)
-const modePickerOpen = ref(false)
-const modeTriggerRef = ref<HTMLElement | null>(null)
 
 // Get selected labels
 const selectedParameterLabel = computed(() => {
   const option = filteredOptions.value.find(opt => opt.value === model.value.ccNumber)
   return option?.label || 'None'
-})
-
-const selectedModeLabel = computed(() => {
-  const mode = props.functionModes.find(m => m.value === model.value.functionMode)
-  return mode?.label || 'Unknown'
 })
 
 // Flag to prevent infinite watch loops
@@ -434,5 +469,69 @@ const userThreshold = computed({
   color: var(--color-text-muted);
   padding: 0.5rem 0 1rem 0;
   font-family: 'Roboto Mono';
+}
+
+/* Controls Row */
+.controls-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  width: 100%;
+}
+
+/* Mode Selector */
+.mode-selector {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.mode-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #848484;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s ease;
+  font-family: 'Roboto Mono';
+}
+
+.mode-btn:hover {
+  color: #CDCDCD;
+}
+
+.mode-btn.active {
+  color: #CDCDCD;
+}
+
+.mode-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #CDCDCD;
+}
+
+/* Mode Visualization */
+.mode-visualization {
+  margin: 0.5rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: auto;
+}
+
+.mode-visualization img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 </style>

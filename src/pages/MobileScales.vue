@@ -30,14 +30,14 @@
         />
       </AccordionSection>
       
-      <!-- Scales second -->
+      <!-- Keyboard second -->
       <AccordionSection
-        ref="scalesAccordion"
-        title="Scales"
-        :title-suffix="scalesSuffix"
-        :title-suffix-fading="scalesSuffixFading"
-        :subtitle="scalesSubtitle"
-        :id="'scales'"
+        ref="keyboardAccordion"
+        title="KEYBOARD"
+        :title-suffix="keyboardSuffix"
+        :title-suffix-fading="keyboardSuffixFading"
+        :subtitle="keyboardSubtitle"
+        :id="'keyboard'"
         :default-open="false"
       >
         <template #header-right>
@@ -45,12 +45,14 @@
             Root Note <span class="root-note-value">{{ currentRootNoteLabel }}</span>
           </div>
         </template>
-        <ScaleSettings
-          v-model="localSettings.scale"
+        <KeyboardSettings
+          v-model="keyboardModel"
           :scales="scales"
+          :chordTypes="chordTypes"
           :rootNotes="rootNotes"
-          @update:modelValue="markChanged"
+          @update:modelValue="handleKeyboardChange"
           @mappingChanged="handleMappingChange"
+          @chordStyleChanged="handleChordStyleChange"
         />
       </AccordionSection>
       
@@ -208,7 +210,7 @@ import type {
   TouchSettings as TouchSettingsType 
 } from '../ble/kb1Protocol';
 import StickyActionBar from '../components/StickyActionBar.vue';
-import ScaleSettings from '../components/ScaleSettings.vue';
+import KeyboardSettings from '../components/KeyboardSettings.vue';
 import AccordionSection from '../components/AccordionSection.vue';
 import SystemSettings from '../components/SystemSettings.vue';
 import PresetManager from '../components/PresetManager.vue';
@@ -249,10 +251,10 @@ const activePresetId = ref<string | null>(PresetStore.getActivePresetId());
 const activePresetName = ref<string>('');
 
 // State for temporary accordion title suffix (fade-in/out effect)
-const scalesSuffix = ref<string>('');
-const scalesSuffixFading = ref<boolean>(false);
-let scalesFadeTimeoutId: number | null = null;
-let scalesClearTimeoutId: number | null = null;
+const keyboardSuffix = ref<string>('');
+const keyboardSuffixFading = ref<boolean>(false);
+let keyboardFadeTimeoutId: number | null = null;
+let keyboardClearTimeoutId: number | null = null;
 
 const presetsSuffix = ref<string>('');
 const presetsSuffixFading = ref<boolean>(false);
@@ -294,8 +296,8 @@ onMounted(async () => {
 
 // Cleanup timeouts on unmount
 onBeforeUnmount(() => {
-  if (scalesFadeTimeoutId) clearTimeout(scalesFadeTimeoutId);
-  if (scalesClearTimeoutId) clearTimeout(scalesClearTimeoutId);
+  if (keyboardFadeTimeoutId) clearTimeout(keyboardFadeTimeoutId);
+  if (keyboardClearTimeoutId) clearTimeout(keyboardClearTimeoutId);
   if (presetsFadeTimeoutId) clearTimeout(presetsFadeTimeoutId);
   if (presetsClearTimeoutId) clearTimeout(presetsClearTimeoutId);
   if (lever1FadeTimeoutId) clearTimeout(lever1FadeTimeoutId);
@@ -371,6 +373,18 @@ const scales = [
   { value: 10, label: 'Pentatonic Minor' },
 ];
 
+// Chord Types
+const chordTypes = [
+  { value: 0, label: 'Off' },
+  { value: 1, label: 'Major' },
+  { value: 2, label: 'Minor' },
+  { value: 3, label: 'Diminished' },
+  { value: 4, label: 'Augmented' },
+  { value: 5, label: 'Sus2' },
+  { value: 6, label: 'Sus4' },
+  { value: 7, label: 'Power' },
+];
+
 // Root Notes (MIDI note numbers - firmware uses these as absolute pitches)
 const rootNotes = [
   { value: 60, label: 'C' },
@@ -387,19 +401,61 @@ const rootNotes = [
   { value: 71, label: 'B' },
 ];
 
+// Keyboard play mode (reactive state)
+const playMode = ref<'scale' | 'chord'>('scale');
+
+// Chord settings (temporary until firmware supports it)
+const chordSettings = ref({
+  chordType: 1, // Default: Major
+  rootNote: 60, // Default: C
+  velocitySpread: 25, // Default: 25%
+  strumMode: false, // Default: chord (not strum)
+  strumSpeed: 25, // Default: 25ms
+});
+
+// Keyboard model that wraps scale data for the component
+const keyboardModel = computed({
+  get: () => ({
+    mode: playMode.value,
+    scale: localSettings.value.scale,
+    chord: chordSettings.value
+  }),
+  set: (v) => {
+    // Update play mode
+    playMode.value = v.mode;
+    // Update scale data in localSettings
+    localSettings.value.scale = v.scale;
+    // Update chord settings (temporary until firmware supports it)
+    chordSettings.value = v.chord;
+  }
+});
+
 // Computed properties for accordion header display
 const currentScaleLabel = computed(() => {
   const scale = scales.find(s => s.value === localSettings.value.scale.scaleType);
   return scale ? scale.label : 'Unknown';
 });
 
+const currentChordLabel = computed(() => {
+  const chord = chordTypes.find(c => c.value === chordSettings.value.chordType);
+  return chord ? chord.label : 'Off';
+});
+
 const currentRootNoteLabel = computed(() => {
-  const rootNote = rootNotes.find(n => n.value === localSettings.value.scale.rootNote);
+  // Use scale root note in scale mode, chord root note in chord mode
+  const rootNoteValue = playMode.value === 'scale' 
+    ? localSettings.value.scale.rootNote 
+    : chordSettings.value.rootNote;
+  const rootNote = rootNotes.find(n => n.value === rootNoteValue);
   return rootNote ? rootNote.label : 'C';
 });
 
-const scalesSubtitle = computed(() => {
-  return currentScaleLabel.value;
+const keyboardSubtitle = computed(() => {
+  // Show current mode and type
+  if (playMode.value === 'chord') {
+    return `Chord • ${currentChordLabel.value}`;
+  }
+  return `Scale • ${currentScaleLabel.value}`;
 });
 
 const presetsSubtitle = computed(() => {
@@ -577,19 +633,39 @@ function markChanged() {
   hasChanges.value = true;
 }
 
+function handleKeyboardChange() {
+  markChanged();
+}
+
 function handleMappingChange(mappingName: string) {
-  if (scalesFadeTimeoutId) clearTimeout(scalesFadeTimeoutId);
-  if (scalesClearTimeoutId) clearTimeout(scalesClearTimeoutId);
-  scalesSuffix.value = ` ${mappingName}`;
-  scalesSuffixFading.value = false;
-  scalesFadeTimeoutId = window.setTimeout(() => {
-    scalesSuffixFading.value = true;
-    scalesFadeTimeoutId = null;
+  if (keyboardFadeTimeoutId) clearTimeout(keyboardFadeTimeoutId);
+  if (keyboardClearTimeoutId) clearTimeout(keyboardClearTimeoutId);
+  keyboardSuffix.value = ` ${mappingName}`;
+  keyboardSuffixFading.value = false;
+  keyboardFadeTimeoutId = window.setTimeout(() => {
+    keyboardSuffixFading.value = true;
+    keyboardFadeTimeoutId = null;
   }, 500);
-  scalesClearTimeoutId = window.setTimeout(() => {
-    scalesSuffix.value = '';
-    scalesSuffixFading.value = false;
-    scalesClearTimeoutId = null;
+  keyboardClearTimeoutId = window.setTimeout(() => {
+    keyboardSuffix.value = '';
+    keyboardSuffixFading.value = false;
+    keyboardClearTimeoutId = null;
+  }, 2500);
+}
+
+function handleChordStyleChange(styleName: string) {
+  if (keyboardFadeTimeoutId) clearTimeout(keyboardFadeTimeoutId);
+  if (keyboardClearTimeoutId) clearTimeout(keyboardClearTimeoutId);
+  keyboardSuffix.value = ` ${styleName}`;
+  keyboardSuffixFading.value = false;
+  keyboardFadeTimeoutId = window.setTimeout(() => {
+    keyboardSuffixFading.value = true;
+    keyboardFadeTimeoutId = null;
+  }, 500);
+  keyboardClearTimeoutId = window.setTimeout(() => {
+    keyboardSuffix.value = '';
+    keyboardSuffixFading.value = false;
+    keyboardClearTimeoutId = null;
   }, 2500);
 }
 
@@ -653,7 +729,7 @@ async function handleSaveToDevice() {
 
 // Accordion refs
 const presetsAccordion = ref<InstanceType<typeof AccordionSection> | null>(null);
-const scalesAccordion = ref<InstanceType<typeof AccordionSection> | null>(null);
+const keyboardAccordion = ref<InstanceType<typeof AccordionSection> | null>(null);
 const lever1Accordion = ref<InstanceType<typeof AccordionSection> | null>(null);
 const leverPush1Accordion = ref<InstanceType<typeof AccordionSection> | null>(null);
 const lever2Accordion = ref<InstanceType<typeof AccordionSection> | null>(null);
@@ -663,7 +739,7 @@ const systemAccordion = ref<InstanceType<typeof AccordionSection> | null>(null);
 
 function closeAllAccordions() {
   presetsAccordion.value?.close();
-  scalesAccordion.value?.close();
+  keyboardAccordion.value?.close();
   lever1Accordion.value?.close();
   leverPush1Accordion.value?.close();
   lever2Accordion.value?.close();

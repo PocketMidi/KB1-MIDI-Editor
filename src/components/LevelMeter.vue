@@ -116,12 +116,16 @@ const handleMarkerTouchStart = (e: TouchEvent) => {
   if (e.touches.length !== 1) return
   const target = e.currentTarget as HTMLElement
   const rect = target.getBoundingClientRect()
-  updateValueFromPosition(e.touches[0].clientX, rect)
+  const touch = e.touches[0]
+  if (!touch) return
+  updateValueFromPosition(touch.clientX, rect)
   
   const handleTouchMove = (e: TouchEvent) => {
     if (e.touches.length !== 1) return
+    const touch = e.touches[0]
+    if (!touch) return
     e.preventDefault()
-    updateValueFromPosition(e.touches[0].clientX, rect)
+    updateValueFromPosition(touch.clientX, rect)
   }
   
   const handleTouchEnd = () => {

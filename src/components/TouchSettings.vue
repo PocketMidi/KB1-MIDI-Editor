@@ -41,6 +41,8 @@
       :max="userMax" 
       :is-bipolar="false"
       mode="range"
+      @update:min="userMin = $event"
+      @update:max="userMax = $event"
     />
 
     <div class="inputs">

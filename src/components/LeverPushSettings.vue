@@ -68,6 +68,9 @@
       :is-bipolar="false"
       :mode="isResetMode ? 'reset' : 'range'"
       :value="resetValue"
+      @update:min="userMin = $event"
+      @update:max="userMax = $event"
+      @update:value="resetValue = $event"
     />
 
     <div class="inputs">

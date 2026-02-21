@@ -70,6 +70,8 @@
       :min="userMin" 
       :max="userMax" 
       :is-bipolar="model.valueMode === 1"
+      @update:min="userMin = $event"
+      @update:max="userMax = $event"
     />
 
     <div class="inputs">

@@ -1,7 +1,11 @@
 <template>
   <div class="level-meter">
     <!-- Dots/Triangles container -->
-    <div class="markers-container">
+    <div 
+      class="markers-container"
+      @mousedown="handleMarkerMouseDown"
+      @touchstart="handleMarkerTouchStart"
+    >
       <!-- Reset mode: triangles -->
       <template v-if="mode === 'reset'">
         <div 
@@ -53,6 +57,81 @@ const props = withDefaults(defineProps<{
   mode: 'range',
   value: 70
 })
+
+const emit = defineEmits<{
+  'update:min': [value: number]
+  'update:max': [value: number]
+  'update:value': [value: number]
+}>()
+
+// Direct marker interaction handlers
+const updateValueFromPosition = (clientX: number, rect: DOMRect) => {
+  const rangeMin = props.isBipolar ? -100 : 0
+  const rangeMax = 100
+  const rangeSpan = rangeMax - rangeMin
+  
+  const percentage = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100))
+  const clickedValue = rangeMin + (percentage / 100) * rangeSpan
+  
+  if (props.mode === 'reset') {
+    // In reset mode, update the single value
+    emit('update:value', Math.round(clickedValue))
+  } else {
+    // In range mode, update whichever is closer (min or max)
+    const distToMin = Math.abs(clickedValue - props.min)
+    const distToMax = Math.abs(clickedValue - props.max)
+    
+    if (distToMin < distToMax) {
+      // Update min, but don't go above max
+      const newMin = Math.min(Math.round(clickedValue), props.max)
+      emit('update:min', newMin)
+    } else {
+      // Update max, but don't go below min
+      const newMax = Math.max(Math.round(clickedValue), props.min)
+      emit('update:max', newMax)
+    }
+  }
+}
+
+const handleMarkerMouseDown = (e: MouseEvent) => {
+  e.preventDefault()
+  const target = e.currentTarget as HTMLElement
+  const rect = target.getBoundingClientRect()
+  updateValueFromPosition(e.clientX, rect)
+  
+  const handleMouseMove = (e: MouseEvent) => {
+    updateValueFromPosition(e.clientX, rect)
+  }
+  
+  const handleMouseUp = () => {
+    document.removeEventListener('mousemove', handleMouseMove)
+    document.removeEventListener('mouseup', handleMouseUp)
+  }
+  
+  document.addEventListener('mousemove', handleMouseMove)
+  document.addEventListener('mouseup', handleMouseUp)
+}
+
+const handleMarkerTouchStart = (e: TouchEvent) => {
+  if (e.touches.length !== 1) return
+  const target = e.currentTarget as HTMLElement
+  const rect = target.getBoundingClientRect()
+  updateValueFromPosition(e.touches[0].clientX, rect)
+  
+  const handleTouchMove = (e: TouchEvent) => {
+    if (e.touches.length !== 1) return
+    e.preventDefault()
+    updateValueFromPosition(e.touches[0].clientX, rect)
+  }
+  
+  const handleTouchEnd = () => {
+    document.removeEventListener('touchmove', handleTouchMove)
+    document.removeEventListener('touchend', handleTouchEnd)
+  }
+  
+  document.addEventListener('touchmove', handleTouchMove, { passive: false })
+  document.addEventListener('touchend', handleTouchEnd)
+}
 
 interface Marker {
   position: number
@@ -136,6 +215,8 @@ const labels = computed<Label[]>(() => {
   height: 13px;
   width: 100%;
   margin-bottom: 1rem;
+  cursor: pointer;
+  user-select: none;
 }
 
 .dot {

@@ -105,7 +105,11 @@
       <div class="smart-slider-section">
         <!-- Duration Meter Visual -->
         <div class="duration-meter">
-          <div class="meter-bar-container">
+          <div 
+            class="meter-bar-container"
+            @mousedown="handleBarMouseDown"
+            @touchstart="handleBarTouchStart"
+          >
             <div class="meter-divider"></div>
             <div class="meter-bar-wrapper">
               <div class="meter-bar green-bar-base"></div>
@@ -394,6 +398,58 @@ const sliderPercentage = computed(() => {
   const value = smartSliderValue.value - smartSliderMin.value
   return (value / range) * 100
 })
+
+// Direct bar interaction handlers
+const updateValueFromPosition = (clientX: number, rect: DOMRect) => {
+  const percentage = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100))
+  const range = smartSliderMax.value - smartSliderMin.value
+  const newValue = Math.round(smartSliderMin.value + (percentage / 100) * range)
+  smartSliderValue.value = Math.max(smartSliderMin.value, Math.min(smartSliderMax.value, newValue))
+}
+
+const handleBarMouseDown = (e: MouseEvent) => {
+  e.preventDefault()
+  const target = e.currentTarget as HTMLElement
+  const rect = target.getBoundingClientRect()
+  updateValueFromPosition(e.clientX, rect)
+  
+  const handleMouseMove = (e: MouseEvent) => {
+    updateValueFromPosition(e.clientX, rect)
+  }
+  
+  const handleMouseUp = () => {
+    document.removeEventListener('mousemove', handleMouseMove)
+    document.removeEventListener('mouseup', handleMouseUp)
+  }
+  
+  document.addEventListener('mousemove', handleMouseMove)
+  document.addEventListener('mouseup', handleMouseUp)
+}
+
+const handleBarTouchStart = (e: TouchEvent) => {
+  if (e.touches.length !== 1) return
+  const target = e.currentTarget as HTMLElement
+  const rect = target.getBoundingClientRect()
+  const touch = e.touches[0]
+  if (!touch) return
+  updateValueFromPosition(touch.clientX, rect)
+  
+  const handleTouchMove = (e: TouchEvent) => {
+    if (e.touches.length !== 1) return
+    const touch = e.touches[0]
+    if (!touch) return
+    e.preventDefault()
+    updateValueFromPosition(touch.clientX, rect)
+  }
+  
+  const handleTouchEnd = () => {
+    document.removeEventListener('touchmove', handleTouchMove)
+    document.removeEventListener('touchend', handleTouchEnd)
+  }
+  
+  document.addEventListener('touchmove', handleTouchMove, { passive: false })
+  document.addEventListener('touchend', handleTouchEnd)
+}
 
 // Cleanup timeouts on unmount
 onBeforeUnmount(() => {
@@ -698,6 +754,8 @@ function isRootNote(midiNote: number): boolean {
   align-items: center;
   gap: 0;
   height: 17px;
+  cursor: pointer;
+  user-select: none;
 }
 
 .meter-bar-wrapper {

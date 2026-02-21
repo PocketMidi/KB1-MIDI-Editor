@@ -562,7 +562,6 @@ function renamePreset(id: string) {
   if (!preset) return;
 
   renamingId.value = id;
-  renamingDeviceSlot.value = null;
   renameValue.value = preset.name;
   showRenameDialog.value = true;
   openMenuId.value = null;
